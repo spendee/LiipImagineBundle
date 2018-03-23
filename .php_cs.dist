@@ -25,6 +25,9 @@ return Config::create()
     ->setUsingCache(true)
     ->setRiskyAllowed(true)
     ->setFinder((new Finder())->in(__DIR__))
+    ->setHideProgress(false)
+    ->setLineEnding("\n")
+    ->setIndent('    ')
     ->setRules([
         '@Symfony' => true,
         '@Symfony:risky' => true,
