@@ -23,7 +23,7 @@ class FlysystemLoaderFactory extends AbstractLoaderFactory
     public function create(ContainerBuilder $container, $loaderName, array $config)
     {
         $definition = $this->getChildLoaderDefinition();
-        $definition->replaceArgument(1, new Reference($config['filesystem_service']));
+        $definition->replaceArgument(0, new Reference($config['filesystem_service']));
 
         return $this->setTaggedLoaderDefinition($loaderName, $definition, $container);
     }

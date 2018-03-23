@@ -15,7 +15,10 @@ use Imagine\Image\ImageInterface;
 use Imagine\Image\ImagineInterface;
 use Imagine\Image\Metadata\MetadataBag;
 use Liip\ImagineBundle\Binary\Loader\LoaderInterface;
-use Liip\ImagineBundle\Binary\MimeTypeGuesserInterface;
+use Liip\ImagineBundle\File\Guesser\ContentTypeGuesser;
+use Liip\ImagineBundle\File\Guesser\ExtensionGuesser;
+use Liip\ImagineBundle\File\Guesser\GuesserInterface;
+use Liip\ImagineBundle\File\Guesser\GuesserManager;
 use Liip\ImagineBundle\Imagine\Cache\CacheManager;
 use Liip\ImagineBundle\Imagine\Cache\Resolver\ResolverInterface;
 use Liip\ImagineBundle\Imagine\Cache\SignerInterface;
@@ -29,6 +32,8 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesserInterface;
+use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser as SymfonyExtensionGuesser;
+use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
 use Symfony\Component\Routing\RouterInterface;
 
 abstract class AbstractTest extends TestCase
@@ -195,11 +200,11 @@ abstract class AbstractTest extends TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|MimeTypeGuesserInterface
+     * @return \PHPUnit_Framework_MockObject_MockObject|GuesserInterface
      */
     protected function createMimeTypeGuesserInterfaceMock()
     {
-        return $this->createObjectMock(MimeTypeGuesserInterface::class);
+        return $this->createObjectMock(GuesserInterface::class);
     }
 
     /**
@@ -231,7 +236,7 @@ abstract class AbstractTest extends TestCase
      */
     protected function createFilterServiceMock()
     {
-        return $this->createObjectMock('\Liip\ImagineBundle\Service\FilterService');
+        return $this->createObjectMock(FilterService::class);
     }
 
     /**
@@ -240,6 +245,49 @@ abstract class AbstractTest extends TestCase
     protected function createDataManagerMock()
     {
         return $this->createObjectMock(DataManager::class, [], false);
+    }
+
+    /**
+     * @param array ...$guessers
+     *
+     * @return ContentTypeGuesser
+     */
+    protected function createFileContentTypeGuesser(...$guessers): ContentTypeGuesser
+    {
+        $g = new ContentTypeGuesser(...$guessers);
+
+        if (0 === count($guessers)) {
+            $g->register(MimeTypeGuesser::getInstance());
+        }
+
+        return $g;
+    }
+
+    /**
+     * @param array ...$guessers
+     *
+     * @return ExtensionGuesser
+     */
+    protected function createFileExtensionGuesser(...$guessers): ExtensionGuesser
+    {
+        $g = new ExtensionGuesser(...$guessers);
+
+        if (0 === count($guessers)) {
+            $g->register(SymfonyExtensionGuesser::getInstance());
+        }
+
+        return $g;
+    }
+
+    /**
+     * @return GuesserManager
+     */
+    protected function createFileGuesserManager($contentTypeGuessers = [], $extensionGuessers = []): GuesserManager
+    {
+        return new GuesserManager(
+            $this->createFileContentTypeGuesser(...$contentTypeGuessers),
+            $this->createFileExtensionGuesser(...$extensionGuessers)
+        );
     }
 
     /**

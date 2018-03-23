@@ -11,8 +11,8 @@
 
 namespace Liip\ImagineBundle\Imagine\Filter\PostProcessor;
 
-use Liip\ImagineBundle\Binary\BinaryInterface;
-use Liip\ImagineBundle\Model\Binary;
+use Liip\ImagineBundle\File\FileInterface;
+use Liip\ImagineBundle\File\FileContent;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 
@@ -63,45 +63,41 @@ class MozJpegPostProcessor implements PostProcessorInterface
     }
 
     /**
-     * @param BinaryInterface $binary
-     * @param array           $options
+     * @param FileInterface $file
+     * @param array         $options
      *
      * @throws ProcessFailedException
      *
-     * @return BinaryInterface
+     * @return FileInterface
      */
-    public function process(BinaryInterface $binary, array $options = []): BinaryInterface
+    public function process(FileInterface $file, array $options = []): FileInterface
     {
-        $type = mb_strtolower($binary->getMimeType());
-        if (!in_array($type, ['image/jpeg', 'image/jpg'], true)) {
-            return $binary;
+        if (!$file->contentType()->isEquivalent('image', 'jpg') && !$file->contentType()->isEquivalent('image', 'jpeg')) {
+            return $file;
         }
 
-        $processArguments = [$this->mozjpegBin];
+        $arguments = [$this->mozjpegBin];
 
         // Places emphasis on DC
-        $processArguments[] = '-quant-table';
-        $processArguments[] = 2;
+        $arguments[] = '-quant-table';
+        $arguments[] = 2;
 
-        $transformQuality = array_key_exists('quality', $options) ? $options['quality'] : $this->quality;
-        if (null !== $transformQuality) {
-            $processArguments[] = '-quality';
-            $processArguments[] = $transformQuality;
+        if (null !== $quality = ($options['quality'] ?? $this->quality)) {
+            $arguments[] = '-quality';
+            $arguments[] = $quality;
         }
 
-        $processArguments[] = '-optimise';
+        $arguments[] = '-optimise';
 
         // Favor stdin/stdout so we don't waste time creating a new file.
-        $proc = new Process($processArguments);
-        $proc->setInput($binary->getContent());
-        $proc->run();
+        $process = new Process($arguments);
+        $process->setInput($file->contents());
+        $process->run();
 
-        if (false !== mb_strpos($proc->getOutput(), 'ERROR') || 0 !== $proc->getExitCode()) {
-            throw new ProcessFailedException($proc);
+        if (false !== mb_strpos($process->getOutput(), 'ERROR') || 0 !== $process->getExitCode()) {
+            throw new ProcessFailedException($process);
         }
 
-        $result = new Binary($proc->getOutput(), $binary->getMimeType(), $binary->getFormat());
-
-        return $result;
+        return new FileContent($process->getOutput(), $file->contentType(), $file->extension());
     }
 }

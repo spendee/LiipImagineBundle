@@ -74,8 +74,8 @@ for your custom post-processor.
 
     namespace AppBundle\Imagine\Filter\PostProcessor;
 
-    use Liip\ImagineBundle\Binary\BinaryInterface;
-    use Liip\ImagineBundle\Model\Binary;
+    use Liip\ImagineBundle\File\BinaryInterface;
+    use Liip\ImagineBundle\File\Binary;
     use Liip\ImagineBundle\Imagine\Filter\PostProcessor\PostProcessorInterface;
     use Symfony\Component\Process\Exception\ProcessFailedException;
     use Symfony\Component\Process\ProcessBuilder;

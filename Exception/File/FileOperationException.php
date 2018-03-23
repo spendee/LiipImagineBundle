@@ -9,12 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Liip\ImagineBundle\Binary;
+namespace Liip\ImagineBundle\Exception\File;
 
-interface FileBinaryInterface extends BinaryInterface
+use Liip\ImagineBundle\Exception\ExceptionInterface;
+
+class FileOperationException extends \RuntimeException implements ExceptionInterface
 {
-    /**
-     * @return string
-     */
-    public function getPath();
 }

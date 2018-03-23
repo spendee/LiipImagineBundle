@@ -11,9 +11,11 @@
 
 namespace Liip\ImagineBundle\Tests\Imagine\Filter\PostProcessor;
 
-use Liip\ImagineBundle\Binary\BinaryInterface;
+use Liip\ImagineBundle\File\FileInterface;
+use Liip\ImagineBundle\File\Metadata\ContentTypeMetadata;
+use Liip\ImagineBundle\File\Metadata\ExtensionMetadata;
 use Liip\ImagineBundle\Imagine\Filter\PostProcessor\MozJpegPostProcessor;
-use Liip\ImagineBundle\Model\Binary;
+use Liip\ImagineBundle\File\FileContent;
 use Liip\ImagineBundle\Tests\AbstractTest;
 
 /**
@@ -27,9 +29,9 @@ class MozJpegPostProcessorTest extends AbstractTest
             __DIR__.'/../../../Fixtures/bash/empty-command.sh'
         );
 
-        $binary = new Binary('content', 'image/jpg', 'jpg');
+        $binary = FileContent::create('content', 'image/jpeg', 'jpeg');
         $result = $mozJpegPostProcessor->process($binary);
 
-        $this->assertInstanceOf(BinaryInterface::class, $result);
+        $this->assertInstanceOf(FileInterface::class, $result);
     }
 }

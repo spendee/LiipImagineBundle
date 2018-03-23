@@ -11,6 +11,7 @@
 
 namespace Liip\ImagineBundle\Tests\Filter;
 
+use Liip\ImagineBundle\Exception\InvalidArgumentException;
 use Liip\ImagineBundle\Imagine\Filter\Loader\FlipFilterLoader;
 use Liip\ImagineBundle\Tests\AbstractTest;
 
@@ -73,7 +74,7 @@ class FlipFilterLoaderTest extends AbstractTest
 
     public function testThrowsOnInvalidOptions()
     {
-        $this->expectException(\Liip\ImagineBundle\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The "axis" option must be set to "x", "horizontal", "y", or "vertical".');
 
         $loader = new FlipFilterLoader();

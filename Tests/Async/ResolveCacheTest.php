@@ -13,6 +13,7 @@ namespace Liip\ImagineBundle\Tests\Async;
 
 use Enqueue\Bundle\EnqueueBundle;
 use Liip\ImagineBundle\Async\ResolveCache;
+use Liip\ImagineBundle\Exception\LogicException;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -90,7 +91,7 @@ class ResolveCacheTest extends TestCase
 
     public function testThrowIfMessageMissingPathOnJsonDeserialize()
     {
-        $this->expectException(\Liip\ImagineBundle\Exception\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage('The message does not contain "path" but it is required.');
 
         ResolveCache::jsonDeserialize('{}');
@@ -98,7 +99,7 @@ class ResolveCacheTest extends TestCase
 
     public function testThrowIfMessageContainsNotSupportedFilters()
     {
-        $this->expectException(\Liip\ImagineBundle\Exception\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage('The message filters could be either null or array.');
 
         ResolveCache::jsonDeserialize('{"path": "aPath", "filters": "stringFilterIsNotAllowed"}');

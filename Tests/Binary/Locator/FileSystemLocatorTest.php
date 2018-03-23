@@ -13,6 +13,7 @@ namespace Liip\ImagineBundle\Tests\Binary\Locator;
 
 use Liip\ImagineBundle\Binary\Locator\FileSystemLocator;
 use Liip\ImagineBundle\Binary\Locator\LocatorInterface;
+use Liip\ImagineBundle\Exception\Binary\Loader\NotLoadableException;
 
 /**
  * @covers \Liip\ImagineBundle\Binary\Locator\FileSystemLocator
@@ -21,7 +22,7 @@ class FileSystemLocatorTest extends AbstractFileSystemLocatorTest
 {
     public function testThrowsIfPathHasSymbolicLinksPointOutsideRoot()
     {
-        $this->expectException(\Liip\ImagineBundle\Exception\Binary\Loader\NotLoadableException::class);
+        $this->expectException(NotLoadableException::class);
         $this->expectExceptionMessage('Source image invalid');
 
         $this->getFileSystemLocator(realpath(__DIR__.'/../../Fixtures/FileSystemLocator/root-02'))->locate('root-01/file.ext');

@@ -11,8 +11,8 @@
 
 namespace Liip\ImagineBundle\Imagine\Filter\PostProcessor;
 
-use Liip\ImagineBundle\Binary\BinaryInterface;
-use Liip\ImagineBundle\Model\Binary;
+use Liip\ImagineBundle\File\FileInterface;
+use Liip\ImagineBundle\File\FileContent;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 
@@ -62,39 +62,36 @@ class PngquantPostProcessor implements PostProcessorInterface
     }
 
     /**
-     * @param BinaryInterface $binary
+     * @param FileInterface $file
+     * @param array         $options
      *
      * @throws ProcessFailedException
      *
-     * @return BinaryInterface
+     * @return FileInterface
      */
-    public function process(BinaryInterface $binary, array $options = []): BinaryInterface
+    public function process(FileInterface $file, array $options = []): FileInterface
     {
-        $type = mb_strtolower($binary->getMimeType());
-        if (!in_array($type, ['image/png'], true)) {
-            return $binary;
+        if (!$file->contentType()->isEquivalent('image', 'png')) {
+            return $file;
         }
 
-        $processArguments = [$this->pngquantBin];
+        $arguments = [$this->pngquantBin];
 
-        // Specify quality.
-        $tranformQuality = array_key_exists('quality', $options) ? $options['quality'] : $this->quality;
-        $processArguments[] = '--quality';
-        $processArguments[] = $tranformQuality;
+        $arguments[] = '--quality';
+        $arguments[] = $options['quality'] ?? $this->quality;
 
-        // Read to/from stdout to save resources.
-        $processArguments[] = '-';
-        $proc = new Process($processArguments);
-        $proc->setInput($binary->getContent());
-        $proc->run();
+        // have process read file contents from STDIN
+        $arguments[] = '-';
 
-        // 98 and 99 are "quality too low" to compress current current image which, while isn't ideal, is not a failure
-        if (!in_array($proc->getExitCode(), [0, 98, 99], true)) {
-            throw new ProcessFailedException($proc);
+        $process = new Process($arguments);
+        $process->setInput($file->contents());
+        $process->run();
+
+        // Both 98 and 99 mean the quality was too low to compress; they aren't throwable failures
+        if (!in_array($process->getExitCode(), [0, 98, 99], true)) {
+            throw new ProcessFailedException($process);
         }
 
-        $result = new Binary($proc->getOutput(), $binary->getMimeType(), $binary->getFormat());
-
-        return $result;
+        return new FileContent($process->getOutput(), $file->contentType(), $file->extension());
     }
 }

@@ -11,7 +11,7 @@
 
 namespace Liip\ImagineBundle\Imagine\Cache;
 
-use Liip\ImagineBundle\Binary\BinaryInterface;
+use Liip\ImagineBundle\File\FileInterface;
 use Liip\ImagineBundle\Events\CacheResolveEvent;
 use Liip\ImagineBundle\Imagine\Cache\Resolver\ResolverInterface;
 use Liip\ImagineBundle\Imagine\Filter\FilterConfiguration;
@@ -208,12 +208,12 @@ class CacheManager
     /**
      * @see ResolverInterface::store
      *
-     * @param BinaryInterface $binary
-     * @param string          $path
-     * @param string          $filter
-     * @param string          $resolver
+     * @param FileInterface $binary
+     * @param string        $path
+     * @param string        $filter
+     * @param string        $resolver
      */
-    public function store(BinaryInterface $binary, $path, $filter, $resolver = null)
+    public function store(FileInterface $binary, $path, $filter, $resolver = null)
     {
         $this->getResolver($filter, $resolver)->store($binary, $path, $filter);
     }

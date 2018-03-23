@@ -9,14 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Liip\ImagineBundle\Binary;
+namespace Liip\ImagineBundle\File\Guesser;
 
-interface MimeTypeGuesserInterface
+use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesserInterface;
+
+/**
+ * @author Rob Frawley 2nd <rmf@src.run>
+ */
+final class ExtensionGuesser extends AbstractGuesser implements ExtensionGuesserInterface
 {
-    /**
-     * @param string $binary The image binary
-     *
-     * @return string|null mime type or null if it could be not be guessed
-     */
-    public function guess($binary);
 }

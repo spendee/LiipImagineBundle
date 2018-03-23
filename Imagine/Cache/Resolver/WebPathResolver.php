@@ -11,7 +11,7 @@
 
 namespace Liip\ImagineBundle\Imagine\Cache\Resolver;
 
-use Liip\ImagineBundle\Binary\BinaryInterface;
+use Liip\ImagineBundle\File\FileInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Routing\RequestContext;
 
@@ -84,11 +84,11 @@ class WebPathResolver implements ResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function store(BinaryInterface $binary, $path, $filter)
+    public function store(FileInterface $binary, $path, $filter)
     {
         $this->filesystem->dumpFile(
             $this->getFilePath($path, $filter),
-            $binary->getContent()
+            $binary->contents()
         );
     }
 

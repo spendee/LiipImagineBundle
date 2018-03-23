@@ -11,10 +11,12 @@
 
 namespace Liip\ImagineBundle\Tests\Filter;
 
-use Liip\ImagineBundle\Binary\BinaryInterface;
+use Liip\ImagineBundle\File\FileInterface;
+use Liip\ImagineBundle\File\Metadata\ContentTypeMetadata;
+use Liip\ImagineBundle\File\Metadata\ExtensionMetadata;
 use Liip\ImagineBundle\Imagine\Filter\FilterManager;
 use Liip\ImagineBundle\Imagine\Filter\Loader\LoaderInterface;
-use Liip\ImagineBundle\Model\Binary;
+use Liip\ImagineBundle\File\FileContent;
 use Liip\ImagineBundle\Tests\AbstractTest;
 
 /**
@@ -42,12 +44,12 @@ class FilterManagerTest extends AbstractTest
                 'post_processors' => [],
             ]));
 
-        $binary = new Binary('aContent', 'image/png', 'png');
+        $binary = FileContent::create('aContent', 'image/png', 'png');
 
         $filterManager = new FilterManager(
             $config,
             $this->createImagineInterfaceMock(),
-            $this->createMimeTypeGuesserInterfaceMock()
+            $this->createFileGuesserManager()
         );
 
         $filterManager->applyFilter($binary, 'thumbnail');
@@ -58,7 +60,7 @@ class FilterManagerTest extends AbstractTest
         $originalContent = 'aOriginalContent';
         $expectedFilteredContent = 'theFilteredContent';
 
-        $binary = new Binary($originalContent, 'image/png', 'png');
+        $binary = FileContent::create($originalContent, 'image/png', 'png');
 
         $thumbConfig = [
             'size' => [180, 180],
@@ -100,14 +102,14 @@ class FilterManagerTest extends AbstractTest
         $filterManager = new FilterManager(
             $config,
             $imagine,
-            $this->createMimeTypeGuesserInterfaceMock()
+            $this->createFileGuesserManager()
         );
         $filterManager->addLoader('thumbnail', $loader);
 
         $filteredBinary = $filterManager->applyFilter($binary, 'thumbnail');
 
-        $this->assertInstanceOf(Binary::class, $filteredBinary);
-        $this->assertSame($expectedFilteredContent, $filteredBinary->getContent());
+        $this->assertInstanceOf(FileContent::class, $filteredBinary);
+        $this->assertSame($expectedFilteredContent, $filteredBinary->contents());
     }
 
     public function testReturnFilteredBinaryWithFormatOfOriginalBinaryOnApplyFilter()
@@ -115,7 +117,7 @@ class FilterManagerTest extends AbstractTest
         $originalContent = 'aOriginalContent';
         $expectedFormat = 'png';
 
-        $binary = new Binary($originalContent, 'image/png', $expectedFormat);
+        $binary = FileContent::create($originalContent, 'image/png', $expectedFormat);
 
         $thumbConfig = [
             'size' => [180, 180],
@@ -156,14 +158,14 @@ class FilterManagerTest extends AbstractTest
         $filterManager = new FilterManager(
             $config,
             $imagine,
-            $this->createMimeTypeGuesserInterfaceMock()
+            $this->createFileGuesserManager()
         );
         $filterManager->addLoader('thumbnail', $loader);
 
         $filteredBinary = $filterManager->applyFilter($binary, 'thumbnail');
 
-        $this->assertInstanceOf(Binary::class, $filteredBinary);
-        $this->assertSame($expectedFormat, $filteredBinary->getFormat());
+        $this->assertInstanceOf(FileContent::class, $filteredBinary);
+        $this->assertSame($expectedFormat, (string) $filteredBinary->extension());
     }
 
     public function testReturnFilteredBinaryWithCustomFormatIfSetOnApplyFilter()
@@ -172,7 +174,7 @@ class FilterManagerTest extends AbstractTest
         $originalFormat = 'png';
         $expectedFormat = 'jpg';
 
-        $binary = new Binary($originalContent, 'image/png', $originalFormat);
+        $binary = FileContent::create($originalContent, 'image/png', $originalFormat);
 
         $thumbConfig = [
             'size' => [180, 180],
@@ -214,22 +216,19 @@ class FilterManagerTest extends AbstractTest
         $filterManager = new FilterManager(
             $config,
             $imagine,
-            $this->createMimeTypeGuesserInterfaceMock()
+            $this->createFileGuesserManager()
         );
         $filterManager->addLoader('thumbnail', $loader);
 
         $filteredBinary = $filterManager->applyFilter($binary, 'thumbnail');
 
-        $this->assertInstanceOf(Binary::class, $filteredBinary);
-        $this->assertSame($expectedFormat, $filteredBinary->getFormat());
+        $this->assertInstanceOf(FileContent::class, $filteredBinary);
+        $this->assertSame($expectedFormat, (string) $filteredBinary->extension());
     }
 
     public function testReturnFilteredBinaryWithMimeTypeOfOriginalBinaryOnApplyFilter()
     {
-        $originalContent = 'aOriginalContent';
-        $expectedMimeType = 'image/png';
-
-        $binary = new Binary($originalContent, $expectedMimeType, 'png');
+        $binary = FileContent::create('foobar', 'image/png', 'png');
 
         $thumbConfig = [
             'size' => [180, 180],
@@ -275,14 +274,14 @@ class FilterManagerTest extends AbstractTest
         $filterManager = new FilterManager(
             $config,
             $imagine,
-            $mimeTypeGuesser
+            $this->createFileGuesserManager([$mimeTypeGuesser])
         );
         $filterManager->addLoader('thumbnail', $loader);
 
         $filteredBinary = $filterManager->applyFilter($binary, 'thumbnail');
 
-        $this->assertInstanceOf(Binary::class, $filteredBinary);
-        $this->assertSame($expectedMimeType, $filteredBinary->getMimeType());
+        $this->assertInstanceOf(FileContent::class, $filteredBinary);
+        $this->assertSame('image/png', (string) $filteredBinary->contentType());
     }
 
     public function testReturnFilteredBinaryWithMimeTypeOfCustomFormatIfSetOnApplyFilter()
@@ -292,7 +291,7 @@ class FilterManagerTest extends AbstractTest
         $expectedContent = 'aFilteredContent';
         $expectedMimeType = 'image/jpeg';
 
-        $binary = new Binary($originalContent, $originalMimeType, 'png');
+        $binary = FileContent::create($originalContent, $originalMimeType, 'png');
 
         $thumbConfig = [
             'size' => [180, 180],
@@ -328,7 +327,6 @@ class FilterManagerTest extends AbstractTest
         $mimeTypeGuesser
             ->expects($this->once())
             ->method('guess')
-            ->with($expectedContent)
             ->will($this->returnValue($expectedMimeType));
 
         $loader = $this->createFilterLoaderInterfaceMock();
@@ -341,14 +339,14 @@ class FilterManagerTest extends AbstractTest
         $filterManager = new FilterManager(
             $config,
             $imagine,
-            $mimeTypeGuesser
+            $this->createFileGuesserManager([$mimeTypeGuesser])
         );
         $filterManager->addLoader('thumbnail', $loader);
 
         $filteredBinary = $filterManager->applyFilter($binary, 'thumbnail');
 
-        $this->assertInstanceOf(Binary::class, $filteredBinary);
-        $this->assertSame($expectedMimeType, $filteredBinary->getMimeType());
+        $this->assertInstanceOf(FileContent::class, $filteredBinary);
+        $this->assertSame($expectedMimeType, (string) $filteredBinary->contentType());
     }
 
     public function testAltersQualityOnApplyFilter()
@@ -356,7 +354,7 @@ class FilterManagerTest extends AbstractTest
         $originalContent = 'aOriginalContent';
         $expectedQuality = 80;
 
-        $binary = new Binary($originalContent, 'image/png', 'png');
+        $binary = FileContent::create($originalContent, 'image/png', 'png');
 
         $thumbConfig = [
             'size' => [180, 180],
@@ -399,11 +397,11 @@ class FilterManagerTest extends AbstractTest
         $filterManager = new FilterManager(
             $config,
             $imagine,
-            $this->createMimeTypeGuesserInterfaceMock()
+            $this->createFileGuesserManager()
         );
         $filterManager->addLoader('thumbnail', $loader);
 
-        $this->assertInstanceOf(Binary::class, $filterManager->applyFilter($binary, 'thumbnail'));
+        $this->assertInstanceOf(FileContent::class, $filterManager->applyFilter($binary, 'thumbnail'));
     }
 
     public function testAlters100QualityIfNotSetOnApplyFilter()
@@ -411,7 +409,7 @@ class FilterManagerTest extends AbstractTest
         $originalContent = 'aOriginalContent';
         $expectedQuality = 100;
 
-        $binary = new Binary($originalContent, 'image/png', 'png');
+        $binary = FileContent::create($originalContent, 'image/png', 'png');
 
         $thumbConfig = [
             'size' => [180, 180],
@@ -453,16 +451,16 @@ class FilterManagerTest extends AbstractTest
         $filterManager = new FilterManager(
             $config,
             $imagine,
-            $this->createMimeTypeGuesserInterfaceMock()
+            $this->createFileGuesserManager()
         );
         $filterManager->addLoader('thumbnail', $loader);
 
-        $this->assertInstanceOf(Binary::class, $filterManager->applyFilter($binary, 'thumbnail'));
+        $this->assertInstanceOf(FileContent::class, $filterManager->applyFilter($binary, 'thumbnail'));
     }
 
     public function testMergeRuntimeConfigWithOneFromFilterConfigurationOnApplyFilter()
     {
-        $binary = new Binary('aContent', 'image/png', 'png');
+        $binary = FileContent::create('aContent', 'image/png', 'png');
 
         $runtimeConfig = [
             'filters' => [
@@ -517,12 +515,12 @@ class FilterManagerTest extends AbstractTest
         $filterManager = new FilterManager(
             $config,
             $imagine,
-            $this->createMimeTypeGuesserInterfaceMock()
+            $this->createFileGuesserManager()
         );
         $filterManager->addLoader('thumbnail', $loader);
 
         $this->assertInstanceOf(
-            Binary::class,
+            FileContent::class,
             $filterManager->applyFilter($binary, 'thumbnail', $runtimeConfig)
         );
     }
@@ -532,12 +530,12 @@ class FilterManagerTest extends AbstractTest
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Could not find filter(s): "thumbnail"');
 
-        $binary = new Binary('aContent', 'image/png', 'png');
+        $binary = FileContent::create('aContent', 'image/png', 'png');
 
         $filterManager = new FilterManager(
             $this->createFilterConfigurationMock(),
             $this->createImagineInterfaceMock(),
-            $this->createMimeTypeGuesserInterfaceMock()
+            $this->createFileGuesserManager()
         );
 
         $filterManager->apply($binary, [
@@ -555,7 +553,7 @@ class FilterManagerTest extends AbstractTest
         $originalContent = 'aOriginalContent';
         $expectedFilteredContent = 'theFilteredContent';
 
-        $binary = new Binary($originalContent, 'image/png', 'png');
+        $binary = FileContent::create($originalContent, 'image/png', 'png');
 
         $thumbConfig = [
             'size' => [180, 180],
@@ -585,7 +583,7 @@ class FilterManagerTest extends AbstractTest
         $filterManager = new FilterManager(
             $this->createFilterConfigurationMock(),
             $imagineMock,
-            $this->createMimeTypeGuesserInterfaceMock()
+            $this->createFileGuesserManager()
         );
         $filterManager->addLoader('thumbnail', $loader);
 
@@ -596,8 +594,8 @@ class FilterManagerTest extends AbstractTest
             'post_processors' => [],
         ]);
 
-        $this->assertInstanceOf(Binary::class, $filteredBinary);
-        $this->assertSame($expectedFilteredContent, $filteredBinary->getContent());
+        $this->assertInstanceOf(FileContent::class, $filteredBinary);
+        $this->assertSame($expectedFilteredContent, $filteredBinary->contents());
     }
 
     public function testReturnFilteredBinaryWithFormatOfOriginalBinaryOnApply()
@@ -605,7 +603,7 @@ class FilterManagerTest extends AbstractTest
         $originalContent = 'aOriginalContent';
         $expectedFormat = 'png';
 
-        $binary = new Binary($originalContent, 'image/png', $expectedFormat);
+        $binary = FileContent::create($originalContent, 'image/png', $expectedFormat);
 
         $thumbConfig = [
             'size' => [180, 180],
@@ -634,7 +632,7 @@ class FilterManagerTest extends AbstractTest
         $filterManager = new FilterManager(
             $this->createFilterConfigurationMock(),
             $imagineMock,
-            $this->createMimeTypeGuesserInterfaceMock()
+            $this->createFileGuesserManager()
         );
         $filterManager->addLoader('thumbnail', $loader);
 
@@ -645,8 +643,8 @@ class FilterManagerTest extends AbstractTest
             'post_processors' => [],
         ]);
 
-        $this->assertInstanceOf(Binary::class, $filteredBinary);
-        $this->assertSame($expectedFormat, $filteredBinary->getFormat());
+        $this->assertInstanceOf(FileContent::class, $filteredBinary);
+        $this->assertSame($expectedFormat, (string) $filteredBinary->extension());
     }
 
     public function testReturnFilteredBinaryWithCustomFormatIfSetOnApply()
@@ -655,7 +653,7 @@ class FilterManagerTest extends AbstractTest
         $originalFormat = 'png';
         $expectedFormat = 'jpg';
 
-        $binary = new Binary($originalContent, 'image/png', $originalFormat);
+        $binary = FileContent::create($originalContent, 'image/png', $originalFormat);
 
         $thumbConfig = [
             'size' => [180, 180],
@@ -684,7 +682,7 @@ class FilterManagerTest extends AbstractTest
         $filterManager = new FilterManager(
             $this->createFilterConfigurationMock(),
             $imagineMock,
-            $this->createMimeTypeGuesserInterfaceMock()
+            $this->createFileGuesserManager()
         );
         $filterManager->addLoader('thumbnail', $loader);
 
@@ -696,8 +694,8 @@ class FilterManagerTest extends AbstractTest
             'post_processors' => [],
         ]);
 
-        $this->assertInstanceOf(Binary::class, $filteredBinary);
-        $this->assertSame($expectedFormat, $filteredBinary->getFormat());
+        $this->assertInstanceOf(FileContent::class, $filteredBinary);
+        $this->assertSame($expectedFormat, (string) $filteredBinary->extension());
     }
 
     public function testReturnFilteredBinaryWithMimeTypeOfOriginalBinaryOnApply()
@@ -705,7 +703,7 @@ class FilterManagerTest extends AbstractTest
         $originalContent = 'aOriginalContent';
         $expectedMimeType = 'image/png';
 
-        $binary = new Binary($originalContent, $expectedMimeType, 'png');
+        $binary = FileContent::create($originalContent, $expectedMimeType, 'png');
 
         $thumbConfig = [
             'size' => [180, 180],
@@ -739,7 +737,7 @@ class FilterManagerTest extends AbstractTest
         $filterManager = new FilterManager(
             $this->createFilterConfigurationMock(),
             $imagineMock,
-            $mimeTypeGuesser
+            $this->createFileGuesserManager([$mimeTypeGuesser])
         );
         $filterManager->addLoader('thumbnail', $loader);
 
@@ -750,8 +748,8 @@ class FilterManagerTest extends AbstractTest
             'post_processors' => [],
         ]);
 
-        $this->assertInstanceOf(Binary::class, $filteredBinary);
-        $this->assertSame($expectedMimeType, $filteredBinary->getMimeType());
+        $this->assertInstanceOf(FileContent::class, $filteredBinary);
+        $this->assertSame($expectedMimeType, (string) $filteredBinary->contentType());
     }
 
     public function testReturnFilteredBinaryWithMimeTypeOfCustomFormatIfSetOnApply()
@@ -761,7 +759,7 @@ class FilterManagerTest extends AbstractTest
         $expectedContent = 'aFilteredContent';
         $expectedMimeType = 'image/jpeg';
 
-        $binary = new Binary($originalContent, $originalMimeType, 'png');
+        $binary = FileContent::create($originalContent, $originalMimeType, 'png');
 
         $thumbConfig = [
             'size' => [180, 180],
@@ -784,7 +782,6 @@ class FilterManagerTest extends AbstractTest
         $mimeTypeGuesser
             ->expects($this->once())
             ->method('guess')
-            ->with($expectedContent)
             ->will($this->returnValue($expectedMimeType));
 
         $loader = $this->createFilterLoaderInterfaceMock();
@@ -797,7 +794,7 @@ class FilterManagerTest extends AbstractTest
         $filterManager = new FilterManager(
             $this->createFilterConfigurationMock(),
             $imagineMock,
-            $mimeTypeGuesser
+            $this->createFileGuesserManager([$mimeTypeGuesser])
         );
         $filterManager->addLoader('thumbnail', $loader);
 
@@ -809,8 +806,8 @@ class FilterManagerTest extends AbstractTest
             'post_processors' => [],
         ]);
 
-        $this->assertInstanceOf(Binary::class, $filteredBinary);
-        $this->assertSame($expectedMimeType, $filteredBinary->getMimeType());
+        $this->assertInstanceOf(FileContent::class, $filteredBinary);
+        $this->assertSame($expectedMimeType, (string) $filteredBinary->contentType());
     }
 
     public function testAltersQualityOnApply()
@@ -818,7 +815,7 @@ class FilterManagerTest extends AbstractTest
         $originalContent = 'aOriginalContent';
         $expectedQuality = 80;
 
-        $binary = new Binary($originalContent, 'image/png', 'png');
+        $binary = FileContent::create($originalContent, 'image/png', 'png');
 
         $thumbConfig = [
             'size' => [180, 180],
@@ -848,7 +845,7 @@ class FilterManagerTest extends AbstractTest
         $filterManager = new FilterManager(
             $this->createFilterConfigurationMock(),
             $imagineMock,
-            $this->createMimeTypeGuesserInterfaceMock()
+            $this->createFileGuesserManager()
         );
         $filterManager->addLoader('thumbnail', $loader);
 
@@ -860,7 +857,7 @@ class FilterManagerTest extends AbstractTest
             'post_processors' => [],
         ]);
 
-        $this->assertInstanceOf(Binary::class, $filteredBinary);
+        $this->assertInstanceOf(FileContent::class, $filteredBinary);
     }
 
     public function testAlters100QualityIfNotSetOnApply()
@@ -868,7 +865,7 @@ class FilterManagerTest extends AbstractTest
         $originalContent = 'aOriginalContent';
         $expectedQuality = 100;
 
-        $binary = new Binary($originalContent, 'image/png', 'png');
+        $binary = FileContent::create($originalContent, 'image/png', 'png');
 
         $thumbConfig = [
             'size' => [180, 180],
@@ -898,7 +895,7 @@ class FilterManagerTest extends AbstractTest
         $filterManager = new FilterManager(
             $this->createFilterConfigurationMock(),
             $imagineMock,
-            $this->createMimeTypeGuesserInterfaceMock()
+            $this->createFileGuesserManager()
         );
         $filterManager->addLoader('thumbnail', $loader);
 
@@ -909,14 +906,14 @@ class FilterManagerTest extends AbstractTest
             'post_processors' => [],
         ]);
 
-        $this->assertInstanceOf(Binary::class, $filteredBinary);
+        $this->assertInstanceOf(FileContent::class, $filteredBinary);
     }
 
     public function testApplyPostProcessor()
     {
         $originalContent = 'aContent';
         $expectedPostProcessedContent = 'postProcessedContent';
-        $binary = new Binary($originalContent, 'image/png', 'png');
+        $binary = FileContent::create($originalContent, 'image/png', 'png');
 
         $thumbConfig = [
             'size' => [180, 180],
@@ -962,7 +959,7 @@ class FilterManagerTest extends AbstractTest
             ->with($this->identicalTo($image), $thumbConfig)
             ->will($this->returnArgument(0));
 
-        $processedBinary = new Binary($expectedPostProcessedContent, 'image/png', 'png');
+        $processedBinary = FileContent::create($expectedPostProcessedContent, 'image/png', 'png');
 
         $postProcessor = $this->createPostProcessorInterfaceMock();
         $postProcessor
@@ -974,14 +971,14 @@ class FilterManagerTest extends AbstractTest
         $filterManager = new FilterManager(
             $config,
             $imagineMock,
-            $this->createMimeTypeGuesserInterfaceMock()
+            $this->createFileGuesserManager()
         );
         $filterManager->addLoader('thumbnail', $loader);
         $filterManager->addPostProcessor('foo', $postProcessor);
 
         $filteredBinary = $filterManager->applyFilter($binary, 'thumbnail');
-        $this->assertInstanceOf(Binary::class, $filteredBinary);
-        $this->assertSame($expectedPostProcessedContent, $filteredBinary->getContent());
+        $this->assertInstanceOf(FileContent::class, $filteredBinary);
+        $this->assertSame($expectedPostProcessedContent, $filteredBinary->contents());
     }
 
     public function testThrowsIfNoPostProcessorAddedForFilterOnApplyFilter()
@@ -990,7 +987,7 @@ class FilterManagerTest extends AbstractTest
         $this->expectExceptionMessage('Could not find post processor(s): "foo"');
 
         $originalContent = 'aContent';
-        $binary = new Binary($originalContent, 'image/png', 'png');
+        $binary = FileContent::create($originalContent, 'image/png', 'png');
 
         $thumbConfig = [
             'size' => [180, 180],
@@ -1039,7 +1036,7 @@ class FilterManagerTest extends AbstractTest
         $filterManager = new FilterManager(
             $config,
             $imagineMock,
-            $this->createMimeTypeGuesserInterfaceMock()
+            $this->createFileGuesserManager()
         );
 
         $filterManager->addLoader('thumbnail', $loader);
@@ -1048,11 +1045,11 @@ class FilterManagerTest extends AbstractTest
 
     public function testApplyPostProcessorsWhenNotDefined()
     {
-        $binary = $this->getMockBuilder(BinaryInterface::class)->getMock();
+        $binary = $this->getMockBuilder(FileInterface::class)->getMock();
         $filterManager = new FilterManager(
             $this->createFilterConfigurationMock(),
             $this->createImagineInterfaceMock(),
-            $this->createMimeTypeGuesserInterfaceMock()
+            $this->createFileGuesserManager()
         );
 
         $this->assertSame($binary, $filterManager->applyPostProcessors($binary, []));

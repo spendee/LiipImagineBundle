@@ -11,7 +11,7 @@
 
 namespace Liip\ImagineBundle\Binary\Loader;
 
-use Liip\ImagineBundle\Binary\BinaryInterface;
+use Liip\ImagineBundle\File\FileInterface;
 
 interface LoaderInterface
 {
@@ -22,7 +22,7 @@ interface LoaderInterface
      *
      * @param mixed $path
      *
-     * @return BinaryInterface|string An image binary content
+     * @return FileInterface|string An image binary content
      */
     public function find($path);
 }

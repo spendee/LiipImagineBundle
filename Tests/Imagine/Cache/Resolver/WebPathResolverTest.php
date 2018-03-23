@@ -11,9 +11,11 @@
 
 namespace Liip\ImagineBundle\Tests\Imagine\Cache\Resolver;
 
+use Liip\ImagineBundle\File\Metadata\ContentTypeMetadata;
+use Liip\ImagineBundle\File\Metadata\ExtensionMetadata;
 use Liip\ImagineBundle\Imagine\Cache\Resolver\ResolverInterface;
 use Liip\ImagineBundle\Imagine\Cache\Resolver\WebPathResolver;
-use Liip\ImagineBundle\Model\Binary;
+use Liip\ImagineBundle\File\FileContent;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Routing\RequestContext;
@@ -289,7 +291,7 @@ class WebPathResolverTest extends TestCase
 
     public function testDumpBinaryContentOnStore()
     {
-        $binary = new Binary('theContent', 'aMimeType', 'aFormat');
+        $binary = FileContent::create('theContent', 'a/content-type', 'format');
 
         $filesystemMock = $this->createFilesystemMock();
         $filesystemMock
@@ -304,7 +306,7 @@ class WebPathResolverTest extends TestCase
             'aCachePrefix'
         );
 
-        $this->assertNull($resolver->store($binary, 'aPath', 'aFilter'));
+        $resolver->store($binary, 'aPath', 'aFilter');
     }
 
     public function testDoNothingIfFiltersAndPathsEmptyOnRemove()

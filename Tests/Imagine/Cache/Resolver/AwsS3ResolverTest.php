@@ -13,9 +13,12 @@ namespace Liip\ImagineBundle\Tests\Imagine\Cache\Resolver;
 
 use Aws\S3\S3Client;
 use Guzzle\Service\Resource\Model;
+use Liip\ImagineBundle\Exception\Imagine\Cache\Resolver\NotStorableException;
+use Liip\ImagineBundle\File\Metadata\ContentTypeMetadata;
+use Liip\ImagineBundle\File\Metadata\ExtensionMetadata;
 use Liip\ImagineBundle\Imagine\Cache\Resolver\AwsS3Resolver;
 use Liip\ImagineBundle\Imagine\Cache\Resolver\ResolverInterface;
-use Liip\ImagineBundle\Model\Binary;
+use Liip\ImagineBundle\File\FileContent;
 use Liip\ImagineBundle\Tests\AbstractTest;
 
 /**
@@ -57,10 +60,10 @@ class AwsS3ResolverTest extends AbstractTest
 
     public function testLogNotCreatedObjects()
     {
-        $this->expectException(\Liip\ImagineBundle\Exception\Imagine\Cache\Resolver\NotStorableException::class);
+        $this->expectException(NotStorableException::class);
         $this->expectExceptionMessage('The object could not be created on Amazon S3');
 
-        $binary = new Binary('aContent', 'image/jpeg', 'jpeg');
+        $binary = FileContent::create('aContent', 'image/jpeg', 'jpeg');
 
         $s3 = $this->getS3ClientMock();
         $s3
@@ -80,7 +83,7 @@ class AwsS3ResolverTest extends AbstractTest
 
     public function testCreateObjectOnAmazon()
     {
-        $binary = new Binary('aContent', 'image/jpeg', 'jpeg');
+        $binary = FileContent::create('aContent', 'image/jpeg', 'jpeg');
 
         $s3 = $this->getS3ClientMock();
         $s3
@@ -94,7 +97,7 @@ class AwsS3ResolverTest extends AbstractTest
 
     public function testObjectOptionsPassedToS3ClintOnCreate()
     {
-        $binary = new Binary('aContent', 'image/jpeg', 'jpeg');
+        $binary = FileContent::create('aContent', 'image/jpeg', 'jpeg');
 
         $s3 = $this->getS3ClientMock();
         $s3

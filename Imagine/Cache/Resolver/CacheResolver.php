@@ -12,7 +12,7 @@
 namespace Liip\ImagineBundle\Imagine\Cache\Resolver;
 
 use Doctrine\Common\Cache\Cache;
-use Liip\ImagineBundle\Binary\BinaryInterface;
+use Liip\ImagineBundle\File\FileInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CacheResolver implements ResolverInterface
@@ -93,7 +93,7 @@ class CacheResolver implements ResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function store(BinaryInterface $binary, $path, $filter)
+    public function store(FileInterface $binary, $path, $filter)
     {
         $this->resolver->store($binary, $path, $filter);
     }

@@ -20,8 +20,10 @@ use Liip\ImagineBundle\Async\CacheResolved;
 use Liip\ImagineBundle\Async\Commands;
 use Liip\ImagineBundle\Async\ResolveCacheProcessor;
 use Liip\ImagineBundle\Async\Topics;
+use Liip\ImagineBundle\File\Metadata\ContentTypeMetadata;
+use Liip\ImagineBundle\File\Metadata\ExtensionMetadata;
 use Liip\ImagineBundle\Imagine\Filter\FilterConfiguration;
-use Liip\ImagineBundle\Model\Binary;
+use Liip\ImagineBundle\File\FileContent;
 use Liip\ImagineBundle\Service\FilterService;
 use Liip\ImagineBundle\Tests\AbstractTest;
 
@@ -476,10 +478,10 @@ class ResolveCacheProcessorTest extends AbstractTest
     }
 
     /**
-     * @return Binary
+     * @return FileContent
      */
     private function createDummyBinary()
     {
-        return new Binary('theContent', 'image/png', 'png');
+        return FileContent::create('theContent', 'image/png', 'png');
     }
 }

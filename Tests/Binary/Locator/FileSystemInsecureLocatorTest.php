@@ -13,6 +13,7 @@ namespace Liip\ImagineBundle\Tests\Binary\Locator;
 
 use Liip\ImagineBundle\Binary\Locator\FileSystemInsecureLocator;
 use Liip\ImagineBundle\Binary\Locator\LocatorInterface;
+use Liip\ImagineBundle\Exception\Binary\Loader\NotLoadableException;
 
 /**
  * @covers \Liip\ImagineBundle\Binary\Locator\FileSystemInsecureLocator
@@ -27,7 +28,7 @@ class FileSystemInsecureLocatorTest extends AbstractFileSystemLocatorTest
 
     public function testThrowsIfPathHasDoublePeriodBackStep()
     {
-        $this->expectException(\Liip\ImagineBundle\Exception\Binary\Loader\NotLoadableException::class);
+        $this->expectException(NotLoadableException::class);
         $this->expectExceptionMessage('Source image not resolvable');
 
         $this->getFileSystemLocator(realpath(__DIR__.'/../../Fixtures/FileSystemLocator/root-02'))->locate('/../root-01/file.ext');

@@ -15,15 +15,15 @@ use Liip\ImagineBundle\Binary\Loader\FileSystemLoader;
 use Liip\ImagineBundle\Binary\Loader\LoaderInterface;
 use Liip\ImagineBundle\Binary\Locator\FileSystemLocator;
 use Liip\ImagineBundle\Binary\Locator\LocatorInterface;
-use Liip\ImagineBundle\Model\FileBinary;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser;
-use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
+use Liip\ImagineBundle\Exception\Binary\Loader\NotLoadableException;
+use Liip\ImagineBundle\Exception\InvalidArgumentException;
+use Liip\ImagineBundle\File\FileReference;
+use Liip\ImagineBundle\Tests\AbstractTest;
 
 /**
  * @covers \Liip\ImagineBundle\Binary\Loader\FileSystemLoader
  */
-class FileSystemLoaderTest extends TestCase
+class FileSystemLoaderTest extends AbstractTest
 {
     public function testConstruction()
     {
@@ -119,7 +119,7 @@ class FileSystemLoaderTest extends TestCase
 
     public function testThrowsIfRootPathDoesNotExist()
     {
-        $this->expectException(\Liip\ImagineBundle\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Root image path not resolvable');
 
         $loader = $this->getFileSystemLoader(['/a/bad/root/path']);
@@ -145,7 +145,7 @@ class FileSystemLoaderTest extends TestCase
      */
     public function testThrowsIfRealPathOutsideRootPath($path)
     {
-        $this->expectException(\Liip\ImagineBundle\Exception\Binary\Loader\NotLoadableException::class);
+        $this->expectException(NotLoadableException::class);
         $this->expectExceptionMessage('Source image invalid');
 
         $loader = $this->getFileSystemLoader()->find($path);
@@ -160,7 +160,7 @@ class FileSystemLoaderTest extends TestCase
 
     public function testThrowsIfFileDoesNotExist()
     {
-        $this->expectException(\Liip\ImagineBundle\Exception\Binary\Loader\NotLoadableException::class);
+        $this->expectException(NotLoadableException::class);
         $this->expectExceptionMessage('Source image not resolvable');
 
         $loader = $this->getFileSystemLoader()->find('fileNotExist');
@@ -195,19 +195,18 @@ class FileSystemLoaderTest extends TestCase
     private function getFileSystemLoader(array $roots = [], LocatorInterface $locator = null)
     {
         return new FileSystemLoader(
-            MimeTypeGuesser::getInstance(),
-            ExtensionGuesser::getInstance(),
-            null !== $locator ? $locator : $this->getFileSystemLocator(count($roots) ? $roots : $this->getDefaultDataRoots())
+            null !== $locator ? $locator : $this->getFileSystemLocator(count($roots) ? $roots : $this->getDefaultDataRoots()),
+            $this->createFileGuesserManager()
         );
     }
 
     /**
-     * @param FileBinary|mixed $return
-     * @param string|null      $message
+     * @param FileReference|mixed $return
+     * @param string|null         $message
      */
     private function assertValidLoaderFindReturn($return, $message = null)
     {
-        $this->assertInstanceOf(FileBinary::class, $return, $message);
-        $this->assertStringStartsWith('text/', $return->getMimeType(), $message);
+        $this->assertInstanceOf(FileReference::class, $return, $message);
+        $this->assertStringStartsWith('text/', $return->contentType()->__toString(), $message);
     }
 }

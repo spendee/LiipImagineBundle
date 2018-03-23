@@ -44,11 +44,8 @@ final class ResolveCacheProcessor implements PsrProcessor, CommandSubscriberInte
      * @param FilterService     $filterService
      * @param ProducerInterface $producer
      */
-    public function __construct(
-        FilterManager $filterManager,
-        FilterService $filterService,
-        ProducerInterface $producer
-    ) {
+    public function __construct(FilterManager $filterManager, FilterService $filterService, ProducerInterface $producer)
+    {
         $this->filterManager = $filterManager;
         $this->filterService = $filterService;
         $this->producer = $producer;

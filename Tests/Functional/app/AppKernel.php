@@ -11,6 +11,10 @@
 
 namespace Liip\ImagineBundle\Tests\Functional\app;
 
+use Liip\ImagineBundle\LiipImagineBundle;
+use Liip\ImagineBundle\Tests\Functional\Fixtures\BarBundle\LiipBarBundle;
+use Liip\ImagineBundle\Tests\Functional\Fixtures\FooBundle\LiipFooBundle;
+use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\HttpKernel\Kernel;
 
@@ -22,10 +26,10 @@ class AppKernel extends Kernel
     public function registerBundles()
     {
         $bundles = [
-            new \Symfony\Bundle\FrameworkBundle\FrameworkBundle(),
-            new \Liip\ImagineBundle\LiipImagineBundle(),
-            new \Liip\ImagineBundle\Tests\Functional\Fixtures\FooBundle\LiipFooBundle(),
-            new \Liip\ImagineBundle\Tests\Functional\Fixtures\BarBundle\LiipBarBundle(),
+            new FrameworkBundle(),
+            new LiipImagineBundle(),
+            new LiipFooBundle(),
+            new LiipBarBundle(),
         ];
 
         return $bundles;

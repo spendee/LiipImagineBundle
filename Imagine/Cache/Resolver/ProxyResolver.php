@@ -11,7 +11,7 @@
 
 namespace Liip\ImagineBundle\Imagine\Cache\Resolver;
 
-use Liip\ImagineBundle\Binary\BinaryInterface;
+use Liip\ImagineBundle\File\FileInterface;
 
 /**
  * ProxyResolver.
@@ -53,7 +53,7 @@ class ProxyResolver implements ResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function store(BinaryInterface $binary, $targetPath, $filter)
+    public function store(FileInterface $binary, $targetPath, $filter)
     {
         return $this->resolver->store($binary, $targetPath, $filter);
     }

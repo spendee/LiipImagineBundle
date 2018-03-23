@@ -12,7 +12,7 @@
 namespace Liip\ImagineBundle\Imagine\Cache\Resolver;
 
 use Aws\S3\S3Client;
-use Liip\ImagineBundle\Binary\BinaryInterface;
+use Liip\ImagineBundle\File\FileInterface;
 use Liip\ImagineBundle\Exception\Imagine\Cache\Resolver\NotStorableException;
 use Psr\Log\LoggerInterface;
 
@@ -108,7 +108,7 @@ class AwsS3Resolver implements ResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function store(BinaryInterface $binary, $path, $filter)
+    public function store(FileInterface $binary, $path, $filter)
     {
         $objectPath = $this->getObjectPath($path, $filter);
 
@@ -120,8 +120,8 @@ class AwsS3Resolver implements ResolverInterface
                         'ACL' => $this->acl,
                         'Bucket' => $this->bucket,
                         'Key' => $objectPath,
-                        'Body' => $binary->getContent(),
-                        'ContentType' => $binary->getMimeType(),
+                        'Body' => $binary->contents(),
+                        'ContentType' => $binary->contentType(),
                     ]
                 )
             );

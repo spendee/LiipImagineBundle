@@ -15,6 +15,7 @@ use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
 use Liip\ImagineBundle\Binary\Loader\FlysystemLoader;
 use Liip\ImagineBundle\Binary\Loader\LoaderInterface;
+use Liip\ImagineBundle\Exception\Binary\Loader\NotLoadableException;
 use Liip\ImagineBundle\Tests\AbstractTest;
 use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser;
 
@@ -43,7 +44,7 @@ class FlysystemLoaderTest extends AbstractTest
      */
     public function getFlysystemLoader()
     {
-        return new FlysystemLoader(ExtensionGuesser::getInstance(), $this->flyFilesystem);
+        return new FlysystemLoader($this->flyFilesystem, $this->createFileGuesserManager());
     }
 
     public function testShouldImplementLoaderInterface()
@@ -57,13 +58,13 @@ class FlysystemLoaderTest extends AbstractTest
 
         $this->assertSame(
             file_get_contents($this->fixturesPath.'/assets/cats.jpeg'),
-            $loader->find('assets/cats.jpeg')->getContent()
+            $loader->find('assets/cats.jpeg')->contents()
         );
     }
 
     public function testThrowsIfInvalidPathGivenOnFind()
     {
-        $this->expectException(\Liip\ImagineBundle\Exception\Binary\Loader\NotLoadableException::class);
+        $this->expectException(NotLoadableException::class);
         $this->expectExceptionMessageRegExp('{Source image .+ not found}');
 
         $loader = $this->getFlysystemLoader();

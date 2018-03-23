@@ -11,9 +11,9 @@
 
 namespace Liip\ImagineBundle\Imagine\Filter\PostProcessor;
 
-use Liip\ImagineBundle\Binary\BinaryInterface;
-use Liip\ImagineBundle\Binary\FileBinaryInterface;
-use Liip\ImagineBundle\Model\Binary;
+use Liip\ImagineBundle\File\FileInterface;
+use Liip\ImagineBundle\File\FileContent;
+use Liip\ImagineBundle\File\FileReferenceTemporary;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 
@@ -62,57 +62,46 @@ class OptiPngPostProcessor implements PostProcessorInterface
     }
 
     /**
-     * @param BinaryInterface $binary
-     * @param array           $options
+     * @param FileInterface $file
+     * @param array         $options
      *
      * @throws ProcessFailedException
      *
-     * @return BinaryInterface|Binary
+     * @return FileInterface|FileContent
      */
-    public function process(BinaryInterface $binary, array $options = []): BinaryInterface
+    public function process(FileInterface $file, array $options = []): FileInterface
     {
-        $type = mb_strtolower($binary->getMimeType());
-        if (!in_array($type, ['image/png'], true)) {
-            return $binary;
+        if (!$file->contentType()->isEquivalent('image', 'png')) {
+            return $file;
         }
 
-        $tempDir = array_key_exists('temp_dir', $options) ? $options['temp_dir'] : $this->tempDir;
-        if (false === $input = tempnam($tempDir, 'imagine_optipng')) {
-            throw new \RuntimeException(sprintf('Temp file can not be created in "%s".', $tempDir));
+        $temporary = new FileReferenceTemporary(
+            'post-processor-optipng', $options['temp_dir'] ?? $this->tempDir
+        );
+        $temporary->acquire();
+        $arguments = [$this->optipngBin];
+
+        if (null !== $level = ($options['level'] ?? $this->level)) {
+            $arguments[] = sprintf('--o%d', $level);
         }
 
-        $processArguments = [$this->optipngBin];
-
-        $level = array_key_exists('level', $options) ? $options['level'] : $this->level;
-        if (null !== $level) {
-            $processArguments[] = sprintf('--o%d', $level);
+        if (true === ($options['strip_all'] ?? $this->stripAll)) {
+            $arguments[] = '--strip=all';
         }
 
-        $stripAll = array_key_exists('strip_all', $options) ? $options['strip_all'] : $this->stripAll;
-        if ($stripAll) {
-            $processArguments[] = '--strip=all';
+        $arguments[] = $temporary->file()->getPathname();
+        $temporary->setContents($file->contents());
+
+        $process = new Process($arguments);
+        $process->run();
+
+        $processed = $temporary->contents();
+        $temporary->release();
+
+        if (false !== mb_strpos($process->getOutput(), 'ERROR') || 0 !== $process->getExitCode()) {
+            throw new ProcessFailedException($process);
         }
 
-        $processArguments[] = $input;
-
-        if ($binary instanceof FileBinaryInterface) {
-            copy($binary->getPath(), $input);
-        } else {
-            file_put_contents($input, $binary->getContent());
-        }
-
-        $proc = new Process($processArguments);
-        $proc->run();
-
-        if (false !== mb_strpos($proc->getOutput(), 'ERROR') || 0 !== $proc->getExitCode()) {
-            unlink($input);
-            throw new ProcessFailedException($proc);
-        }
-
-        $result = new Binary(file_get_contents($input), $binary->getMimeType(), $binary->getFormat());
-
-        unlink($input);
-
-        return $result;
+        return new FileContent($processed, $file->contentType(), $file->extension());
     }
 }

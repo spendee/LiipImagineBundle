@@ -11,7 +11,7 @@
 
 namespace Liip\ImagineBundle\Service;
 
-use Liip\ImagineBundle\Binary\BinaryInterface;
+use Liip\ImagineBundle\File\FileInterface;
 use Liip\ImagineBundle\Exception\Imagine\Filter\NonExistingFilterException;
 use Liip\ImagineBundle\Imagine\Cache\CacheManager;
 use Liip\ImagineBundle\Imagine\Data\DataManager;
@@ -138,7 +138,7 @@ class FilterService
      *
      * @throws NonExistingFilterException
      *
-     * @return BinaryInterface
+     * @return FileInterface
      */
     private function createFilteredBinary($path, $filter, array $runtimeFilters = [])
     {

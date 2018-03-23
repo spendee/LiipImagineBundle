@@ -13,7 +13,9 @@ namespace Liip\ImagineBundle\Binary\Loader;
 
 use League\Flysystem\FilesystemInterface;
 use Liip\ImagineBundle\Exception\Binary\Loader\NotLoadableException;
-use Liip\ImagineBundle\Model\Binary;
+use Liip\ImagineBundle\File\Guesser\GuesserManager;
+use Liip\ImagineBundle\File\Metadata\ContentTypeMetadata;
+use Liip\ImagineBundle\File\FileContent;
 use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesserInterface;
 
 class FlysystemLoader implements LoaderInterface
@@ -21,19 +23,21 @@ class FlysystemLoader implements LoaderInterface
     /**
      * @var FilesystemInterface
      */
-    protected $filesystem;
+    private $filesystem;
 
     /**
-     * @var ExtensionGuesserInterface
+     * @var GuesserManager
      */
-    protected $extensionGuesser;
+    private $guesserManager;
 
-    public function __construct(
-        ExtensionGuesserInterface $extensionGuesser,
-        FilesystemInterface $filesystem)
+    /**
+     * @param FilesystemInterface $filesystem
+     * @param GuesserManager      $guesserManager
+     */
+    public function __construct(FilesystemInterface $filesystem, GuesserManager $guesserManager)
     {
-        $this->extensionGuesser = $extensionGuesser;
         $this->filesystem = $filesystem;
+        $this->guesserManager = $guesserManager;
     }
 
     /**
@@ -45,12 +49,13 @@ class FlysystemLoader implements LoaderInterface
             throw new NotLoadableException(sprintf('Source image "%s" not found.', $path));
         }
 
-        $mimeType = $this->filesystem->getMimetype($path);
+        try {
+            $file = $this->filesystem->read($path);
+            $type = ContentTypeMetadata::create($this->filesystem->getMimetype($path));
+        } catch (\Exception $e) {
+            throw new NotLoadableException(sprintf('Failed to load "%s" from flysystem service!', $path), 0, $e);
+        }
 
-        return new Binary(
-            $this->filesystem->read($path),
-            $mimeType,
-            $this->extensionGuesser->guess($mimeType)
-        );
+        return new FileContent($file, ContentTypeMetadata::create($type), $this->guesserManager->guessExtension($type));
     }
 }

@@ -14,6 +14,7 @@ namespace Liip\ImagineBundle\Tests\Binary\Loader;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Liip\ImagineBundle\Binary\Loader\AbstractDoctrineLoader;
+use Liip\ImagineBundle\Exception\Binary\Loader\NotLoadableException;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -103,7 +104,7 @@ class AbstractDoctrineLoaderTest extends TestCase
 
     public function testFindWithInvalidObject()
     {
-        $this->expectException(\Liip\ImagineBundle\Exception\Binary\Loader\NotLoadableException::class);
+        $this->expectException(NotLoadableException::class);
 
         $this->loader
             ->expects($this->atLeastOnce())

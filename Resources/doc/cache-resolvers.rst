@@ -82,7 +82,7 @@ implementations for all methods to create a valid cache resolver.
 
     namespace AppBundle\Imagine\Cache\Resolver;
 
-    use Liip\ImagineBundle\Binary\BinaryInterface;
+    use Liip\ImagineBundle\File\BinaryInterface;
     use Liip\ImagineBundle\Exception\Imagine\Cache\Resolver\NotResolvableException;
     use Liip\ImagineBundle\Imagine\Cache\Resolver\ResolverInterface;
 

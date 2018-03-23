@@ -13,8 +13,10 @@ namespace Liip\ImagineBundle\Tests\Imagine\Cache\Resolver;
 
 use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\Common\Cache\Cache;
+use Liip\ImagineBundle\File\Metadata\ContentTypeMetadata;
+use Liip\ImagineBundle\File\Metadata\ExtensionMetadata;
 use Liip\ImagineBundle\Imagine\Cache\Resolver\CacheResolver;
-use Liip\ImagineBundle\Model\Binary;
+use Liip\ImagineBundle\File\FileContent;
 use Liip\ImagineBundle\Tests\AbstractTest;
 
 /**
@@ -90,7 +92,7 @@ class CacheResolverTest extends AbstractTest
 
     public function testStoreIsForwardedToResolver()
     {
-        $binary = new Binary('aContent', 'image/jpeg', 'jpg');
+        $binary = FileContent::create('aContent', 'image/jpeg', 'jpeg');
 
         $resolver = $this->createCacheResolverInterfaceMock();
         $resolver
@@ -101,8 +103,8 @@ class CacheResolverTest extends AbstractTest
         $cacheResolver = new CacheResolver(new ArrayCache(), $resolver);
 
         // Call twice, as this method should not be cached.
-        $this->assertNull($cacheResolver->store($binary, $this->webPath, $this->filter));
-        $this->assertNull($cacheResolver->store($binary, $this->webPath, $this->filter));
+        $cacheResolver->store($binary, $this->webPath, $this->filter);
+        $cacheResolver->store($binary, $this->webPath, $this->filter);
     }
 
     public function testSavesToCacheIfInternalResolverReturnUrlOnResolve()

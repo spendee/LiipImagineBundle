@@ -12,6 +12,7 @@
 namespace Liip\ImagineBundle\Tests\Binary\Loader;
 
 use Liip\ImagineBundle\Binary\Loader\StreamLoader;
+use Liip\ImagineBundle\Exception\Binary\Loader\NotLoadableException;
 use Liip\ImagineBundle\Tests\AbstractTest;
 
 /**
@@ -21,7 +22,7 @@ class StreamLoaderTest extends AbstractTest
 {
     public function testThrowsIfInvalidPathGivenOnFind()
     {
-        $this->expectException(\Liip\ImagineBundle\Exception\Binary\Loader\NotLoadableException::class);
+        $this->expectException(NotLoadableException::class);
         $this->expectExceptionMessageRegExp('{Source image file://.+ not found.}');
 
         $loader = new StreamLoader('file://');

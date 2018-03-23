@@ -13,12 +13,11 @@ namespace Liip\ImagineBundle\Imagine\Filter;
 
 use Imagine\Image\ImageInterface;
 use Imagine\Image\ImagineInterface;
-use Liip\ImagineBundle\Binary\BinaryInterface;
-use Liip\ImagineBundle\Binary\FileBinaryInterface;
-use Liip\ImagineBundle\Binary\MimeTypeGuesserInterface;
+use Liip\ImagineBundle\File\FileInterface;
+use Liip\ImagineBundle\File\Guesser\GuesserManager;
 use Liip\ImagineBundle\Imagine\Filter\Loader\LoaderInterface;
 use Liip\ImagineBundle\Imagine\Filter\PostProcessor\PostProcessorInterface;
-use Liip\ImagineBundle\Model\Binary;
+use Liip\ImagineBundle\File\FileContent;
 
 class FilterManager
 {
@@ -33,9 +32,9 @@ class FilterManager
     protected $imagine;
 
     /**
-     * @var MimeTypeGuesserInterface
+     * @var GuesserManager
      */
-    protected $mimeTypeGuesser;
+    protected $guesserManager;
 
     /**
      * @var LoaderInterface[]
@@ -48,15 +47,18 @@ class FilterManager
     protected $postProcessors = [];
 
     /**
-     * @param FilterConfiguration      $filterConfig
-     * @param ImagineInterface         $imagine
-     * @param MimeTypeGuesserInterface $mimeTypeGuesser
+     * @param FilterConfiguration $filterConfig
+     * @param ImagineInterface    $imagine
+     * @param GuesserManager      $guesserManager
      */
-    public function __construct(FilterConfiguration $filterConfig, ImagineInterface $imagine, MimeTypeGuesserInterface $mimeTypeGuesser)
-    {
+    public function __construct(
+        FilterConfiguration $filterConfig,
+        ImagineInterface $imagine,
+        GuesserManager $guesserManager
+    ) {
         $this->filterConfig = $filterConfig;
         $this->imagine = $imagine;
-        $this->mimeTypeGuesser = $mimeTypeGuesser;
+        $this->guesserManager = $guesserManager;
     }
 
     /**
@@ -90,36 +92,32 @@ class FilterManager
     }
 
     /**
-     * @param BinaryInterface $binary
-     * @param array           $config
+     * @param FileInterface $file
+     * @param array         $config
      *
      * @throws \InvalidArgumentException
      *
-     * @return BinaryInterface
+     * @return FileInterface
      */
-    public function apply(BinaryInterface $binary, array $config): BinaryInterface
+    public function apply(FileInterface $file, array $config): FileInterface
     {
         $config += [
             'quality' => 100,
             'animated' => false,
         ];
 
-        return $this->applyPostProcessors($this->applyFilters($binary, $config), $config);
+        return $this->applyPostProcessors($this->applyFilters($file, $config), $config);
     }
 
     /**
-     * @param BinaryInterface $binary
-     * @param array           $config
+     * @param FileInterface $file
+     * @param array         $config
      *
-     * @return BinaryInterface
+     * @return FileInterface
      */
-    public function applyFilters(BinaryInterface $binary, array $config): BinaryInterface
+    public function applyFilters(FileInterface $file, array $config): FileInterface
     {
-        if ($binary instanceof FileBinaryInterface) {
-            $image = $this->imagine->open($binary->getPath());
-        } else {
-            $image = $this->imagine->load($binary->getContent());
-        }
+        $image = $this->imagine->load($file->contents());
 
         foreach ($this->sanitizeFilters($config['filters'] ?? []) as $name => $options) {
             $prior = $image;
@@ -130,84 +128,88 @@ class FilterManager
             }
         }
 
-        return $this->exportConfiguredImageBinary($binary, $image, $config);
+        return $this->exportConfiguredImageBinary($file, $image, $config);
     }
 
     /**
      * Apply the provided filter set on the given binary.
      *
-     * @param BinaryInterface $binary
-     * @param string          $filter
-     * @param array           $runtimeConfig
+     * @param FileInterface $file
+     * @param string        $filter
+     * @param array         $runtimeConfig
      *
      * @throws \InvalidArgumentException
      *
-     * @return BinaryInterface
+     * @return FileInterface
      */
-    public function applyFilter(BinaryInterface $binary, $filter, array $runtimeConfig = [])
+    public function applyFilter(FileInterface $file, $filter, array $runtimeConfig = [])
     {
         $config = array_replace_recursive(
             $this->getFilterConfiguration()->get($filter),
             $runtimeConfig
         );
 
-        return $this->apply($binary, $config);
+        return $this->apply($file, $config);
     }
 
     /**
-     * @param BinaryInterface $binary
-     * @param array           $config
+     * @param FileInterface $file
+     * @param array         $config
      *
      * @throws \InvalidArgumentException
      *
-     * @return BinaryInterface
+     * @return FileInterface
      */
-    public function applyPostProcessors(BinaryInterface $binary, array $config): BinaryInterface
+    public function applyPostProcessors(FileInterface $file, array $config): FileInterface
     {
         foreach ($this->sanitizePostProcessors($config['post_processors'] ?? []) as $name => $options) {
-            $binary = $this->postProcessors[$name]->process($binary, $options);
+            $file = $this->postProcessors[$name]->process($file, $options);
         }
 
-        return $binary;
+        return $file;
     }
 
     /**
-     * @param BinaryInterface $binary
-     * @param ImageInterface  $image
-     * @param array           $config
+     * @param FileInterface  $file
+     * @param ImageInterface $image
+     * @param array          $config
      *
-     * @return BinaryInterface
+     * @return FileInterface
      */
-    private function exportConfiguredImageBinary(BinaryInterface $binary, ImageInterface $image, array $config): BinaryInterface
+    private function exportConfiguredImageBinary(FileInterface $file, ImageInterface $image, array $config): FileInterface
     {
-        $options = [
-            'quality' => $config['quality'],
-        ];
+        $options = ['quality' => $config['quality']];
 
         if (isset($config['jpeg_quality'])) {
             $options['jpeg_quality'] = $config['jpeg_quality'];
         }
+
         if (isset($config['png_compression_level'])) {
             $options['png_compression_level'] = $config['png_compression_level'];
         }
+
         if (isset($config['png_compression_filter'])) {
             $options['png_compression_filter'] = $config['png_compression_filter'];
         }
 
-        if ('gif' === $binary->getFormat() && $config['animated']) {
+        if ($file->extension()->isExtension('gif') && $config['animated'] ?? false) {
             $options['animated'] = $config['animated'];
         }
 
-        $filteredFormat = $config['format'] ?? $binary->getFormat();
-        $filteredString = $image->get($filteredFormat, $options);
+        $filterDataTyped = $file->contentType();
+        $filterExtension = $config['format'] ?? (string) $file->extension();
+        $filterImageBlob = $image->get($filterExtension, $options);
+
+        if ($filterExtension !== (string) $file->extension()) {
+            $filterDataTyped = $this
+                ->guesserManager
+                ->guessUsingContent($filterImageBlob)
+                ->contentType();
+        }
 
         $this->destroyImage($image);
 
-        return new Binary(
-            $filteredString,
-            $filteredFormat === $binary->getFormat() ? $binary->getMimeType() : $this->mimeTypeGuesser->guess($filteredString),
-            $filteredFormat
-        );
+        return FileContent::create($filterImageBlob, $filterDataTyped, $filterExtension);
     }
 
     /**

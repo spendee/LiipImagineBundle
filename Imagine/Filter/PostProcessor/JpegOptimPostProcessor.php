@@ -11,9 +11,9 @@
 
 namespace Liip\ImagineBundle\Imagine\Filter\PostProcessor;
 
-use Liip\ImagineBundle\Binary\BinaryInterface;
-use Liip\ImagineBundle\Binary\FileBinaryInterface;
-use Liip\ImagineBundle\Model\Binary;
+use Liip\ImagineBundle\File\FileInterface;
+use Liip\ImagineBundle\File\FileContent;
+use Liip\ImagineBundle\File\FileReferenceTemporary;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 
@@ -76,99 +76,54 @@ class JpegOptimPostProcessor implements PostProcessorInterface
     }
 
     /**
-     * @param int $max
-     *
-     * @return JpegOptimPostProcessor
-     */
-    public function setMax($max)
-    {
-        $this->max = $max;
-
-        return $this;
-    }
-
-    /**
-     * @param bool $progressive
-     *
-     * @return JpegOptimPostProcessor
-     */
-    public function setProgressive($progressive)
-    {
-        $this->progressive = $progressive;
-
-        return $this;
-    }
-
-    /**
-     * @param bool $stripAll
-     *
-     * @return JpegOptimPostProcessor
-     */
-    public function setStripAll($stripAll)
-    {
-        $this->stripAll = $stripAll;
-
-        return $this;
-    }
-
-    /**
-     * @param BinaryInterface $binary
-     * @param array           $options
+     * @param FileInterface $file
+     * @param array         $options
      *
      * @throws ProcessFailedException
      *
-     * @return BinaryInterface
+     * @return FileInterface
      */
-    public function process(BinaryInterface $binary, array $options = []): BinaryInterface
+    public function process(FileInterface $file, array $options = []): FileInterface
     {
-        $type = mb_strtolower($binary->getMimeType());
-        if (!in_array($type, ['image/jpeg', 'image/jpg'], true)) {
-            return $binary;
+        if (!$file->contentType()->isEquivalent('image', 'jpeg') ||
+            !$file->contentType()->isEquivalent('image', 'jpg')
+        ) {
+            return $file;
         }
 
-        $tempDir = array_key_exists('temp_dir', $options) ? $options['temp_dir'] : $this->tempDir;
-        if (false === $input = tempnam($tempDir, 'imagine_jpegoptim')) {
-            throw new \RuntimeException(sprintf('Temp file can not be created in "%s".', $tempDir));
+        $temporary = new FileReferenceTemporary(
+            'post-processor-jpegoptim', $options['temp_dir'] ?? $this->tempDir
+        );
+        $temporary->acquire();
+        $arguments = [$this->jpegoptimBin];
+
+        if (true === ($options['strip_all'] ?? $this->stripAll)) {
+            $arguments[] = '--strip-all';
         }
 
-        $processArguments = [$this->jpegoptimBin];
-
-        $stripAll = array_key_exists('strip_all', $options) ? $options['strip_all'] : $this->stripAll;
-        if ($stripAll) {
-            $processArguments[] = '--strip-all';
+        if (null !== $quality = ($options['max'] ?? $this->max)) {
+            $arguments[] = '--max='.$quality;
         }
 
-        $max = array_key_exists('max', $options) ? $options['max'] : $this->max;
-        if ($max) {
-            $processArguments[] = '--max='.$max;
-        }
-
-        $progressive = array_key_exists('progressive', $options) ? $options['progressive'] : $this->progressive;
-        if ($progressive) {
-            $processArguments[] = '--all-progressive';
+        if (true === ($options['progressive'] ?? $this->progressive)) {
+            $arguments[] = '--all-progressive';
         } else {
-            $processArguments[] = '--all-normal';
+            $arguments[] = '--all-normal';
         }
 
-        $processArguments[] = $input;
-        if ($binary instanceof FileBinaryInterface) {
-            copy($binary->getPath(), $input);
-        } else {
-            file_put_contents($input, $binary->getContent());
+        $arguments[] = $temporary->file()->getPathname();
+        $temporary->setContents($file->contents());
+
+        $process = new Process($arguments);
+        $process->run();
+
+        $processed = $temporary->contents();
+        $temporary->release();
+
+        if (false !== mb_strpos($process->getOutput(), 'ERROR') || 0 !== $process->getExitCode()) {
+            throw new ProcessFailedException($process);
         }
 
-        $proc = new Process($processArguments);
-        $proc->run();
-
-        if (false !== mb_strpos($proc->getOutput(), 'ERROR') || 0 !== $proc->getExitCode()) {
-            unlink($input);
-            throw new ProcessFailedException($proc);
-        }
-
-        $result = new Binary(file_get_contents($input), $binary->getMimeType(), $binary->getFormat());
-
-        unlink($input);
-
-        return $result;
+        return new FileContent($processed, $file->contentType(), $file->extension());
     }
 }

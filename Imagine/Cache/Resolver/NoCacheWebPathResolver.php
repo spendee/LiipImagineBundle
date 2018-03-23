@@ -11,7 +11,7 @@
 
 namespace Liip\ImagineBundle\Imagine\Cache\Resolver;
 
-use Liip\ImagineBundle\Binary\BinaryInterface;
+use Liip\ImagineBundle\File\FileInterface;
 use Symfony\Component\Routing\RequestContext;
 
 class NoCacheWebPathResolver implements ResolverInterface
@@ -52,7 +52,7 @@ class NoCacheWebPathResolver implements ResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function store(BinaryInterface $binary, $path, $filter)
+    public function store(FileInterface $binary, $path, $filter)
     {
     }
 

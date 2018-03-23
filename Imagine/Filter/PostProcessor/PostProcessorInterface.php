@@ -11,7 +11,7 @@
 
 namespace Liip\ImagineBundle\Imagine\Filter\PostProcessor;
 
-use Liip\ImagineBundle\Binary\BinaryInterface;
+use Liip\ImagineBundle\File\FileInterface;
 
 /**
  * Interface for PostProcessors - handlers which can operate on binaries prepared in FilterManager.
@@ -19,12 +19,10 @@ use Liip\ImagineBundle\Binary\BinaryInterface;
 interface PostProcessorInterface
 {
     /**
-     * Allows processing a BinaryInterface, with run-time options, so PostProcessors remain stateless.
+     * @param FileInterface $file
+     * @param array         $options
      *
-     * @param BinaryInterface $binary
-     * @param array           $options Operation-specific options
-     *
-     * @return BinaryInterface
+     * @return FileInterface
      */
-    public function process(BinaryInterface $binary, array $options = []): BinaryInterface;
+    public function process(FileInterface $file, array $options = []): FileInterface;
 }

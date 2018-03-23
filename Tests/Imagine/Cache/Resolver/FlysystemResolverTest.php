@@ -12,9 +12,11 @@
 namespace Liip\ImagineBundle\Tests\Imagine\Cache\Resolver;
 
 use League\Flysystem\Filesystem;
+use Liip\ImagineBundle\File\Metadata\ContentTypeMetadata;
+use Liip\ImagineBundle\File\Metadata\ExtensionMetadata;
 use Liip\ImagineBundle\Imagine\Cache\Resolver\FlysystemResolver;
 use Liip\ImagineBundle\Imagine\Cache\Resolver\ResolverInterface;
-use Liip\ImagineBundle\Model\Binary;
+use Liip\ImagineBundle\File\FileContent;
 use Liip\ImagineBundle\Tests\AbstractTest;
 use Symfony\Component\Routing\RequestContext;
 
@@ -64,7 +66,7 @@ class FlysystemResolverTest extends AbstractTest
 
     public function testCreateObjectInAdapter()
     {
-        $binary = new Binary('aContent', 'image/jpeg', 'jpeg');
+        $binary = FileContent::create('aContent', 'image/jpeg', 'jpeg');
 
         $fs = $this->createFlySystemMock();
         $fs
@@ -74,7 +76,7 @@ class FlysystemResolverTest extends AbstractTest
 
         $resolver = new FlysystemResolver($fs, new RequestContext(), 'http://images.example.com');
 
-        $this->assertNull($resolver->store($binary, 'thumb/foobar.jpg', 'thumb'));
+        $resolver->store($binary, 'thumb/foobar.jpg', 'thumb');
     }
 
     public function testIsStoredChecksObjectExistence()

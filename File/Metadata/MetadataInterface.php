@@ -9,22 +9,20 @@
  * file that was distributed with this source code.
  */
 
-namespace Liip\ImagineBundle\Binary;
+namespace Liip\ImagineBundle\File\Metadata;
 
-interface BinaryInterface
+/**
+ * @author Rob Frawley 2nd <rmf@src.run>
+ */
+interface MetadataInterface
 {
     /**
      * @return string
      */
-    public function getContent();
+    public function __toString(): string;
 
     /**
-     * @return string
+     * @return bool
      */
-    public function getMimeType();
-
-    /**
-     * @return string
-     */
-    public function getFormat();
+    public function isValid(): bool;
 }

@@ -46,9 +46,9 @@ the implementation for the ``find`` method to create a valid data loader.
 
     namespace AppBundle\Imagine\Binary\Loader;
 
-    use Liip\ImagineBundle\Binary\BinaryInterface;
+    use Liip\ImagineBundle\File\BinaryInterface;
     use Liip\ImagineBundle\Binary\Loader\LoaderInterface;
-    use Liip\ImagineBundle\Model\Binary;
+    use Liip\ImagineBundle\File\Binary;
 
     class MyCustomDataLoader implements LoaderInterface
     {

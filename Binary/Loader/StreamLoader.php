@@ -12,6 +12,7 @@
 namespace Liip\ImagineBundle\Binary\Loader;
 
 use Liip\ImagineBundle\Exception\Binary\Loader\NotLoadableException;
+use Liip\ImagineBundle\File\FileContent;
 
 class StreamLoader implements LoaderInterface
 {
@@ -35,7 +36,7 @@ class StreamLoader implements LoaderInterface
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct($wrapperPrefix, $context = null)
+    public function __construct(string $wrapperPrefix, $context = null)
     {
         $this->wrapperPrefix = $wrapperPrefix;
 

@@ -54,7 +54,7 @@ class ResolveCache implements \JsonSerializable
     /**
      * @return null|\string[]
      */
-    public function getFilters()
+    public function getFilters(): ?array
     {
         return $this->filters;
     }

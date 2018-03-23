@@ -13,7 +13,7 @@ namespace Liip\ImagineBundle\Imagine\Cache\Resolver;
 
 use League\Flysystem\AdapterInterface;
 use League\Flysystem\Filesystem;
-use Liip\ImagineBundle\Binary\BinaryInterface;
+use Liip\ImagineBundle\File\FileInterface;
 use Liip\ImagineBundle\Exception\Imagine\Cache\Resolver\NotResolvableException;
 use Symfony\Component\Routing\RequestContext;
 
@@ -113,15 +113,15 @@ class FlysystemResolver implements ResolverInterface
     /**
      * Stores the content of the given binary.
      *
-     * @param BinaryInterface $binary The image binary to store
-     * @param string          $path   The path where the original file is expected to be
-     * @param string          $filter The name of the imagine filter in effect
+     * @param FileInterface $binary The image binary to store
+     * @param string        $path   The path where the original file is expected to be
+     * @param string        $filter The name of the imagine filter in effect
      */
-    public function store(BinaryInterface $binary, $path, $filter)
+    public function store(FileInterface $binary, $path, $filter)
     {
         $this->flysystem->put(
             $this->getFilePath($path, $filter),
-            $binary->getContent(),
+            $binary->contents(),
             ['visibility' => $this->visibility]
         );
     }
