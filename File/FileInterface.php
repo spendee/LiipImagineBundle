@@ -42,7 +42,7 @@ interface FileInterface
      *
      * @return FileInterface
      */
-    public function setContents(string $contents = '', bool $append = false): FileInterface;
+    public function setContents(string $contents = '', bool $append = false): self;
 
     /**
      * @return ContentTypeMetadata

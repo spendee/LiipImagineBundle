@@ -11,8 +11,8 @@
 
 namespace Liip\ImagineBundle\Imagine\Cache;
 
-use Liip\ImagineBundle\File\FileInterface;
 use Liip\ImagineBundle\Events\CacheResolveEvent;
+use Liip\ImagineBundle\File\FileInterface;
 use Liip\ImagineBundle\Imagine\Cache\Resolver\ResolverInterface;
 use Liip\ImagineBundle\Imagine\Filter\FilterConfiguration;
 use Liip\ImagineBundle\ImagineEvents;

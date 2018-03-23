@@ -13,11 +13,7 @@ namespace Liip\ImagineBundle\File;
 
 use Liip\ImagineBundle\Exception\File\FileOperationException;
 use Liip\ImagineBundle\File\Lock\LockAction;
-use Liip\ImagineBundle\File\Lock\LockFactory;
 use Liip\ImagineBundle\Utility\Interpreter\Interpreter;
-use Symfony\Component\Lock\Factory;
-use Symfony\Component\Lock\Lock;
-use Symfony\Component\Lock\Store\SemaphoreStore;
 
 /**
  * @internal

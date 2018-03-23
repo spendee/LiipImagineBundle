@@ -11,10 +11,8 @@
 
 namespace Liip\ImagineBundle\File;
 
-use Liip\ImagineBundle\Exception\File\FileOperationException;
 use Liip\ImagineBundle\File\Metadata\ContentTypeMetadata;
 use Liip\ImagineBundle\File\Metadata\ExtensionMetadata;
-use Liip\ImagineBundle\Utility\Interpreter\Interpreter;
 
 /**
  * @author Rob Frawley 2nd <rmf@src.run>

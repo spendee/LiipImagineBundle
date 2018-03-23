@@ -72,5 +72,5 @@ class MetadataTest extends TestCase
                 ExtensionMetadata::create($item['e'][0]),
             ];
         }
-     }
+    }
 }

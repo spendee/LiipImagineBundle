@@ -13,7 +13,6 @@ namespace Liip\ImagineBundle\File;
 
 use Liip\ImagineBundle\File\Metadata\ContentTypeMetadata;
 use Liip\ImagineBundle\File\Metadata\ExtensionMetadata;
-use Liip\ImagineBundle\File\Metadata\Metadata;
 
 /**
  * @author Rob Frawley 2nd <rmf@src.run>

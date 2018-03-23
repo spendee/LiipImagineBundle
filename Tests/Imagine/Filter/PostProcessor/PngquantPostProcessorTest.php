@@ -11,11 +11,9 @@
 
 namespace Liip\ImagineBundle\Tests\Imagine\Filter\PostProcessor;
 
-use Liip\ImagineBundle\File\FileInterface;
-use Liip\ImagineBundle\File\Metadata\ContentTypeMetadata;
-use Liip\ImagineBundle\File\Metadata\ExtensionMetadata;
-use Liip\ImagineBundle\Imagine\Filter\PostProcessor\PngquantPostProcessor;
 use Liip\ImagineBundle\File\FileContent;
+use Liip\ImagineBundle\File\FileInterface;
+use Liip\ImagineBundle\Imagine\Filter\PostProcessor\PngquantPostProcessor;
 use Liip\ImagineBundle\Tests\AbstractTest;
 
 /**

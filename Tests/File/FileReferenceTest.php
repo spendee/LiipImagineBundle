@@ -221,7 +221,7 @@ class FileReferenceTest extends TestCase
      */
     private static function normalizeClassOrMethodName(string $name): string
     {
-        return strtolower(ltrim(preg_replace('{[A-Z]([a-z]+)}', '-$0',
+        return mb_strtolower(ltrim(preg_replace('{[A-Z]([a-z]+)}', '-$0',
                 preg_replace('{^.+\\\}i', '', get_called_class())
         ), '-'));
     }

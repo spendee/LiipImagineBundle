@@ -13,8 +13,8 @@ namespace Liip\ImagineBundle\Imagine\Cache\Resolver;
 
 use League\Flysystem\AdapterInterface;
 use League\Flysystem\Filesystem;
-use Liip\ImagineBundle\File\FileInterface;
 use Liip\ImagineBundle\Exception\Imagine\Cache\Resolver\NotResolvableException;
+use Liip\ImagineBundle\File\FileInterface;
 use Symfony\Component\Routing\RequestContext;
 
 class FlysystemResolver implements ResolverInterface

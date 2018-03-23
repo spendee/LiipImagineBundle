@@ -13,10 +13,8 @@ namespace Liip\ImagineBundle\Tests\Imagine\Cache\Resolver;
 
 use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\Common\Cache\Cache;
-use Liip\ImagineBundle\File\Metadata\ContentTypeMetadata;
-use Liip\ImagineBundle\File\Metadata\ExtensionMetadata;
-use Liip\ImagineBundle\Imagine\Cache\Resolver\CacheResolver;
 use Liip\ImagineBundle\File\FileContent;
+use Liip\ImagineBundle\Imagine\Cache\Resolver\CacheResolver;
 use Liip\ImagineBundle\Tests\AbstractTest;
 
 /**

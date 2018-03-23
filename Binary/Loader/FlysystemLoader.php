@@ -13,10 +13,9 @@ namespace Liip\ImagineBundle\Binary\Loader;
 
 use League\Flysystem\FilesystemInterface;
 use Liip\ImagineBundle\Exception\Binary\Loader\NotLoadableException;
+use Liip\ImagineBundle\File\FileContent;
 use Liip\ImagineBundle\File\Guesser\GuesserManager;
 use Liip\ImagineBundle\File\Metadata\ContentTypeMetadata;
-use Liip\ImagineBundle\File\FileContent;
-use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesserInterface;
 
 class FlysystemLoader implements LoaderInterface
 {

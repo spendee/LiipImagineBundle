@@ -12,8 +12,8 @@
 namespace Liip\ImagineBundle\Binary\Loader;
 
 use Liip\ImagineBundle\Binary\Locator\LocatorInterface;
-use Liip\ImagineBundle\File\Guesser\GuesserManager;
 use Liip\ImagineBundle\File\FileReference;
+use Liip\ImagineBundle\File\Guesser\GuesserManager;
 
 class FileSystemLoader implements LoaderInterface
 {

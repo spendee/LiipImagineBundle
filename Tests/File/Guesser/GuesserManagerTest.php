@@ -93,7 +93,7 @@ class GuesserManagerTest extends TestCase
 
     public static function provideContentGuessData(): \Iterator
     {
-        foreach (self::providePathGuessData() as list($p, $c, $e)) {
+        foreach (self::providePathGuessData() as [$p, $c, $e]) {
             yield [file_get_contents($p), $p, $c, $e];
         }
     }

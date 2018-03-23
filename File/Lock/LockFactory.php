@@ -11,8 +11,6 @@
 
 namespace Liip\ImagineBundle\File\Lock;
 
-use Liip\ImagineBundle\File\FileInterface;
-use Liip\ImagineBundle\File\FileReferenceTrait;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\Lock\Factory;

@@ -12,7 +12,6 @@
 namespace Liip\ImagineBundle\Binary\Loader;
 
 use Liip\ImagineBundle\Exception\Binary\Loader\NotLoadableException;
-use Liip\ImagineBundle\File\FileContent;
 
 class StreamLoader implements LoaderInterface
 {

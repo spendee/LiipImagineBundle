@@ -11,8 +11,8 @@
 
 namespace Liip\ImagineBundle\Imagine\Cache\Resolver;
 
-use Liip\ImagineBundle\File\FileInterface;
 use Liip\ImagineBundle\Exception\Imagine\Cache\Resolver\NotResolvableException;
+use Liip\ImagineBundle\File\FileInterface;
 
 interface ResolverInterface
 {

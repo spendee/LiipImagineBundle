@@ -140,16 +140,6 @@ final class FileReferenceTemporary implements FileInterface
     }
 
     /**
-     * @param string $message
-     */
-    private function requireReleasedState(string $message): void
-    {
-        if ($this->isAcquired()) {
-            throw new FileOperationException(sprintf('Temporary file must be released first: %s', $message));
-        }
-    }
-
-    /**
      * @param string $contents
      * @param bool   $append
      *
@@ -162,5 +152,15 @@ final class FileReferenceTemporary implements FileInterface
         }
 
         return $this->doDumpContents($contents, $append);
+    }
+
+    /**
+     * @param string $message
+     */
+    private function requireReleasedState(string $message): void
+    {
+        if ($this->isAcquired()) {
+            throw new FileOperationException(sprintf('Temporary file must be released first: %s', $message));
+        }
     }
 }

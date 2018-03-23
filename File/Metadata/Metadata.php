@@ -47,6 +47,18 @@ final class Metadata implements MetadataInterface
     }
 
     /**
+     * @return string
+     */
+    public function __toString(): string
+    {
+        return vsprintf('(%s) [%s]: %s', [
+            $this->extension(),
+            $this->contentType(),
+            $this->location(),
+        ]);
+    }
+
+    /**
      * @param LocationMetadata|null    $location
      * @param ContentTypeMetadata|null $contentType
      * @param ExtensionMetadata|null   $extension
@@ -59,18 +71,6 @@ final class Metadata implements MetadataInterface
         ExtensionMetadata $extension = null
     ): self {
         return new self($location, $contentType, $extension);
-    }
-
-    /**
-     * @return string
-     */
-    public function __toString(): string
-    {
-        return vsprintf('(%s) [%s]: %s', [
-            $this->extension(),
-            $this->contentType(),
-            $this->location(),
-        ]);
     }
 
     /**

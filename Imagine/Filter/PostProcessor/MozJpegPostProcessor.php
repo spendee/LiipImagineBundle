@@ -11,8 +11,8 @@
 
 namespace Liip\ImagineBundle\Imagine\Filter\PostProcessor;
 
-use Liip\ImagineBundle\File\FileInterface;
 use Liip\ImagineBundle\File\FileContent;
+use Liip\ImagineBundle\File\FileInterface;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 

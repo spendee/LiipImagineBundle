@@ -91,7 +91,7 @@ class ContentTypeMetadataTest extends TestCase
         } else {
             $this->assertFalse($meta->hasSuffix());
             $this->assertNull($meta->suffix());
-            $this->assertTrue($meta->isSuffix( null));
+            $this->assertTrue($meta->isSuffix(null));
             $this->assertFalse($meta->isSuffix('foobar'));
         }
     }

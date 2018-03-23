@@ -30,6 +30,14 @@ final class ExtensionMetadata implements MetadataInterface
     }
 
     /**
+     * @return string
+     */
+    public function __toString(): string
+    {
+        return $this->hasExtension() ? $this->extension : '';
+    }
+
+    /**
      * @param string|null $extension
      *
      * @return self
@@ -37,14 +45,6 @@ final class ExtensionMetadata implements MetadataInterface
     public static function create(string $extension = null): self
     {
         return new self($extension);
-    }
-
-    /**
-     * @return string
-     */
-    public function __toString(): string
-    {
-        return $this->hasExtension() ? $this->extension : '';
     }
 
     /**

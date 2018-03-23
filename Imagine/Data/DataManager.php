@@ -11,11 +11,11 @@
 
 namespace Liip\ImagineBundle\Imagine\Data;
 
-use Liip\ImagineBundle\File\FileInterface;
 use Liip\ImagineBundle\Binary\Loader\LoaderInterface;
+use Liip\ImagineBundle\File\FileContent;
+use Liip\ImagineBundle\File\FileInterface;
 use Liip\ImagineBundle\File\Guesser\GuesserManager;
 use Liip\ImagineBundle\Imagine\Filter\FilterConfiguration;
-use Liip\ImagineBundle\File\FileContent;
 
 class DataManager
 {

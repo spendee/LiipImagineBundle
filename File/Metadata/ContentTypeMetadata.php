@@ -71,23 +71,9 @@ final class ContentTypeMetadata implements MetadataInterface
             self::PREFIX_UNREGISTERED,
             self::PREFIX_VENDOR,
             self::PREFIX_PERSONAL,
-        ]) ? $prefix : null;
+        ], true) ? $prefix : null;
         $this->suffix = $suffix;
         $this->prefixDeliminator = $prefixDeliminator ?: null;
-    }
-
-    /**
-     * @param string|null $string
-     *
-     * @return self
-     */
-    public static function create(string $string = null): self
-    {
-        if (null !== $sections = self::explodeContentType($string)) {
-            return new self(...$sections);
-        }
-
-        return new self();
     }
 
     /**
@@ -102,6 +88,20 @@ final class ContentTypeMetadata implements MetadataInterface
             $this->subType(),
             $this->hasSuffix() ? sprintf('+%s', $this->suffix()) : '',
         ]);
+    }
+
+    /**
+     * @param string|null $string
+     *
+     * @return self
+     */
+    public static function create(string $string = null): self
+    {
+        if (null !== $sections = self::explodeContentType($string)) {
+            return new self(...$sections);
+        }
+
+        return new self();
     }
 
     /**

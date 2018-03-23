@@ -14,11 +14,9 @@ namespace Liip\ImagineBundle\Tests\Imagine\Cache\Resolver;
 use Aws\S3\S3Client;
 use Guzzle\Service\Resource\Model;
 use Liip\ImagineBundle\Exception\Imagine\Cache\Resolver\NotStorableException;
-use Liip\ImagineBundle\File\Metadata\ContentTypeMetadata;
-use Liip\ImagineBundle\File\Metadata\ExtensionMetadata;
+use Liip\ImagineBundle\File\FileContent;
 use Liip\ImagineBundle\Imagine\Cache\Resolver\AwsS3Resolver;
 use Liip\ImagineBundle\Imagine\Cache\Resolver\ResolverInterface;
-use Liip\ImagineBundle\File\FileContent;
 use Liip\ImagineBundle\Tests\AbstractTest;
 
 /**

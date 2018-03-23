@@ -52,7 +52,7 @@ abstract class AbstractGuesser implements GuesserInterface
     public function guess($subject): ?string
     {
         foreach ($this->guessers as $g) {
-            if (null !== $guess = $g->guess((string)$subject)) {
+            if (null !== $guess = $g->guess((string) $subject)) {
                 return $guess;
             }
         }

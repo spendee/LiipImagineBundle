@@ -13,11 +13,11 @@ namespace Liip\ImagineBundle\Imagine\Filter;
 
 use Imagine\Image\ImageInterface;
 use Imagine\Image\ImagineInterface;
+use Liip\ImagineBundle\File\FileContent;
 use Liip\ImagineBundle\File\FileInterface;
 use Liip\ImagineBundle\File\Guesser\GuesserManager;
 use Liip\ImagineBundle\Imagine\Filter\Loader\LoaderInterface;
 use Liip\ImagineBundle\Imagine\Filter\PostProcessor\PostProcessorInterface;
-use Liip\ImagineBundle\File\FileContent;
 
 class FilterManager
 {

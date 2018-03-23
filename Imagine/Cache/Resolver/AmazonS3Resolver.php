@@ -11,8 +11,8 @@
 
 namespace Liip\ImagineBundle\Imagine\Cache\Resolver;
 
-use Liip\ImagineBundle\File\FileInterface;
 use Liip\ImagineBundle\Exception\Imagine\Cache\Resolver\NotStorableException;
+use Liip\ImagineBundle\File\FileInterface;
 use Psr\Log\LoggerInterface;
 
 class AmazonS3Resolver implements ResolverInterface

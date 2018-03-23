@@ -11,8 +11,8 @@
 
 namespace Liip\ImagineBundle\Tests\Imagine\Data;
 
-use Liip\ImagineBundle\Imagine\Data\DataManager;
 use Liip\ImagineBundle\File\FileContent;
+use Liip\ImagineBundle\Imagine\Data\DataManager;
 use Liip\ImagineBundle\Tests\AbstractTest;
 
 /**

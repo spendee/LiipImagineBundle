@@ -11,12 +11,11 @@
 
 namespace Liip\ImagineBundle\File\Guesser;
 
+use Liip\ImagineBundle\File\FileReferenceTemporary;
 use Liip\ImagineBundle\File\Metadata\ContentTypeMetadata;
 use Liip\ImagineBundle\File\Metadata\ExtensionMetadata;
 use Liip\ImagineBundle\File\Metadata\LocationMetadata;
 use Liip\ImagineBundle\File\Metadata\Metadata;
-use Liip\ImagineBundle\File\FileReferenceTemporary;
-use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
 
 /**
  * @author Rob Frawley 2nd <rmf@src.run>

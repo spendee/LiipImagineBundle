@@ -257,6 +257,6 @@ return function (): array {
             ['x-world/x-vrml', 'x-world', 'vrml', 'x', null, '-', 'wrz'],
             ['x-world/x-vrml', 'x-world', 'vrml', 'x', null, '-', 'xaf'],
             ['x-world/x-vrml', 'x-world', 'vrml', 'x', null, '-', 'xof'],
-        ]
+        ],
     ];
 };

@@ -12,8 +12,8 @@
 namespace Liip\ImagineBundle\Imagine\Cache\Resolver;
 
 use Aws\S3\S3Client;
-use Liip\ImagineBundle\File\FileInterface;
 use Liip\ImagineBundle\Exception\Imagine\Cache\Resolver\NotStorableException;
+use Liip\ImagineBundle\File\FileInterface;
 use Psr\Log\LoggerInterface;
 
 class AwsS3Resolver implements ResolverInterface

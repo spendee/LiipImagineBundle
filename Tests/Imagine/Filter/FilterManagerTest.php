@@ -11,12 +11,10 @@
 
 namespace Liip\ImagineBundle\Tests\Filter;
 
+use Liip\ImagineBundle\File\FileContent;
 use Liip\ImagineBundle\File\FileInterface;
-use Liip\ImagineBundle\File\Metadata\ContentTypeMetadata;
-use Liip\ImagineBundle\File\Metadata\ExtensionMetadata;
 use Liip\ImagineBundle\Imagine\Filter\FilterManager;
 use Liip\ImagineBundle\Imagine\Filter\Loader\LoaderInterface;
-use Liip\ImagineBundle\File\FileContent;
 use Liip\ImagineBundle\Tests\AbstractTest;
 
 /**
