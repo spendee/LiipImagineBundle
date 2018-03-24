@@ -11,7 +11,7 @@
 
 namespace Liip\ImagineBundle\Tests\Imagine\Cache\Resolver;
 
-use Liip\ImagineBundle\File\FileContent;
+use Liip\ImagineBundle\File\FileBlob;
 use Liip\ImagineBundle\Imagine\Cache\Resolver\ProxyResolver;
 use Liip\ImagineBundle\Imagine\Cache\Resolver\ResolverInterface;
 use Liip\ImagineBundle\Tests\AbstractTest;
@@ -127,12 +127,13 @@ class ProxyResolverTest extends AbstractTest
     {
         $expectedPath = 'thePath';
         $expectedFilter = 'theFilter';
-        $expectedBinary = FileContent::create('aContent', 'image/png', 'png');
+        $expectedBinary = FileBlob::create('aContent', 'image/png', 'png');
 
         $this->primaryResolver
             ->expects($this->once())
             ->method('store')
-            ->with($expectedBinary, $expectedPath, $expectedFilter);
+            ->with($expectedBinary, $expectedPath, $expectedFilter)
+            ->willReturn(FileBlob::create());
 
         $this->resolver->store($expectedBinary, $expectedPath, $expectedFilter);
     }

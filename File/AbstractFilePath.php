@@ -12,7 +12,7 @@
 namespace Liip\ImagineBundle\File;
 
 use Liip\ImagineBundle\Exception\File\FileOperationException;
-use Liip\ImagineBundle\File\Lock\LockAction;
+use Liip\ImagineBundle\File\Lock\LockInvokable;
 use Liip\ImagineBundle\Utility\Interpreter\Interpreter;
 
 /**
@@ -20,27 +20,25 @@ use Liip\ImagineBundle\Utility\Interpreter\Interpreter;
  *
  * @author Rob Frawley 2nd <rmf@src.run>
  */
-trait FileReferenceTrait
+abstract class AbstractFilePath extends AbstractFile implements FilePathInterface
 {
-    use FileTrait;
-
     /**
      * @var \SplFileInfo|null
      */
-    private $file;
+    protected $file;
 
     /**
      * @return string
      */
     public function __toString(): string
     {
-        return $this->hasFile() ? $this->file()->getPathname() : '';
+        return $this->hasFile() ? $this->getFile()->getPathname() : '';
     }
 
     /**
      * {@inheritdoc}
      */
-    public function file(): ?\SplFileInfo
+    public function getFile(): ?\SplFileInfo
     {
         return $this->file;
     }
@@ -56,26 +54,26 @@ trait FileReferenceTrait
     /**
      * {@inheritdoc}
      */
-    public function exists(): bool
+    public function fileExists(): bool
     {
-        return $this->hasFile() && file_exists($this->file()->getPathname());
+        return $this->hasFile() && file_exists($this->getFile()->getPathname());
     }
 
     /**
      * {@inheritdoc}
      */
-    public function isReadable(): bool
+    public function isFileReadable(): bool
     {
-        return $this->exists() && is_readable($this->file()->getPathname());
+        return $this->fileExists() && is_readable($this->getFile()->getPathname());
     }
 
     /**
      * {@inheritdoc}
      */
-    public function isWritable(): bool
+    public function isFileWritable(): bool
     {
-        return ($this->exists() && is_writable($this->file()->getPathname()))
-            || (!$this->exists() && $this->hasFile() && is_writable($this->file()->getPath()));
+        return ($this->fileExists() && is_writable($this->getFile()->getPathname()))
+            || (!$this->fileExists() && $this->hasFile() && is_writable($this->getFile()->getPath()));
     }
 
     /**
@@ -83,8 +81,8 @@ trait FileReferenceTrait
      */
     public function remove(): self
     {
-        LockAction::blocking($this, function (): void {
-            if ($this->exists() && (false === $this->isWritable() || false === @unlink($this->file()->getPathname()))) {
+        LockInvokable::blocking($this, function (): void {
+            if ($this->fileExists() && (false === $this->isFileWritable() || false === @unlink($this->getFile()->getPathname()))) {
                 throw new FileOperationException(sprintf(
                     'Failed to remove file "%s": %s', $this->file->getPathname(), Interpreter::lastErrorMessage()
                 ));
@@ -97,14 +95,14 @@ trait FileReferenceTrait
     /**
      * @return string|null
      */
-    protected function readFileContents(): ?string
+    protected function doGetContents(): ?string
     {
         if (!$this->hasFile()) {
             return null;
         }
 
-        return LockAction::blocking($this, function (): ?string {
-            if (false !== $contents = @file_get_contents($this->file()->getPathname())) {
+        return LockInvokable::blocking($this, function (): ?string {
+            if (false !== $contents = @file_get_contents($this->getFile()->getPathname())) {
                 return $contents;
             }
 
@@ -117,21 +115,13 @@ trait FileReferenceTrait
      * @param bool   $append
      *
      * @throws FileOperationException
-     *
-     * @return FileInterface|FileReferenceTrait
      */
-    protected function dumpContents(string $contents, bool $append): FileInterface
+    protected function doSetContents(string $contents, bool $append): void
     {
-        if (!$this->hasFile()) {
-            throw new FileOperationException('Failed to dump file contents: no file assigned!');
-        }
-
-        LockAction::blocking($this, function () use ($contents, $append): void {
-            self::makePathIfNotExists($this->file()->getPath());
-            self::dumpContentsForFile($this->file()->getPathname(), $contents, $append);
+        LockInvokable::blocking($this, function () use ($contents, $append): void {
+            self::makePathIfNotExists($this->getFile()->getPath());
+            self::dumpContentsForFile($this->getFile()->getPathname(), $contents, $append);
         });
-
-        return $this;
     }
 
     /**

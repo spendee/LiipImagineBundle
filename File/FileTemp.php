@@ -12,38 +12,37 @@
 namespace Liip\ImagineBundle\File;
 
 use Liip\ImagineBundle\Exception\File\FileOperationException;
-use Liip\ImagineBundle\File\Lock\LockAction;
+use Liip\ImagineBundle\File\Lock\LockInvokable;
 use Liip\ImagineBundle\Utility\Interpreter\Interpreter;
 
 /**
  * @author Rob Frawley 2nd <rmf@src.run>
  */
-final class FileReferenceTemporary implements FileInterface
+final class FileTemp extends AbstractFilePath
 {
-    use FileReferenceTrait {
-        FileReferenceTrait::dumpContents as doDumpContents;
-    }
+    /**
+     * @var string
+     */
+    private $name;
 
     /**
      * @var string
      */
-    private $tmpContext;
+    private $root;
 
     /**
-     * @var string
+     * @param string|null $name
+     * @param string|null $root
      */
-    private $pathPrefix;
-
-    /**
-     * @param string|null $tmpContext
-     * @param string|null $pathPrefix
-     */
-    public function __construct(string $tmpContext = null, string $pathPrefix = null)
+    public function __construct(string $name = null, string $root = null)
     {
-        $this->setTmpContext($tmpContext);
-        $this->setPathPrefix($pathPrefix);
+        $this->setName($name);
+        $this->setRoot($root);
     }
 
+    /**
+     * Automatically release the temporary file.
+     */
     public function __destruct()
     {
         $this->release();
@@ -52,9 +51,9 @@ final class FileReferenceTemporary implements FileInterface
     /**
      * @return string
      */
-    public function tmpContext(): string
+    public function getName(): string
     {
-        return $this->tmpContext;
+        return $this->name;
     }
 
     /**
@@ -62,10 +61,10 @@ final class FileReferenceTemporary implements FileInterface
      *
      * @return self
      */
-    public function setTmpContext(string $name = null): self
+    public function setName(string $name = null): self
     {
         $this->requireReleasedState('failed to change context descriptor');
-        $this->tmpContext = sprintf('imagine-bundle-temporary_%s', $name ?: 'general');
+        $this->name = sprintf('imagine-bundle-temporary_%s', $name ?: 'general');
 
         return $this;
     }
@@ -73,20 +72,20 @@ final class FileReferenceTemporary implements FileInterface
     /**
      * @return string
      */
-    public function pathPrefix(): string
+    public function getRoot(): string
     {
-        return $this->pathPrefix;
+        return $this->root;
     }
 
     /**
      * @param string|null $path
      *
-     * @return FileReferenceTemporary
+     * @return FileTemp
      */
-    public function setPathPrefix(string $path = null): self
+    public function setRoot(string $path = null): self
     {
         $this->requireReleasedState('failed to change path prefix');
-        $this->pathPrefix = self::makePathIfNotExists($path ?? sys_get_temp_dir());
+        $this->root = self::makePathIfNotExists($path ?? sys_get_temp_dir());
 
         return $this;
     }
@@ -106,13 +105,13 @@ final class FileReferenceTemporary implements FileInterface
     {
         $this->requireReleasedState('failed to acquire a new one');
 
-        $this->file = LockAction::blocking($this, function (): \SplFileInfo {
-            if (false !== $file = @tempnam($this->pathPrefix(), $this->tmpContext())) {
+        $this->file = LockInvokable::blocking($this, function (): \SplFileInfo {
+            if (false !== $file = @tempnam($this->getRoot(), $this->getName())) {
                 return new \SplFileInfo($file);
             }
 
             throw new FileOperationException(sprintf(
-                'Failed to acquire temporary file in "%s": %s.', $this->pathPrefix(), Interpreter::lastErrorMessage()
+                'Failed to acquire temporary file in "%s": %s.', $this->getRoot(), Interpreter::lastErrorMessage()
             ));
         });
 
@@ -142,16 +141,14 @@ final class FileReferenceTemporary implements FileInterface
     /**
      * @param string $contents
      * @param bool   $append
-     *
-     * @return FileInterface
      */
-    protected function dumpContents(string $contents, bool $append): FileInterface
+    protected function doSetContents(string $contents, bool $append): void
     {
         if (!$this->isAcquired()) {
             $this->acquire();
         }
 
-        return $this->doDumpContents($contents, $append);
+        parent::doSetContents($contents, $append);
     }
 
     /**

@@ -12,6 +12,8 @@
 namespace Liip\ImagineBundle\Binary\Loader;
 
 use Liip\ImagineBundle\Exception\Binary\Loader\NotLoadableException;
+use Liip\ImagineBundle\File\FileBlob;
+use Liip\ImagineBundle\File\FileInterface;
 
 class StreamLoader implements LoaderInterface
 {
@@ -49,9 +51,9 @@ class StreamLoader implements LoaderInterface
     /**
      * {@inheritdoc}
      */
-    public function find($path)
+    public function find(string $identity): FileInterface
     {
-        $name = $this->wrapperPrefix.$path;
+        $name = $this->wrapperPrefix.$identity;
 
         /*
          * This looks strange, but at least in PHP 5.3.8 it will raise an E_WARNING if the 4th parameter is null.
@@ -77,6 +79,6 @@ class StreamLoader implements LoaderInterface
             throw new NotLoadableException(sprintf('Source image %s could not be loaded.', $name));
         }
 
-        return $content;
+        return FileBlob::create($content);
     }
 }

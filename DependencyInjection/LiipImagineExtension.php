@@ -36,7 +36,7 @@ class LiipImagineExtension extends Extension
     /**
      * @param ResolverFactoryInterface $resolverFactory
      */
-    public function addResolverFactory(ResolverFactoryInterface $resolverFactory)
+    public function addResolverFactory(ResolverFactoryInterface $resolverFactory): void
     {
         $this->resolversFactories[$resolverFactory->getName()] = $resolverFactory;
     }
@@ -44,7 +44,7 @@ class LiipImagineExtension extends Extension
     /**
      * @param LoaderFactoryInterface $loaderFactory
      */
-    public function addLoaderFactory(LoaderFactoryInterface $loaderFactory)
+    public function addLoaderFactory(LoaderFactoryInterface $loaderFactory): void
     {
         $this->loadersFactories[$loaderFactory->getName()] = $loaderFactory;
     }
@@ -52,7 +52,7 @@ class LiipImagineExtension extends Extension
     /**
      * {@inheritdoc}
      */
-    public function getConfiguration(array $config, ContainerBuilder $container)
+    public function getConfiguration(array $config, ContainerBuilder $container): Configuration
     {
         return new Configuration($this->resolversFactories, $this->loadersFactories);
     }
@@ -63,7 +63,7 @@ class LiipImagineExtension extends Extension
      * @param array            $configs
      * @param ContainerBuilder $container
      */
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
         $config = $this->processConfiguration(
             $this->getConfiguration($configs, $container),
@@ -108,7 +108,7 @@ class LiipImagineExtension extends Extension
      * @param array            $config
      * @param ContainerBuilder $container
      */
-    private function loadResolvers(array $config, ContainerBuilder $container)
+    private function loadResolvers(array $config, ContainerBuilder $container): void
     {
         $this->createFactories($this->resolversFactories, $config, $container);
     }
@@ -117,7 +117,7 @@ class LiipImagineExtension extends Extension
      * @param array            $config
      * @param ContainerBuilder $container
      */
-    private function loadLoaders(array $config, ContainerBuilder $container)
+    private function loadLoaders(array $config, ContainerBuilder $container): void
     {
         $this->createFactories($this->loadersFactories, $config, $container);
     }
@@ -127,7 +127,7 @@ class LiipImagineExtension extends Extension
      * @param array            $configurations
      * @param ContainerBuilder $container
      */
-    private function createFactories(array $factories, array $configurations, ContainerBuilder $container)
+    private function createFactories(array $factories, array $configurations, ContainerBuilder $container): void
     {
         foreach ($configurations as $name => $conf) {
             $factories[key($conf)]->create($container, $name, $conf[key($conf)]);

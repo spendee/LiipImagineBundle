@@ -65,7 +65,7 @@ class WebPathResolver implements ResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function resolve($path, $filter)
+    public function resolve(string $path, string $filter): string
     {
         return sprintf('%s/%s',
             $this->getBaseUrl(),
@@ -76,7 +76,7 @@ class WebPathResolver implements ResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function isStored($path, $filter)
+    public function isStored(string $path, string $filter): bool
     {
         return is_file($this->getFilePath($path, $filter));
     }
@@ -84,18 +84,18 @@ class WebPathResolver implements ResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function store(FileInterface $binary, $path, $filter)
+    public function store(FileInterface $file, string $path, string $filter): void
     {
         $this->filesystem->dumpFile(
             $this->getFilePath($path, $filter),
-            $binary->contents()
+            $file->getContents()
         );
     }
 
     /**
      * {@inheritdoc}
      */
-    public function remove(array $paths, array $filters)
+    public function remove(array $paths, array $filters): void
     {
         if (empty($paths) && empty($filters)) {
             return;

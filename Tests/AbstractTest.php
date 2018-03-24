@@ -15,10 +15,10 @@ use Imagine\Image\ImageInterface;
 use Imagine\Image\ImagineInterface;
 use Imagine\Image\Metadata\MetadataBag;
 use Liip\ImagineBundle\Binary\Loader\LoaderInterface;
-use Liip\ImagineBundle\File\Guesser\ContentTypeGuesser;
-use Liip\ImagineBundle\File\Guesser\ExtensionGuesser;
-use Liip\ImagineBundle\File\Guesser\GuesserInterface;
+use Liip\ImagineBundle\File\Guesser\Handler\ContentTypeGuesser;
+use Liip\ImagineBundle\File\Guesser\Handler\ExtensionGuesser;
 use Liip\ImagineBundle\File\Guesser\GuesserManager;
+use Liip\ImagineBundle\File\Metadata\Resolver\ImageMetadataResolver;
 use Liip\ImagineBundle\Imagine\Cache\CacheManager;
 use Liip\ImagineBundle\Imagine\Cache\Resolver\ResolverInterface;
 use Liip\ImagineBundle\Imagine\Cache\SignerInterface;
@@ -34,6 +34,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser as SymfonyExtensionGuesser;
 use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesserInterface;
 use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
+use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesserInterface;
 use Symfony\Component\Routing\RouterInterface;
 
 abstract class AbstractTest extends TestCase
@@ -200,11 +201,11 @@ abstract class AbstractTest extends TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|GuesserInterface
+     * @return \PHPUnit_Framework_MockObject_MockObject|MimeTypeGuesserInterface
      */
     protected function createMimeTypeGuesserInterfaceMock()
     {
-        return $this->createObjectMock(GuesserInterface::class);
+        return $this->createObjectMock(MimeTypeGuesserInterface::class);
     }
 
     /**
@@ -250,7 +251,7 @@ abstract class AbstractTest extends TestCase
     /**
      * @param array ...$guessers
      *
-     * @return ContentTypeGuesser
+     * @return \Liip\ImagineBundle\File\Guesser\Handler\ContentTypeGuesser
      */
     protected function createFileContentTypeGuesser(...$guessers): ContentTypeGuesser
     {
@@ -266,7 +267,7 @@ abstract class AbstractTest extends TestCase
     /**
      * @param array ...$guessers
      *
-     * @return ExtensionGuesser
+     * @return \Liip\ImagineBundle\File\Guesser\Handler\ExtensionGuesser
      */
     protected function createFileExtensionGuesser(...$guessers): ExtensionGuesser
     {
@@ -288,6 +289,14 @@ abstract class AbstractTest extends TestCase
             $this->createFileContentTypeGuesser(...$contentTypeGuessers),
             $this->createFileExtensionGuesser(...$extensionGuessers)
         );
+    }
+
+    /**
+     * @return ImageMetadataResolver
+     */
+    protected function createFileMetadataResolver($contentTypeGuessers = [], $extensionGuessers = []): ImageMetadataResolver
+    {
+        return new ImageMetadataResolver($this->createFileGuesserManager($contentTypeGuessers, $extensionGuessers));
     }
 
     /**

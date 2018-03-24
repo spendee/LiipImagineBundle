@@ -12,7 +12,7 @@
 namespace Liip\ImagineBundle\Tests\Imagine\Cache\Resolver;
 
 use League\Flysystem\Filesystem;
-use Liip\ImagineBundle\File\FileContent;
+use Liip\ImagineBundle\File\FileBlob;
 use Liip\ImagineBundle\Imagine\Cache\Resolver\FlysystemResolver;
 use Liip\ImagineBundle\Imagine\Cache\Resolver\ResolverInterface;
 use Liip\ImagineBundle\Tests\AbstractTest;
@@ -64,7 +64,7 @@ class FlysystemResolverTest extends AbstractTest
 
     public function testCreateObjectInAdapter()
     {
-        $binary = FileContent::create('aContent', 'image/jpeg', 'jpeg');
+        $binary = FileBlob::create('aContent', 'image/jpeg', 'jpeg');
 
         $fs = $this->createFlySystemMock();
         $fs

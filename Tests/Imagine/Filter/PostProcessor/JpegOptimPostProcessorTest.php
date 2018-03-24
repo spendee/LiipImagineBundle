@@ -11,7 +11,7 @@
 
 namespace Liip\ImagineBundle\Tests\Imagine\Filter\PostProcessor;
 
-use Liip\ImagineBundle\File\FileContent;
+use Liip\ImagineBundle\File\FileBlob;
 use Liip\ImagineBundle\File\FileInterface;
 use Liip\ImagineBundle\Imagine\Filter\PostProcessor\JpegOptimPostProcessor;
 use Liip\ImagineBundle\Tests\AbstractTest;
@@ -27,7 +27,7 @@ class JpegOptimPostProcessorTest extends AbstractTest
             __DIR__.'/../../../Fixtures/bash/empty-command.sh'
         );
 
-        $binary = FileContent::create('content', 'image/jpeg', 'jpeg');
+        $binary = FileBlob::create('content', 'image/jpeg', 'jpeg');
         $result = $jpegOptimPostProcessor->process($binary);
 
         $this->assertInstanceOf(FileInterface::class, $result);

@@ -14,15 +14,10 @@ namespace Liip\ImagineBundle\File\Metadata;
 /**
  * @author Rob Frawley 2nd <rmf@src.run>
  */
-final class Metadata implements MetadataInterface
+final class Metadata
 {
     /**
-     * @var LocationMetadata
-     */
-    private $location;
-
-    /**
-     * @var ContentTypeMetadata
+     * @var MimeTypeMetadata
      */
     private $contentType;
 
@@ -32,18 +27,13 @@ final class Metadata implements MetadataInterface
     private $extension;
 
     /**
-     * @param LocationMetadata|null    $location
-     * @param ContentTypeMetadata|null $contentType
-     * @param ExtensionMetadata|null   $extension
+     * @param MimeTypeMetadata|null  $contentType
+     * @param ExtensionMetadata|null $extension
      */
-    public function __construct(
-        LocationMetadata $location = null,
-        ContentTypeMetadata $contentType = null,
-        ExtensionMetadata $extension = null
-    ) {
-        $this->location = self::sanitize($location);
-        $this->contentType = self::sanitize($contentType);
-        $this->extension = self::sanitize($extension);
+    public function __construct(MimeTypeMetadata $contentType = null, ExtensionMetadata $extension = null)
+    {
+        $this->contentType = $contentType->isValid() ? $contentType : MimeTypeMetadata::create();
+        $this->extension = $extension->isValid() ? $extension : ExtensionMetadata::create();
     }
 
     /**
@@ -51,48 +41,24 @@ final class Metadata implements MetadataInterface
      */
     public function __toString(): string
     {
-        return vsprintf('(%s) [%s]: %s', [
-            $this->extension(),
-            $this->contentType(),
-            $this->location(),
-        ]);
+        return sprintf('%s => "%s"', $this->getExtension(), $this->getContentType());
     }
 
     /**
-     * @param LocationMetadata|null    $location
-     * @param ContentTypeMetadata|null $contentType
-     * @param ExtensionMetadata|null   $extension
+     * @param string|null $contentType
+     * @param string|null $extension
      *
      * @return self
      */
-    public static function create(
-        LocationMetadata $location = null,
-        ContentTypeMetadata $contentType = null,
-        ExtensionMetadata $extension = null
-    ): self {
-        return new self($location, $contentType, $extension);
-    }
-
-    /**
-     * @return LocationMetadata
-     */
-    public function location(): LocationMetadata
+    public static function create(string $contentType = null, string $extension = null): self
     {
-        return $this->location;
+        return new self(MimeTypeMetadata::create($contentType), ExtensionMetadata::create($extension));
     }
 
     /**
-     * @return bool
+     * @return MimeTypeMetadata
      */
-    public function hasLocation(): bool
-    {
-        return $this->location()->isValid();
-    }
-
-    /**
-     * @return ContentTypeMetadata
-     */
-    public function contentType(): ContentTypeMetadata
+    public function getContentType(): MimeTypeMetadata
     {
         return $this->contentType;
     }
@@ -102,13 +68,13 @@ final class Metadata implements MetadataInterface
      */
     public function hasContentType(): bool
     {
-        return $this->contentType()->isValid();
+        return $this->getContentType()->isValid();
     }
 
     /**
      * @return ExtensionMetadata
      */
-    public function extension(): ExtensionMetadata
+    public function getExtension(): ExtensionMetadata
     {
         return $this->extension;
     }
@@ -118,7 +84,7 @@ final class Metadata implements MetadataInterface
      */
     public function hasExtension(): bool
     {
-        return $this->extension()->isValid();
+        return $this->getExtension()->isValid();
     }
 
     /**
@@ -126,20 +92,6 @@ final class Metadata implements MetadataInterface
      */
     public function isValid(): bool
     {
-        return $this->location()->isValid() &&
-            $this->contentType()->isValid() &&
-            $this->extension()->isValid();
-    }
-
-    /**
-     * @param MetadataInterface|null $metadata
-     *
-     * @return MetadataInterface
-     */
-    private static function sanitize(MetadataInterface $metadata = null): MetadataInterface
-    {
-        return null !== $metadata && $metadata->isValid()
-            ? $metadata
-            : call_user_func(sprintf('%s::create', get_class($metadata)));
+        return $this->getContentType()->isValid() && $this->getExtension()->isValid();
     }
 }

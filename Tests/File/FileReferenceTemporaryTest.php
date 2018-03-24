@@ -13,75 +13,74 @@ namespace Liip\ImagineBundle\Tests\File;
 
 use Liip\ImagineBundle\Exception\File\FileOperationException;
 use Liip\ImagineBundle\File\FileInterface;
-use Liip\ImagineBundle\File\FileReferenceTemporary;
+use Liip\ImagineBundle\File\FileTemp;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \Liip\ImagineBundle\File\FileReferenceTemporary
- * @covers \Liip\ImagineBundle\File\FileReferenceTrait
- * @covers \Liip\ImagineBundle\File\FileTrait
+ * @covers \Liip\ImagineBundle\File\AbstractFile
+ * @covers \Liip\ImagineBundle\File\AbstractFilePath
+ * @covers \Liip\ImagineBundle\File\FileTemp
  */
 class FileReferenceTemporaryTest extends TestCase
 {
     public function testInstanceOfFileInterface()
     {
-        $this->assertInstanceOf(FileInterface::class, new FileReferenceTemporary());
+        $this->assertInstanceOf(FileInterface::class, new FileTemp());
     }
 
     public function testAcquireAndRelease()
     {
-        $temporary = new FileReferenceTemporary();
+        $temporary = new FileTemp();
 
-        $this->assertSame(sys_get_temp_dir(), $temporary->pathPrefix());
-        $this->assertStringStartsWith('imagine-bundle', $temporary->tmpContext());
+        $this->assertSame(sys_get_temp_dir(), $temporary->getRoot());
+        $this->assertStringStartsWith('imagine-bundle', $temporary->getName());
         $this->assertFalse($temporary->hasFile());
-        $this->assertFalse($temporary->exists());
-        $this->assertFalse($temporary->isReadable());
-        $this->assertFalse($temporary->isWritable());
+        $this->assertFalse($temporary->fileExists());
+        $this->assertFalse($temporary->isFileReadable());
+        $this->assertFalse($temporary->isFileWritable());
         $this->assertFalse($temporary->hasContents());
-        $this->assertNull($temporary->contents());
+        $this->assertNull($temporary->getContents());
 
         $temporary->acquire();
 
         $this->assertTrue($temporary->hasFile());
-        $this->assertStringStartsWith(sys_get_temp_dir(), $temporary->file()->getPathname());
-        $this->assertStringStartsWith('imagine-bundle', $temporary->file()->getFilename());
-        $this->assertTrue($temporary->exists());
-        $this->assertTrue($temporary->isReadable());
-        $this->assertTrue($temporary->isWritable());
+        $this->assertStringStartsWith(sys_get_temp_dir(), $temporary->getFile()->getPathname());
+        $this->assertStringStartsWith('imagine-bundle', $temporary->getFile()->getFilename());
+        $this->assertTrue($temporary->fileExists());
+        $this->assertTrue($temporary->isFileReadable());
+        $this->assertTrue($temporary->isFileWritable());
         $this->assertTrue($temporary->hasContents());
-        $this->assertTrue($temporary->hasEmptyContents());
-        $this->assertSame('', $temporary->contents());
+        $this->assertSame('', $temporary->getContents());
 
         $temporary->setContents('foobar');
 
         $this->assertTrue($temporary->hasFile());
-        $this->assertTrue($temporary->exists());
-        $this->assertTrue($temporary->isReadable());
-        $this->assertTrue($temporary->isWritable());
-        $this->assertSame('foobar', $temporary->contents());
+        $this->assertTrue($temporary->fileExists());
+        $this->assertTrue($temporary->isFileReadable());
+        $this->assertTrue($temporary->isFileWritable());
+        $this->assertSame('foobar', $temporary->getContents());
         $this->assertTrue($temporary->hasContents());
-        $this->assertFileExists($file = $temporary->file()->getPathname());
+        $this->assertFileExists($file = $temporary->getFile()->getPathname());
 
         $temporary->release();
 
         $this->assertFalse($temporary->hasFile());
-        $this->assertFalse($temporary->exists());
-        $this->assertFalse($temporary->isReadable());
-        $this->assertFalse($temporary->isWritable());
+        $this->assertFalse($temporary->fileExists());
+        $this->assertFalse($temporary->isFileReadable());
+        $this->assertFalse($temporary->isFileWritable());
         $this->assertFalse($temporary->hasContents());
-        $this->assertNull($temporary->contents());
+        $this->assertNull($temporary->getContents());
         $this->assertFileNotExists($file);
     }
 
     public function testAutomaticallyAcquiredOnSetContents()
     {
-        $temporary = new FileReferenceTemporary();
+        $temporary = new FileTemp();
 
         $this->assertFalse($temporary->isAcquired());
         $temporary->setContents('foobar');
         $this->assertTrue($temporary->isAcquired());
-        $this->assertSame('foobar', $temporary->contents());
+        $this->assertSame('foobar', $temporary->getContents());
         $temporary->release();
     }
 
@@ -90,9 +89,9 @@ class FileReferenceTemporaryTest extends TestCase
         $this->expectException(FileOperationException::class);
         $this->expectExceptionMessage('failed to change context descriptor');
 
-        $temporary = new FileReferenceTemporary();
+        $temporary = new FileTemp();
         $temporary->acquire();
-        $temporary->setTmpContext('foobar');
+        $temporary->setName('foobar');
     }
 
     public function testThrowsOnSetPathPrefixWhileAcquired()
@@ -100,8 +99,8 @@ class FileReferenceTemporaryTest extends TestCase
         $this->expectException(FileOperationException::class);
         $this->expectExceptionMessage('failed to change path prefix');
 
-        $temporary = new FileReferenceTemporary();
+        $temporary = new FileTemp();
         $temporary->acquire();
-        $temporary->setPathPrefix('foobar');
+        $temporary->setRoot('foobar');
     }
 }

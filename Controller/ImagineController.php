@@ -67,7 +67,7 @@ class ImagineController
      *
      * @return RedirectResponse
      */
-    public function filterAction(Request $request, $path, $filter)
+    public function filterAction(Request $request, string $path, string $filter)
     {
         $path = urldecode($path);
         $resolver = $request->get('resolver');
@@ -105,7 +105,7 @@ class ImagineController
      *
      * @return RedirectResponse
      */
-    public function filterRuntimeAction(Request $request, $hash, $path, $filter)
+    public function filterRuntimeAction(Request $request, string $hash, string $path, string $filter)
     {
         $resolver = $request->get('resolver');
         $runtimeConfig = $request->query->get('filters', []);

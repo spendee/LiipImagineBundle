@@ -14,7 +14,7 @@ namespace Liip\ImagineBundle\File\Metadata;
 /**
  * @author Rob Frawley 2nd <rmf@src.run>
  */
-final class ExtensionMetadata implements MetadataInterface
+class ExtensionMetadata
 {
     /**
      * @var string|null
@@ -50,7 +50,7 @@ final class ExtensionMetadata implements MetadataInterface
     /**
      * @return null|string
      */
-    public function extension(): ?string
+    public function getExtension(): ?string
     {
         return $this->extension;
     }
@@ -68,7 +68,7 @@ final class ExtensionMetadata implements MetadataInterface
      *
      * @return bool
      */
-    public function isExtension(string $extension = null): bool
+    public function isMatch(string $extension = null): bool
     {
         return $extension === $this->extension;
     }

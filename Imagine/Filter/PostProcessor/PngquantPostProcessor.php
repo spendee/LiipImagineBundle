@@ -11,7 +11,7 @@
 
 namespace Liip\ImagineBundle\Imagine\Filter\PostProcessor;
 
-use Liip\ImagineBundle\File\FileContent;
+use Liip\ImagineBundle\File\FileBlob;
 use Liip\ImagineBundle\File\FileInterface;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
@@ -71,7 +71,7 @@ class PngquantPostProcessor implements PostProcessorInterface
      */
     public function process(FileInterface $file, array $options = []): FileInterface
     {
-        if (!$file->contentType()->isEquivalent('image', 'png')) {
+        if (!$file->getContentType()->isMatch('image', 'png')) {
             return $file;
         }
 
@@ -84,7 +84,7 @@ class PngquantPostProcessor implements PostProcessorInterface
         $arguments[] = '-';
 
         $process = new Process($arguments);
-        $process->setInput($file->contents());
+        $process->setInput($file->getContents());
         $process->run();
 
         // Both 98 and 99 mean the quality was too low to compress; they aren't throwable failures
@@ -92,6 +92,6 @@ class PngquantPostProcessor implements PostProcessorInterface
             throw new ProcessFailedException($process);
         }
 
-        return new FileContent($process->getOutput(), $file->contentType(), $file->extension());
+        return new FileBlob($process->getOutput(), $file->getContentType(), $file->getExtension());
     }
 }

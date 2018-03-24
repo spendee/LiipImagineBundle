@@ -11,7 +11,7 @@
 
 namespace Liip\ImagineBundle\File;
 
-use Liip\ImagineBundle\File\Metadata\ContentTypeMetadata;
+use Liip\ImagineBundle\File\Metadata\MimeTypeMetadata;
 use Liip\ImagineBundle\File\Metadata\ExtensionMetadata;
 
 interface FileInterface
@@ -24,17 +24,12 @@ interface FileInterface
     /**
      * @return string|null
      */
-    public function contents(): ?string;
+    public function getContents(): ?string;
 
     /**
      * @return bool
      */
     public function hasContents(): bool;
-
-    /**
-     * @return bool
-     */
-    public function hasEmptyContents(): bool;
 
     /**
      * @param string $contents
@@ -45,9 +40,14 @@ interface FileInterface
     public function setContents(string $contents = '', bool $append = false): self;
 
     /**
-     * @return ContentTypeMetadata
+     * @return int
      */
-    public function contentType(): ContentTypeMetadata;
+    public function getContentsLength(): int;
+
+    /**
+     * @return MimeTypeMetadata
+     */
+    public function getContentType(): MimeTypeMetadata;
 
     /**
      * @return bool
@@ -57,7 +57,7 @@ interface FileInterface
     /**
      * @return ExtensionMetadata
      */
-    public function extension(): ExtensionMetadata;
+    public function getExtension(): ExtensionMetadata;
 
     /**
      * @return bool
@@ -65,27 +65,7 @@ interface FileInterface
     public function hasExtension(): bool;
 
     /**
-     * @return \SplFileInfo|null
-     */
-    public function file(): ?\SplFileInfo;
-
-    /**
      * @return bool
      */
     public function hasFile(): bool;
-
-    /**
-     * return bool
-     */
-    public function exists(): bool;
-
-    /**
-     * @return bool
-     */
-    public function isReadable(): bool;
-
-    /**
-     * @return bool
-     */
-    public function isWritable(): bool;
 }

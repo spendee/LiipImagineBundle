@@ -37,11 +37,14 @@ final class LockFactory
      */
     private static $factory;
 
+    /**
+     * Resets the lock state (including logger, store, and factory)
+     */
     public static function reset(): void
     {
-        self::setLogger();
-        self::setStore();
-        self::setFactory();
+        self::$logger = null;
+        self::$store = null;
+        self::$factory = null;
     }
 
     /**
@@ -49,6 +52,7 @@ final class LockFactory
      */
     public static function setLogger(LoggerInterface $logger = null): void
     {
+        self::$factory = null;
         self::$logger = $logger;
     }
 
@@ -57,19 +61,16 @@ final class LockFactory
      */
     public static function getLogger(): LoggerInterface
     {
-        if (null === self::$logger) {
-            self::$logger = new NullLogger();
-        }
-
-        return self::$logger;
+        return self::$logger = self::$logger ?: new NullLogger();
     }
 
     /**
-     * @param StoreInterface|null $factoryStore
+     * @param StoreInterface|null $store
      */
-    public static function setStore(StoreInterface $factoryStore = null): void
+    public static function setStore(StoreInterface $store = null): void
     {
-        self::$store = $factoryStore;
+        self::$factory = null;
+        self::$store = $store;
     }
 
     /**
@@ -77,19 +78,7 @@ final class LockFactory
      */
     public static function getStore(): StoreInterface
     {
-        if (null === self::$store) {
-            self::$store = new SemaphoreStore();
-        }
-
-        return self::$store;
-    }
-
-    /**
-     * @param Factory|null $factory
-     */
-    public static function setFactory(Factory $factory = null): void
-    {
-        self::$factory = $factory;
+        return self::$store = self::$store ?: new SemaphoreStore();
     }
 
     /**
@@ -107,20 +96,12 @@ final class LockFactory
 
     /**
      * @param mixed $context
-     * @param bool  $acquire
-     * @param bool  $blocking
      *
      * @return null|Lock
      */
-    public static function createLock($context, bool $acquire = false, bool $blocking = false): ?Lock
+    public static function create($context): ?Lock
     {
-        $lock = self::getFactory()->createLock(self::normalizeForContext($context));
-
-        if (true === $acquire && false === $lock->acquire($blocking)) {
-            return null;
-        }
-
-        return $lock;
+        return self::getFactory()->createLock(self::stringifyContext($context));
     }
 
     /**
@@ -128,9 +109,11 @@ final class LockFactory
      *
      * @return null|Lock
      */
-    public static function createAcquired($context): ?Lock
+    public static function acquire($context): ?Lock
     {
-        return self::createLock($context, true);
+        $lock = self::create($context);
+
+        return $lock->acquire(false) ? $lock : null;
     }
 
     /**
@@ -138,9 +121,11 @@ final class LockFactory
      *
      * @return Lock
      */
-    public static function createBlocked($context): Lock
+    public static function blocking($context): Lock
     {
-        return self::createLock($context, true, true);
+        ($lock = self::create($context))->acquire(true);
+
+        return $lock;
     }
 
     /**
@@ -148,16 +133,22 @@ final class LockFactory
      *
      * @return string
      */
-    private static function normalizeForContext($context): string
+    private static function stringifyContext($context): string
     {
-        if (method_exists($context, '__toString') && !empty($string = $context->__toString())) {
-            return sprintf('[%s]%s', get_class($context), $string);
+        return is_object($context) ? self::stringifyObjectContext($context) : (string) $context;
+    }
+
+    /**
+     * @param object $object
+     *
+     * @return string
+     */
+    private static function stringifyObjectContext($object): string
+    {
+        if (method_exists($object, '__toString') && !empty($string = $object->__toString())) {
+            return $string;
         }
 
-        if (is_object($context)) {
-            return sprintf('[%s]%s', get_class($context), spl_object_hash($context));
-        }
-
-        return (string) $context;
+        return sprintf('[%s]="%s"', get_class($object), $string ?? spl_object_hash($object));
     }
 }

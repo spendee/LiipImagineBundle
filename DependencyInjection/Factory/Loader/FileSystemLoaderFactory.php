@@ -22,7 +22,7 @@ class FileSystemLoaderFactory extends AbstractLoaderFactory
     /**
      * {@inheritdoc}
      */
-    public function create(ContainerBuilder $container, $loaderName, array $config)
+    public function create(ContainerBuilder $container, string $name, array $config): string
     {
         $locatorDefinition = new ChildDefinition(sprintf('liip_imagine.binary.locator.%s', $config['locator']));
         $locatorDefinition->replaceArgument(0, $this->resolveDataRoots($config['data_root'], $config['bundle_resources'], $container));
@@ -30,13 +30,13 @@ class FileSystemLoaderFactory extends AbstractLoaderFactory
         $definition = $this->getChildLoaderDefinition();
         $definition->replaceArgument(0, $locatorDefinition);
 
-        return $this->setTaggedLoaderDefinition($loaderName, $definition, $container);
+        return $this->setTaggedLoaderDefinition($name, $definition, $container);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'filesystem';
     }
@@ -44,7 +44,7 @@ class FileSystemLoaderFactory extends AbstractLoaderFactory
     /**
      * {@inheritdoc}
      */
-    public function addConfiguration(ArrayNodeDefinition $builder)
+    public function addConfiguration(ArrayNodeDefinition $builder): void
     {
         $builder
             ->children()
@@ -96,7 +96,7 @@ class FileSystemLoaderFactory extends AbstractLoaderFactory
      *
      * @return string[]
      */
-    private function resolveDataRoots(array $staticPaths, array $config, ContainerBuilder $container)
+    private function resolveDataRoots(array $staticPaths, array $config, ContainerBuilder $container): array
     {
         if (false === $config['enabled']) {
             return $staticPaths;
@@ -118,7 +118,7 @@ class FileSystemLoaderFactory extends AbstractLoaderFactory
      *
      * @return string[]
      */
-    private function getBundleResourcePaths(ContainerBuilder $container)
+    private function getBundleResourcePaths(ContainerBuilder $container): array
     {
         if ($container->hasParameter('kernel.bundles_metadata')) {
             $paths = $this->getBundlePathsUsingMetadata($container->getParameter('kernel.bundles_metadata'));
@@ -136,7 +136,7 @@ class FileSystemLoaderFactory extends AbstractLoaderFactory
      *
      * @return string[]
      */
-    private function getBundlePathsUsingMetadata(array $metadata)
+    private function getBundlePathsUsingMetadata(array $metadata): array
     {
         return array_combine(array_keys($metadata), array_map(function ($data) {
             return $data['path'];
@@ -148,7 +148,7 @@ class FileSystemLoaderFactory extends AbstractLoaderFactory
      *
      * @return string[]
      */
-    private function getBundlePathsUsingNamedObj(array $classes)
+    private function getBundlePathsUsingNamedObj(array $classes): array
     {
         $paths = [];
 

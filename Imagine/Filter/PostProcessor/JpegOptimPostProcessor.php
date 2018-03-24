@@ -11,9 +11,9 @@
 
 namespace Liip\ImagineBundle\Imagine\Filter\PostProcessor;
 
-use Liip\ImagineBundle\File\FileContent;
+use Liip\ImagineBundle\File\FileBlob;
 use Liip\ImagineBundle\File\FileInterface;
-use Liip\ImagineBundle\File\FileReferenceTemporary;
+use Liip\ImagineBundle\File\FileTemp;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 
@@ -85,13 +85,13 @@ class JpegOptimPostProcessor implements PostProcessorInterface
      */
     public function process(FileInterface $file, array $options = []): FileInterface
     {
-        if (!$file->contentType()->isEquivalent('image', 'jpeg') ||
-            !$file->contentType()->isEquivalent('image', 'jpg')
+        if (!$file->getContentType()->isMatch('image', 'jpeg') &&
+            !$file->getContentType()->isMatch('image', 'jpg')
         ) {
             return $file;
         }
 
-        $temporary = new FileReferenceTemporary(
+        $temporary = new FileTemp(
             'post-processor-jpegoptim', $options['temp_dir'] ?? $this->tempDir
         );
         $temporary->acquire();
@@ -111,19 +111,19 @@ class JpegOptimPostProcessor implements PostProcessorInterface
             $arguments[] = '--all-normal';
         }
 
-        $arguments[] = $temporary->file()->getPathname();
-        $temporary->setContents($file->contents());
+        $arguments[] = $temporary->getFile()->getPathname();
+        $temporary->setContents($file->getContents());
 
         $process = new Process($arguments);
         $process->run();
 
-        $processed = $temporary->contents();
+        $processed = $temporary->getContents();
         $temporary->release();
 
         if (false !== mb_strpos($process->getOutput(), 'ERROR') || 0 !== $process->getExitCode()) {
             throw new ProcessFailedException($process);
         }
 
-        return new FileContent($processed, $file->contentType(), $file->extension());
+        return new FileBlob($processed, $file->getContentType(), $file->getExtension());
     }
 }

@@ -12,11 +12,11 @@
 namespace Liip\ImagineBundle\Tests\Imagine\Cache;
 
 use Liip\ImagineBundle\Events\CacheResolveEvent;
-use Liip\ImagineBundle\File\FileContent;
+use Liip\ImagineBundle\File\FileBlob;
 use Liip\ImagineBundle\Imagine\Cache\CacheManager;
 use Liip\ImagineBundle\Imagine\Cache\Resolver\ResolverInterface;
 use Liip\ImagineBundle\Imagine\Cache\Signer;
-use Liip\ImagineBundle\ImagineEvents;
+use Liip\ImagineBundle\Events\EventsInterface;
 use Liip\ImagineBundle\Tests\AbstractTest;
 use Liip\ImagineBundle\Tests\Fixtures\CacheManagerAwareResolver;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -227,7 +227,7 @@ class CacheManagerTest extends AbstractTest
 
     public function testFallbackToDefaultResolver()
     {
-        $binary = FileContent::create('aContent', 'image/png', 'png');
+        $binary = FileBlob::create('aContent', 'image/png', 'png');
 
         $resolver = $this->createCacheResolverInterfaceMock();
         $resolver
@@ -547,7 +547,7 @@ class CacheManagerTest extends AbstractTest
         $dispatcher
             ->expects($this->at(0))
             ->method('dispatch')
-            ->with(ImagineEvents::PRE_RESOLVE, new CacheResolveEvent('cats.jpg', 'thumbnail'));
+            ->with(EventsInterface::PRE_RESOLVE, new CacheResolveEvent('cats.jpg', 'thumbnail'));
 
         $cacheManager = new CacheManager(
             $this->createFilterConfigurationMock(),
@@ -566,7 +566,7 @@ class CacheManagerTest extends AbstractTest
         $dispatcher
             ->expects($this->at(1))
             ->method('dispatch')
-            ->with(ImagineEvents::POST_RESOLVE, new CacheResolveEvent('cats.jpg', 'thumbnail'));
+            ->with(EventsInterface::POST_RESOLVE, new CacheResolveEvent('cats.jpg', 'thumbnail'));
 
         $cacheManager = new CacheManager(
             $this->createFilterConfigurationMock(),
@@ -585,7 +585,7 @@ class CacheManagerTest extends AbstractTest
         $dispatcher
             ->expects($this->at(0))
             ->method('dispatch')
-            ->with(ImagineEvents::PRE_RESOLVE, $this->isInstanceOf(CacheResolveEvent::class))
+            ->with(EventsInterface::PRE_RESOLVE, $this->isInstanceOf(CacheResolveEvent::class))
             ->will($this->returnCallback(function ($name, $event) {
                 $event->setPath('changed_path');
                 $event->setFilter('changed_filter');
@@ -643,7 +643,7 @@ class CacheManagerTest extends AbstractTest
         $dispatcher
             ->expects($this->at(0))
             ->method('dispatch')
-            ->with(ImagineEvents::PRE_RESOLVE, $this->isInstanceOf(CacheResolveEvent::class))
+            ->with(EventsInterface::PRE_RESOLVE, $this->isInstanceOf(CacheResolveEvent::class))
             ->will($this->returnCallback(function ($name, $event) {
                 $event->setPath('changed_path');
                 $event->setFilter('changed_filter');
@@ -652,7 +652,7 @@ class CacheManagerTest extends AbstractTest
             ->expects($this->at(1))
             ->method('dispatch')
             ->with(
-                ImagineEvents::POST_RESOLVE,
+                EventsInterface::POST_RESOLVE,
                 $this->logicalAnd(
                     $this->isInstanceOf(CacheResolveEvent::class),
                     $this->attributeEqualTo('path', 'changed_path'),
@@ -676,7 +676,7 @@ class CacheManagerTest extends AbstractTest
         $dispatcher
             ->expects($this->at(1))
             ->method('dispatch')
-            ->with(ImagineEvents::POST_RESOLVE, $this->isInstanceOf(CacheResolveEvent::class))
+            ->with(EventsInterface::POST_RESOLVE, $this->isInstanceOf(CacheResolveEvent::class))
             ->will($this->returnCallback(function ($name, $event) {
                 $event->setUrl('changed_url');
             }));

@@ -11,7 +11,7 @@
 
 namespace Liip\ImagineBundle\Tests\Imagine\Filter\PostProcessor;
 
-use Liip\ImagineBundle\File\FileContent;
+use Liip\ImagineBundle\File\FileBlob;
 use Liip\ImagineBundle\File\FileInterface;
 use Liip\ImagineBundle\Imagine\Filter\PostProcessor\PngquantPostProcessor;
 use Liip\ImagineBundle\Tests\AbstractTest;
@@ -27,7 +27,7 @@ class PngquantPostProcessorTest extends AbstractTest
             __DIR__.'/../../../Fixtures/bash/empty-command.sh'
         );
 
-        $binary = FileContent::create('content', 'image/png', 'png');
+        $binary = FileBlob::create('content', 'image/png', 'png');
         $result = $pngquantPostProcessor->process($binary);
 
         $this->assertInstanceOf(FileInterface::class, $result);

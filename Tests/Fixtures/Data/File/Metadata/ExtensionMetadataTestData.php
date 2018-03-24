@@ -11,38 +11,13 @@
 
 namespace Liip\ImagineBundle\Tests\Fixtures\Data\File\Metadata;
 
+use Liip\ImagineBundle\Tests\File\Metadata\MimeTypeMetadataTest;
+use Liip\ImagineBundle\Tests\Fixtures\Data\DataLoader;
+
 return function (): array {
     return [
-        ['aac'],
-        ['bzip'],
-        ['bzip2'],
-        ['css'],
-        ['csv'],
-        ['epub'],
-        ['gif'],
-        ['ico'],
-        ['txt'],
-        ['json'],
-        ['mpeg'],
-        ['xml'],
-        ['ogg'],
-        ['otf'],
-        ['png'],
-        ['rar'],
-        ['rtf'],
-        ['svg'],
-        ['tar'],
-        ['ts'],
-        ['ttf'],
-        ['wav'],
-        ['webm'],
-        ['webp'],
-        ['woff'],
-        ['woff2'],
-        ['xhtml'],
-        ['html'],
-        ['zip'],
-        ['php'],
-        ['js'],
+        'default' => array_map(function (array $data): array {
+            return [array_pop($data)];
+        }, (iterator_to_array((new DataLoader())(MimeTypeMetadataTest::class)))),
     ];
 };

@@ -38,14 +38,15 @@ final class DataLoader
 
     /**
      * @param string      $testClassName
+     * @param int|null    $limit
      * @param string|null $context
-     * @param bool        $iterator
+     * @param bool        $shuffle
      *
      * @throws \ReflectionException
      *
      * @return array|\Iterator
      */
-    public function __invoke(string $testClassName, string $context = null, bool $iterator = true)
+    public function __invoke(string $testClassName, int $limit = null, string $context = null, bool $shuffle = true)
     {
         $r = new \ReflectionClass($testClassName);
 
@@ -53,30 +54,36 @@ final class DataLoader
             throw new \RuntimeException(sprintf('Failed to load data for "%s" test class!', $r->getName()));
         }
 
-        $dataFile = str_replace(
-            '\\', '/', sprintf('%s/%s/%sData.php', $this->dataRootPath, $m['path'], $m['file'])
-        );
+        $file = str_replace('\\', '/', sprintf(
+            '%s/%s/%sData.php', $this->dataRootPath, $m['path'], $m['file']
+        ));
+        $name = sprintf('%s[limit:%s]', $file, null === $limit ? 'none' : $limit);
 
-        if (!isset(self::$data[$dataFile])) {
-            if (!file_exists($dataFile)) {
-                throw new \RuntimeException(sprintf('Test fixture data file "%s" does not exist!', $dataFile));
+        if (!isset(self::$data[$name])) {
+            if (!file_exists($file)) {
+                throw new \RuntimeException(sprintf('Test fixture data file "%s" does not exist!', $file));
             }
 
-            self::$data[$dataFile] = (include_once $dataFile)();
+            self::$data[$name] = (require $file)();
         }
 
-        $d = self::$data[$dataFile];
+        $d = self::$data[$name];
+        $c = $context ?: 'default';
 
-        if (null !== $context) {
-            if (!isset($d[$context])) {
-                throw new \RuntimeException(sprintf('Test fixture data file "%s" context "%s" not found!', $dataFile, $context));
+        if (null !== $c) {
+            if (!isset($d[$c])) {
+                throw new \RuntimeException(sprintf('Test fixture data file "%s" context "%s" not found!', $file, $c));
             }
 
-            $d = $d[$context];
+            $d = $d[$c];
         }
 
-        if (false === $iterator) {
-            return $d;
+        if ($shuffle) {
+            shuffle($d);
+        }
+
+        if (null !== $limit && count($d) >= $limit) {
+            $d = array_slice($d, 0, $limit);
         }
 
         foreach ($d as $i => $v) {

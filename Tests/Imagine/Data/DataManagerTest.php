@@ -11,7 +11,7 @@
 
 namespace Liip\ImagineBundle\Tests\Imagine\Data;
 
-use Liip\ImagineBundle\File\FileContent;
+use Liip\ImagineBundle\File\FileBlob;
 use Liip\ImagineBundle\Imagine\Data\DataManager;
 use Liip\ImagineBundle\Tests\AbstractTest;
 
@@ -41,11 +41,12 @@ class DataManagerTest extends AbstractTest
 
         $mimeTypeGuesser = $this->createMimeTypeGuesserInterfaceMock();
         $mimeTypeGuesser
-            ->expects($this->once())
+            ->expects($this->atLeastOnce())
             ->method('guess')
+            ->withAnyParameters()
             ->will($this->returnValue('image/png'));
 
-        $dataManager = new DataManager($config, $this->createFileGuesserManager([$mimeTypeGuesser]), 'default');
+        $dataManager = new DataManager($config, $this->createFileMetadataResolver([$mimeTypeGuesser]), 'default');
         $dataManager->addLoader('default', $loader);
 
         $dataManager->find('thumbnail', 'cats.jpeg');
@@ -72,11 +73,11 @@ class DataManagerTest extends AbstractTest
 
         $mimeTypeGuesser = $this->createMimeTypeGuesserInterfaceMock();
         $mimeTypeGuesser
-            ->expects($this->once())
+            ->expects($this->atLeastOnce())
             ->method('guess')
             ->will($this->returnValue('image/png'));
 
-        $dataManager = new DataManager($config, $this->createFileGuesserManager([$mimeTypeGuesser]));
+        $dataManager = new DataManager($config, $this->createFileMetadataResolver([$mimeTypeGuesser]));
         $dataManager->addLoader('the_loader', $loader);
 
         $dataManager->find('thumbnail', 'cats.jpeg');
@@ -85,7 +86,7 @@ class DataManagerTest extends AbstractTest
     public function testThrowsIfMimeTypeWasNotGuessedOnFind()
     {
         $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('The mime type of image cats.jpeg was not guessed');
+        $this->expectExceptionMessage('Failed to resolve the content type of "cats.jpeg"');
 
         $loader = $this->createBinaryLoaderInterfaceMock();
         $loader
@@ -106,11 +107,11 @@ class DataManagerTest extends AbstractTest
 
         $mimeTypeGuesser = $this->createMimeTypeGuesserInterfaceMock();
         $mimeTypeGuesser
-            ->expects($this->once())
+            ->expects($this->atLeastOnce())
             ->method('guess')
             ->will($this->returnValue(null));
 
-        $dataManager = new DataManager($config, $this->createFileGuesserManager([$mimeTypeGuesser]));
+        $dataManager = new DataManager($config, $this->createFileMetadataResolver([$mimeTypeGuesser]));
         $dataManager->addLoader('the_loader', $loader);
         $dataManager->find('thumbnail', 'cats.jpeg');
     }
@@ -118,14 +119,14 @@ class DataManagerTest extends AbstractTest
     public function testThrowsIfMimeTypeNotImageOneOnFind()
     {
         $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('The mime type of image cats.jpeg must be image/xxx got text/plain');
+        $this->expectExceptionMessage('Invalid content type "text/plain" resolved for "cats.jpeg" (expected primary type "image").');
 
         $loader = $this->createBinaryLoaderInterfaceMock();
         $loader
             ->expects($this->once())
             ->method('find')
             ->with('cats.jpeg')
-            ->will($this->returnValue('content'));
+            ->willReturn(FileBlob::create('content'));
 
         $config = $this->createFilterConfigurationMock();
         $config
@@ -140,11 +141,11 @@ class DataManagerTest extends AbstractTest
 
         $mimeTypeGuesser = $this->createMimeTypeGuesserInterfaceMock();
         $mimeTypeGuesser
-            ->expects($this->once())
+            ->expects($this->atLeastOnce())
             ->method('guess')
             ->will($this->returnValue('text/plain'));
 
-        $dataManager = new DataManager($config, $this->createFileGuesserManager([$mimeTypeGuesser]));
+        $dataManager = new DataManager($config, $this->createFileMetadataResolver([$mimeTypeGuesser]));
         $dataManager->addLoader('the_loader', $loader);
         $dataManager->find('thumbnail', 'cats.jpeg');
     }
@@ -152,14 +153,14 @@ class DataManagerTest extends AbstractTest
     public function testThrowsIfLoaderReturnBinaryWithEmtptyMimeTypeOnFind()
     {
         $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('The mime type of image cats.jpeg was not guessed');
+        $this->expectExceptionMessage('Failed to resolve the content type of "cats.jpeg".');
 
         $loader = $this->createBinaryLoaderInterfaceMock();
         $loader
             ->expects($this->once())
             ->method('find')
             ->with('cats.jpeg')
-            ->will($this->returnValue(FileContent::create('content', null, 'jpeg')));
+            ->will($this->returnValue(FileBlob::create('content', null, 'jpeg')));
 
         $config = $this->createFilterConfigurationMock();
         $config
@@ -174,10 +175,10 @@ class DataManagerTest extends AbstractTest
 
         $mimeTypeGuesser = $this->createMimeTypeGuesserInterfaceMock();
         $mimeTypeGuesser
-            ->expects($this->never())
+            ->expects($this->atLeastOnce())
             ->method('guess');
 
-        $dataManager = new DataManager($config, $this->createFileGuesserManager([$mimeTypeGuesser]));
+        $dataManager = new DataManager($config, $this->createFileMetadataResolver([$mimeTypeGuesser]));
         $dataManager->addLoader('the_loader', $loader);
         $dataManager->find('thumbnail', 'cats.jpeg');
     }
@@ -185,9 +186,9 @@ class DataManagerTest extends AbstractTest
     public function testThrowsIfLoaderReturnBinaryWithMimeTypeNotImageOneOnFind()
     {
         $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('The mime type of image cats.jpeg must be image/xxx got text/plain');
+        $this->expectExceptionMessage('Invalid content type "text/plain" resolved for "cats.jpeg" (expected primary type "image").');
 
-        $binary = FileContent::create('content', 'text/plain', 'txt');
+        $binary = FileBlob::create('content', 'text/plain', 'txt');
 
         $loader = $this->createBinaryLoaderInterfaceMock();
         $loader
@@ -212,7 +213,7 @@ class DataManagerTest extends AbstractTest
             ->expects($this->never())
             ->method('guess');
 
-        $dataManager = new DataManager($config, $this->createFileGuesserManager([$mimeTypeGuesser]));
+        $dataManager = new DataManager($config, $this->createFileMetadataResolver([$mimeTypeGuesser]));
         $dataManager->addLoader('the_loader', $loader);
         $dataManager->find('thumbnail', 'cats.jpeg');
     }
@@ -233,7 +234,7 @@ class DataManagerTest extends AbstractTest
                 'data_loader' => null,
             ]));
 
-        $dataManager = new DataManager($config, $this->createFileGuesserManager());
+        $dataManager = new DataManager($config, $this->createFileMetadataResolver());
         $dataManager->find('thumbnail', 'cats.jpeg');
     }
 
@@ -246,11 +247,11 @@ class DataManagerTest extends AbstractTest
         $loader
             ->expects($this->once())
             ->method('find')
-            ->will($this->returnValue($expectedContent));
+            ->willReturn(FileBlob::create($expectedContent));
 
         $mimeTypeGuesser = $this->createMimeTypeGuesserInterfaceMock();
         $mimeTypeGuesser
-            ->expects($this->once())
+            ->expects($this->atLeastOnce())
             ->method('guess')
             ->will($this->returnValue($expectedMimeType));
 
@@ -265,14 +266,14 @@ class DataManagerTest extends AbstractTest
                 'data_loader' => null,
             ]));
 
-        $dataManager = new DataManager($config, $this->createFileGuesserManager([$mimeTypeGuesser]), 'default');
+        $dataManager = new DataManager($config, $this->createFileMetadataResolver([$mimeTypeGuesser]), 'default');
         $dataManager->addLoader('default', $loader);
 
         $binary = $dataManager->find('thumbnail', 'cats.jpeg');
 
-        $this->assertInstanceOf(FileContent::class, $binary);
-        $this->assertSame($expectedContent, (string) $binary->contents());
-        $this->assertSame($expectedMimeType, (string) $binary->contentType());
+        $this->assertInstanceOf(FileBlob::class, $binary);
+        $this->assertSame($expectedContent, $binary->getContents());
+        $this->assertSame($expectedMimeType, (string) $binary->getContentType());
     }
 
     public function testShouldReturnBinaryWithLoaderContentAndGuessedFormatOnFind()
@@ -285,17 +286,17 @@ class DataManagerTest extends AbstractTest
         $loader
             ->expects($this->once())
             ->method('find')
-            ->will($this->returnValue($content));
+            ->willReturn(FileBlob::create($content));
 
         $mimeTypeGuesser = $this->createMimeTypeGuesserInterfaceMock();
         $mimeTypeGuesser
-            ->expects($this->once())
+            ->expects($this->atLeastOnce())
             ->method('guess')
             ->will($this->returnValue($mimeType));
 
         $extensionGuesser = $this->createExtensionGuesserInterfaceMock();
         $extensionGuesser
-            ->expects($this->once())
+            ->expects($this->atLeastOnce())
             ->method('guess')
             ->with($mimeType)
             ->will($this->returnValue($expectedFormat));
@@ -311,13 +312,14 @@ class DataManagerTest extends AbstractTest
                 'data_loader' => null,
             ]));
 
-        $dataManager = new DataManager($config, $this->createFileGuesserManager([$mimeTypeGuesser], [$extensionGuesser]), 'default');
+        $dataManager = new DataManager($config, $this->createFileMetadataResolver([$mimeTypeGuesser], [$extensionGuesser]), 'default');
         $dataManager->addLoader('default', $loader);
 
         $binary = $dataManager->find('thumbnail', 'cats.jpeg');
 
-        $this->assertInstanceOf(FileContent::class, $binary);
-        $this->assertSame($expectedFormat, (string) $binary->extension());
+        $this->assertInstanceOf(FileBlob::class, $binary);
+        $this->assertSame($content, $binary->getContents());
+        $this->assertSame($expectedFormat, (string) $binary->getExtension());
     }
 
     public function testUseDefaultGlobalImageUsedIfImageNotFound()
@@ -339,7 +341,7 @@ class DataManagerTest extends AbstractTest
             ->method('guess');
 
         $defaultGlobalImage = 'cats.jpeg';
-        $dataManager = new DataManager($config, $this->createFileGuesserManager([$mimeTypeGuesser]), 'default', 'cats.jpeg');
+        $dataManager = new DataManager($config, $this->createFileMetadataResolver([$mimeTypeGuesser]), 'default', 'cats.jpeg');
         $dataManager->addLoader('default', $loader);
 
         $defaultImage = $dataManager->getDefaultImageUrl('thumbnail');
@@ -366,7 +368,7 @@ class DataManagerTest extends AbstractTest
             ->expects($this->never())
             ->method('guess');
 
-        $dataManager = new DataManager($config, $this->createFileGuesserManager([$mimeTypeGuesser]), 'default', null);
+        $dataManager = new DataManager($config, $this->createFileMetadataResolver([$mimeTypeGuesser]), 'default', null);
         $dataManager->addLoader('default', $loader);
 
         $defaultImage = $dataManager->getDefaultImageUrl('thumbnail');

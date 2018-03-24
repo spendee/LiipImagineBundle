@@ -16,13 +16,12 @@ use Liip\ImagineBundle\File\FileInterface;
 interface LoaderInterface
 {
     /**
-     * Retrieve the Image represented by the given path.
+     * Retrieves the image file using the passed identity string, which can be a file name, database id, or an other
+     * identifier supported by the specific loader implementation.
      *
-     * The path may be a file path on a filesystem, or any unique identifier among the storage engine implemented by this Loader.
+     * @param string $identity
      *
-     * @param mixed $path
-     *
-     * @return FileInterface|string An image binary content
+     * @return FileInterface
      */
-    public function find($path);
+    public function find(string $identity): FileInterface;
 }

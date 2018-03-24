@@ -11,13 +11,17 @@
 
 namespace Liip\ImagineBundle\File\Guesser;
 
-use Liip\ImagineBundle\File\FileReferenceTemporary;
-use Liip\ImagineBundle\File\Metadata\ContentTypeMetadata;
+use Liip\ImagineBundle\File\FileTemp;
+use Liip\ImagineBundle\File\Guesser\Handler\ContentTypeGuesser;
+use Liip\ImagineBundle\File\Guesser\Handler\ExtensionGuesser;
+use Liip\ImagineBundle\File\Metadata\MimeTypeMetadata;
 use Liip\ImagineBundle\File\Metadata\ExtensionMetadata;
 use Liip\ImagineBundle\File\Metadata\LocationMetadata;
 use Liip\ImagineBundle\File\Metadata\Metadata;
 
 /**
+ * @internal
+ *
  * @author Rob Frawley 2nd <rmf@src.run>
  */
 final class GuesserManager
@@ -52,7 +56,6 @@ final class GuesserManager
     public function guessUsingPath(string $path): Metadata
     {
         return new Metadata(
-            LocationMetadata::create($path),
             $type = $this->guessContentType($path),
             $this->guessExtension($type)
         );
@@ -65,35 +68,31 @@ final class GuesserManager
      */
     public function guessUsingContent(string $contents = null): Metadata
     {
-        $temporary = (new FileReferenceTemporary('guesser-manager'))->acquire();
+        $temporary = (new FileTemp('guesser-manager'))->acquire();
 
         if (null !== $contents) {
             $temporary->setContents($contents);
         }
 
-        try {
-            return $this->guessUsingPath($temporary->file()->getPathname());
-        } finally {
-            $temporary->release();
-        }
+        return $this->guessUsingPath($temporary->getFile()->getPathname());
     }
 
     /**
      * @param string|null $path
      *
-     * @return ContentTypeMetadata
+     * @return MimeTypeMetadata
      */
-    public function guessContentType(string $path = null): ContentTypeMetadata
+    public function guessContentType(string $path = null): MimeTypeMetadata
     {
-        return ContentTypeMetadata::create($this->contentTypeGuesser->guess($path));
+        return MimeTypeMetadata::create($this->contentTypeGuesser->guess($path));
     }
 
     /**
-     * @param ContentTypeMetadata $contentType
+     * @param MimeTypeMetadata $contentType
      *
      * @return ExtensionMetadata
      */
-    public function guessExtension(ContentTypeMetadata $contentType): ExtensionMetadata
+    public function guessExtension(MimeTypeMetadata $contentType): ExtensionMetadata
     {
         return ExtensionMetadata::create($this->extensionGuesser->guess($contentType));
     }

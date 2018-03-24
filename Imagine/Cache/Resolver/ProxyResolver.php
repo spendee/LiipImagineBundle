@@ -45,7 +45,7 @@ class ProxyResolver implements ResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function resolve($path, $filter)
+    public function resolve(string $path, string $filter): string
     {
         return $this->rewriteUrl($this->resolver->resolve($path, $filter));
     }
@@ -53,15 +53,15 @@ class ProxyResolver implements ResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function store(FileInterface $binary, $targetPath, $filter)
+    public function store(FileInterface $binary, string $targetPath, string $filter): void
     {
-        return $this->resolver->store($binary, $targetPath, $filter);
+        $this->resolver->store($binary, $targetPath, $filter);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function isStored($path, $filter)
+    public function isStored(string $path, string $filter): bool
     {
         return $this->resolver->isStored($path, $filter);
     }
@@ -69,9 +69,9 @@ class ProxyResolver implements ResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function remove(array $paths, array $filters)
+    public function remove(array $paths, array $filters): void
     {
-        return $this->resolver->remove($paths, $filters);
+        $this->resolver->remove($paths, $filters);
     }
 
     /**

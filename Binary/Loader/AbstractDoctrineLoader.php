@@ -13,6 +13,8 @@ namespace Liip\ImagineBundle\Binary\Loader;
 
 use Doctrine\Common\Persistence\ObjectManager;
 use Liip\ImagineBundle\Exception\Binary\Loader\NotLoadableException;
+use Liip\ImagineBundle\File\FileBlob;
+use Liip\ImagineBundle\File\FileInterface;
 
 abstract class AbstractDoctrineLoader implements LoaderInterface
 {
@@ -39,23 +41,23 @@ abstract class AbstractDoctrineLoader implements LoaderInterface
     /**
      * {@inheritdoc}
      */
-    public function find($path)
+    public function find(string $identity): FileInterface
     {
-        $image = $this->manager->find($this->class, $this->mapPathToId($path));
+        $image = $this->manager->find($this->class, $this->mapPathToId($identity));
 
         if (!$image) {
             // try to find the image without extension
-            $info = pathinfo($path);
+            $info = pathinfo($identity);
             $name = $info['dirname'].'/'.$info['filename'];
 
             $image = $this->manager->find($this->class, $this->mapPathToId($name));
         }
 
         if (!$image) {
-            throw new NotLoadableException(sprintf('Source image was not found with id "%s"', $path));
+            throw new NotLoadableException(sprintf('Source image was not found with id "%s"', $identity));
         }
 
-        return stream_get_contents($this->getStreamFromImage($image));
+        return FileBlob::create(stream_get_contents($this->getStreamFromImage($image)));
     }
 
     /**

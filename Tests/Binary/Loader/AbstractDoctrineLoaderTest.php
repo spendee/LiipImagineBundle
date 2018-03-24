@@ -15,6 +15,7 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Liip\ImagineBundle\Binary\Loader\AbstractDoctrineLoader;
 use Liip\ImagineBundle\Exception\Binary\Loader\NotLoadableException;
+use Liip\ImagineBundle\File\FileInterface;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -70,7 +71,10 @@ class AbstractDoctrineLoaderTest extends TestCase
             ->with(null, 1337)
             ->will($this->returnValue($image));
 
-        $this->assertSame('foo', $this->loader->find('/foo/bar'));
+        $file = $this->loader->find('/foo/bar');
+
+        $this->assertInstanceOf(FileInterface::class, $file);
+        $this->assertSame('foo', $file->getContents());
     }
 
     public function testFindWithValidObjectSecondHit()
@@ -99,7 +103,10 @@ class AbstractDoctrineLoaderTest extends TestCase
                 [null, 4711, $image],
             ]));
 
-        $this->assertSame('foo', $this->loader->find('/foo/bar.png'));
+        $file = $this->loader->find('/foo/bar.png');
+
+        $this->assertInstanceOf(FileInterface::class, $file);
+        $this->assertSame('foo', $file->getContents());
     }
 
     public function testFindWithInvalidObject()

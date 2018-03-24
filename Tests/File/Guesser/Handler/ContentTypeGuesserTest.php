@@ -9,27 +9,19 @@
  * file that was distributed with this source code.
  */
 
-namespace Liip\ImagineBundle\Tests\File\Metadata;
+namespace Liip\ImagineBundle\Tests\File\Metadata\Handler;
 
-use Liip\ImagineBundle\File\Guesser\ContentTypeGuesser;
+use Liip\ImagineBundle\Exception\InvalidArgumentException;
+use Liip\ImagineBundle\File\Guesser\Handler\ContentTypeGuesser;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
 
 /**
- * @covers \Liip\ImagineBundle\File\Guesser\AbstractGuesser
- * @covers \Liip\ImagineBundle\File\Guesser\ContentTypeGuesser
+ * @covers \Liip\ImagineBundle\File\Guesser\Handler\AbstractGuesser
+ * @covers \Liip\ImagineBundle\File\Guesser\Handler\ContentTypeGuesser
  */
 class ContentTypeGuesserTest extends TestCase
 {
-    public function testConstruction()
-    {
-        $g = new ContentTypeGuesser(MimeTypeGuesser::getInstance());
-        $this->assertSame(1, $g->count());
-
-        $g->register(MimeTypeGuesser::getInstance());
-        $this->assertSame(2, $g->count());
-    }
-
     public function testGuess()
     {
         $mock = $this->createMimeTypeGuesserMock();
@@ -52,6 +44,14 @@ class ContentTypeGuesserTest extends TestCase
 
         $this->assertNull($inst->guess('foobar'));
         $this->assertSame('baz', $inst->guess('foobar'));
+    }
+
+    public function testThrowsOnUnsupportedRegister()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessageRegExp('{Unsupported guesser registered of type "[^"]+"}');
+
+        new ContentTypeGuesser(new class {});
     }
 
     /**

@@ -25,7 +25,7 @@ abstract class AbstractLoaderFactory implements LoaderFactoryInterface
     /**
      * @return ChildDefinition
      */
-    final protected function getChildLoaderDefinition()
+    final protected function getChildLoaderDefinition(): ChildDefinition
     {
         return new ChildDefinition(sprintf('%s.prototype.%s', static::$namePrefix, $this->getName()));
     }
@@ -37,7 +37,7 @@ abstract class AbstractLoaderFactory implements LoaderFactoryInterface
      *
      * @return string
      */
-    final protected function setTaggedLoaderDefinition($name, Definition $definition, ContainerBuilder $container)
+    final protected function setTaggedLoaderDefinition(string $name, Definition $definition, ContainerBuilder $container): string
     {
         $definition->addTag(static::$namePrefix, [
             'loader' => $name,

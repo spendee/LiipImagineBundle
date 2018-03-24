@@ -12,17 +12,19 @@
 namespace Liip\ImagineBundle\Imagine\Data;
 
 use Liip\ImagineBundle\Binary\Loader\LoaderInterface;
-use Liip\ImagineBundle\File\FileContent;
+use Liip\ImagineBundle\File\FileBlob;
 use Liip\ImagineBundle\File\FileInterface;
 use Liip\ImagineBundle\File\Guesser\GuesserManager;
+use Liip\ImagineBundle\File\Metadata\Metadata;
+use Liip\ImagineBundle\File\Metadata\Resolver\ImageMetadataResolver;
 use Liip\ImagineBundle\Imagine\Filter\FilterConfiguration;
 
 class DataManager
 {
     /**
-     * @var GuesserManager
+     * @var ImageMetadataResolver
      */
-    protected $guesserManager;
+    protected $metadataResolver;
 
     /**
      * @var FilterConfiguration
@@ -45,19 +47,19 @@ class DataManager
     protected $loaders = [];
 
     /**
-     * @param FilterConfiguration $filterConfig
-     * @param GuesserManager      $guesserManager
-     * @param string              $defaultLoader
-     * @param string              $globalDefaultImage
+     * @param FilterConfiguration   $filterConfig
+     * @param ImageMetadataResolver $metadataResolver
+     * @param string                $defaultLoader
+     * @param string                $globalDefaultImage
      */
     public function __construct(
         FilterConfiguration $filterConfig,
-        GuesserManager $guesserManager,
-        $defaultLoader = null,
-        $globalDefaultImage = null
+        ImageMetadataResolver $metadataResolver,
+        string $defaultLoader = null,
+        string $globalDefaultImage = null
     ) {
         $this->filterConfig = $filterConfig;
-        $this->guesserManager = $guesserManager;
+        $this->metadataResolver = $metadataResolver;
         $this->defaultLoader = $defaultLoader;
         $this->globalDefaultImage = $globalDefaultImage;
     }
@@ -68,7 +70,7 @@ class DataManager
      * @param string          $filter
      * @param LoaderInterface $loader
      */
-    public function addLoader($filter, LoaderInterface $loader)
+    public function addLoader(string $filter, LoaderInterface $loader): void
     {
         $this->loaders[$filter] = $loader;
     }
@@ -82,21 +84,19 @@ class DataManager
      *
      * @return LoaderInterface
      */
-    public function getLoader($filter)
+    public function getLoader(string $filter): LoaderInterface
     {
         $config = $this->filterConfig->get($filter);
+        $loader = empty($config['data_loader']) ? $this->defaultLoader : $config['data_loader'];
 
-        $loaderName = empty($config['data_loader']) ? $this->defaultLoader : $config['data_loader'];
-
-        if (!isset($this->loaders[$loaderName])) {
+        if (!isset($this->loaders[$loader])) {
             throw new \InvalidArgumentException(sprintf(
                 'Could not find data loader "%s" for "%s" filter type',
-                $loaderName,
-                $filter
+                $loader, $filter
             ));
         }
 
-        return $this->loaders[$loaderName];
+        return $this->loaders[$loader];
     }
 
     /**
@@ -109,22 +109,25 @@ class DataManager
      *
      * @return FileInterface
      */
-    public function find($filter, $path)
+    public function find(string $filter, string $path): FileInterface
     {
-        $loader = $this->getLoader($filter);
-
-        $file = $loader->find($path);
-        if (!$file instanceof FileInterface) {
-            $meta = $this->guesserManager->guessUsingContent($file);
-            $file = new FileContent($file, $meta->contentType(), $meta->extension());
-        }
+        $file = $this
+            ->metadataResolver
+            ->resolve(
+                $this->getLoader($filter)->find($path)
+            );
 
         if (!$file->hasContentType()) {
-            throw new \LogicException(sprintf('The mime type of image %s was not guessed.', $path));
+            throw new \LogicException(sprintf(
+                'Failed to resolve the content type of "%s".', $path
+            ));
         }
 
-        if (0 !== mb_strpos($file->contentType(), 'image/')) {
-            throw new \LogicException(sprintf('The mime type of image %s must be image/xxx got %s.', $path, $file->contentType()));
+        if (!$file->getContentType()->isMatch('image')) {
+            throw new \LogicException(sprintf(
+                'Invalid content type "%s" resolved for "%s" (expected primary type "image").',
+                (string) $file->getContentType(), $path
+            ));
         }
 
         return $file;
@@ -137,17 +140,20 @@ class DataManager
      *
      * @return string|null
      */
-    public function getDefaultImageUrl($filter)
+    public function getDefaultImageUrl(string $filter): ?string
     {
-        $config = $this->filterConfig->get($filter);
+        $config = $this
+            ->filterConfig
+            ->get($filter);
 
-        $defaultImage = null;
-        if (false === empty($config['default_image'])) {
-            $defaultImage = $config['default_image'];
-        } elseif (!empty($this->globalDefaultImage)) {
-            $defaultImage = $this->globalDefaultImage;
+        if (!empty($config['default_image'])) {
+            return $config['default_image'];
         }
 
-        return $defaultImage;
+        if (!empty($this->globalDefaultImage)) {
+            return $this->globalDefaultImage;
+        }
+
+        return null;
     }
 }

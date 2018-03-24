@@ -92,7 +92,7 @@ class AwsS3Resolver implements ResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function isStored($path, $filter)
+    public function isStored(string $path, string $filter): bool
     {
         return $this->objectExists($this->getObjectPath($path, $filter));
     }
@@ -100,7 +100,7 @@ class AwsS3Resolver implements ResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function resolve($path, $filter)
+    public function resolve(string $path, string $filter): string
     {
         return $this->getObjectUrl($this->getObjectPath($path, $filter));
     }
@@ -108,7 +108,7 @@ class AwsS3Resolver implements ResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function store(FileInterface $binary, $path, $filter)
+    public function store(FileInterface $file, string $path, string $filter): void
     {
         $objectPath = $this->getObjectPath($path, $filter);
 
@@ -120,8 +120,8 @@ class AwsS3Resolver implements ResolverInterface
                         'ACL' => $this->acl,
                         'Bucket' => $this->bucket,
                         'Key' => $objectPath,
-                        'Body' => $binary->contents(),
-                        'ContentType' => $binary->contentType(),
+                        'Body' => $file->getContents(),
+                        'ContentType' => (string) $file->getContentType(),
                     ]
                 )
             );
@@ -140,7 +140,7 @@ class AwsS3Resolver implements ResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function remove(array $paths, array $filters)
+    public function remove(array $paths, array $filters): void
     {
         if (empty($paths) && empty($filters)) {
             return;

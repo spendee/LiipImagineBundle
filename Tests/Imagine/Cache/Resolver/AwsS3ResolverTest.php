@@ -14,7 +14,7 @@ namespace Liip\ImagineBundle\Tests\Imagine\Cache\Resolver;
 use Aws\S3\S3Client;
 use Guzzle\Service\Resource\Model;
 use Liip\ImagineBundle\Exception\Imagine\Cache\Resolver\NotStorableException;
-use Liip\ImagineBundle\File\FileContent;
+use Liip\ImagineBundle\File\FileBlob;
 use Liip\ImagineBundle\Imagine\Cache\Resolver\AwsS3Resolver;
 use Liip\ImagineBundle\Imagine\Cache\Resolver\ResolverInterface;
 use Liip\ImagineBundle\Tests\AbstractTest;
@@ -37,7 +37,8 @@ class AwsS3ResolverTest extends AbstractTest
         $s3
             ->expects($this->once())
             ->method('getObjectUrl')
-            ->with('images.example.com', 'thumb/some-folder/path.jpg');
+            ->with('images.example.com', 'thumb/some-folder/path.jpg')
+            ->willReturn('resolved/thumb.png');
 
         $resolver = new AwsS3Resolver($s3, 'images.example.com');
         $resolver->resolve('/some-folder/path.jpg', 'thumb');
@@ -49,7 +50,8 @@ class AwsS3ResolverTest extends AbstractTest
         $s3
             ->expects($this->once())
             ->method('getObjectUrl')
-            ->with('images.example.com', 'thumb/some-folder/path.jpg', 0, ['torrent' => true]);
+            ->with('images.example.com', 'thumb/some-folder/path.jpg', 0, ['torrent' => true])
+            ->willReturn('resolved/thumb.png');
 
         $resolver = new AwsS3Resolver($s3, 'images.example.com');
         $resolver->setGetOption('torrent', true);
@@ -61,7 +63,7 @@ class AwsS3ResolverTest extends AbstractTest
         $this->expectException(NotStorableException::class);
         $this->expectExceptionMessage('The object could not be created on Amazon S3');
 
-        $binary = FileContent::create('aContent', 'image/jpeg', 'jpeg');
+        $binary = FileBlob::create('aContent', 'image/jpeg', 'jpeg');
 
         $s3 = $this->getS3ClientMock();
         $s3
@@ -81,7 +83,7 @@ class AwsS3ResolverTest extends AbstractTest
 
     public function testCreateObjectOnAmazon()
     {
-        $binary = FileContent::create('aContent', 'image/jpeg', 'jpeg');
+        $binary = FileBlob::create('aContent', 'image/jpeg', 'jpeg');
 
         $s3 = $this->getS3ClientMock();
         $s3
@@ -95,7 +97,7 @@ class AwsS3ResolverTest extends AbstractTest
 
     public function testObjectOptionsPassedToS3ClintOnCreate()
     {
-        $binary = FileContent::create('aContent', 'image/jpeg', 'jpeg');
+        $binary = FileBlob::create('aContent', 'image/jpeg', 'jpeg');
 
         $s3 = $this->getS3ClientMock();
         $s3

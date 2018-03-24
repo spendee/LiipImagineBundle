@@ -11,7 +11,7 @@
 
 namespace Liip\ImagineBundle\Imagine\Filter\PostProcessor;
 
-use Liip\ImagineBundle\File\FileContent;
+use Liip\ImagineBundle\File\FileBlob;
 use Liip\ImagineBundle\File\FileInterface;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
@@ -72,7 +72,9 @@ class MozJpegPostProcessor implements PostProcessorInterface
      */
     public function process(FileInterface $file, array $options = []): FileInterface
     {
-        if (!$file->contentType()->isEquivalent('image', 'jpg') && !$file->contentType()->isEquivalent('image', 'jpeg')) {
+        if (!$file->getContentType()->isMatch('image', 'jpg') &&
+            !$file->getContentType()->isMatch('image', 'jpeg')
+        ) {
             return $file;
         }
 
@@ -91,13 +93,13 @@ class MozJpegPostProcessor implements PostProcessorInterface
 
         // Favor stdin/stdout so we don't waste time creating a new file.
         $process = new Process($arguments);
-        $process->setInput($file->contents());
+        $process->setInput($file->getContents());
         $process->run();
 
         if (false !== mb_strpos($process->getOutput(), 'ERROR') || 0 !== $process->getExitCode()) {
             throw new ProcessFailedException($process);
         }
 
-        return new FileContent($process->getOutput(), $file->contentType(), $file->extension());
+        return new FileBlob($process->getOutput(), $file->getContentType(), $file->getExtension());
     }
 }

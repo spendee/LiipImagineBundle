@@ -16,7 +16,7 @@ namespace Liip\ImagineBundle\File\Lock;
  *
  * @author Rob Frawley 2nd <rmf@src.run>
  */
-final class LockAction
+final class LockInvokable
 {
     /**
      * @param mixed    $context
@@ -26,7 +26,7 @@ final class LockAction
      */
     public static function blocking($context, \Closure $action)
     {
-        $lock = LockFactory::createBlocked($context);
+        $lock = LockFactory::blocking($context);
 
         try {
             return $action();

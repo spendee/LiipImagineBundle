@@ -13,7 +13,7 @@ namespace Liip\ImagineBundle\Tests\File;
 
 use Liip\ImagineBundle\Exception\File\FileOperationException;
 use Liip\ImagineBundle\File\FileInterface;
-use Liip\ImagineBundle\File\FileReference;
+use Liip\ImagineBundle\File\FilePath;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
 use org\bovigo\vfs\vfsStreamException;
@@ -22,9 +22,9 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\Finder;
 
 /**
- * @covers \Liip\ImagineBundle\File\FileReference
- * @covers \Liip\ImagineBundle\File\FileReferenceTrait
- * @covers \Liip\ImagineBundle\File\FileTrait
+ * @covers \Liip\ImagineBundle\File\AbstractFile
+ * @covers \Liip\ImagineBundle\File\AbstractFilePath
+ * @covers \Liip\ImagineBundle\File\FilePath
  */
 class FileReferenceTest extends TestCase
 {
@@ -58,7 +58,7 @@ class FileReferenceTest extends TestCase
 
     public function testInstanceOfFileInterface()
     {
-        $this->assertInstanceOf(FileInterface::class, new FileReference());
+        $this->assertInstanceOf(FileInterface::class, new FilePath());
     }
 
     /**
@@ -86,39 +86,37 @@ class FileReferenceTest extends TestCase
         $path = $this->createFakeFileName(__METHOD__, $this->filesystemWork->url());
         $file = $this->createFileReference($path, 'type/sub-type', 'ext');
 
-        $this->assertSame($path, $file->file()->getPathname());
+        $this->assertSame($path, $file->getFile()->getPathname());
         $this->assertSame($path, (string) $file);
         $this->assertTrue($file->hasFile());
-        $this->assertFalse($file->exists());
-        $this->assertFalse($file->isReadable());
-        $this->assertTrue($file->isWritable());
-        $this->assertNull($file->contents());
+        $this->assertFalse($file->fileExists());
+        $this->assertFalse($file->isFileReadable());
+        $this->assertTrue($file->isFileWritable());
+        $this->assertNull($file->getContents());
         $this->assertFalse($file->hasContents());
-        $this->assertTrue($file->hasEmptyContents());
 
         $file->setContents($contents);
 
-        $this->assertTrue($file->exists());
-        $this->assertTrue($file->isReadable());
-        $this->assertTrue($file->isWritable());
-        $this->assertSame($contents, $file->contents());
+        $this->assertTrue($file->fileExists());
+        $this->assertTrue($file->isFileReadable());
+        $this->assertTrue($file->isFileWritable());
+        $this->assertSame($contents, $file->getContents());
         $this->assertTrue($file->hasContents());
-        $this->assertFalse($file->hasEmptyContents());
 
         $file->setContents($contents);
 
-        $this->assertSame($contents, $file->contents());
+        $this->assertSame($contents, $file->getContents());
 
         $file->setContents('');
 
         for ($i = 1; $i < 8; ++$i) {
             $file->setContents($contents, true);
-            $this->assertSame(str_repeat($contents, $i), $file->contents());
+            $this->assertSame(str_repeat($contents, $i), $file->getContents());
         }
 
         $file->remove();
 
-        $this->assertFalse($file->exists());
+        $this->assertFalse($file->fileExists());
     }
 
     /**
@@ -154,11 +152,11 @@ class FileReferenceTest extends TestCase
      * @param string|null          $contentType
      * @param string|null          $extension
      *
-     * @return FileReference
+     * @return FilePath
      */
-    private function createFileReference($file, string $contentType = null, string $extension = null): FileReference
+    private function createFileReference($file, string $contentType = null, string $extension = null): FilePath
     {
-        return FileReference::create(
+        return FilePath::create(
             $file instanceof vfsStreamFile ? $file->url() : $file,
             $contentType ?? 'content-type/sub-type',
             $extension ?? 'ext'

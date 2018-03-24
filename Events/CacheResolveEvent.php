@@ -16,34 +16,26 @@ use Symfony\Component\EventDispatcher\Event;
 class CacheResolveEvent extends Event
 {
     /**
-     * Resource path.
-     *
      * @var string
      */
     protected $path;
 
     /**
-     * Filter name.
-     *
      * @var string
      */
     protected $filter;
 
     /**
-     * Resource url.
-     *
-     * @var null
+     * @var string|null
      */
     protected $url;
 
     /**
-     * Init default event state.
-     *
      * @param string      $path
      * @param string      $filter
-     * @param null|string $url
+     * @param string|null $url
      */
-    public function __construct($path, $filter, $url = null)
+    public function __construct(string $path, string $filter, string $url = null)
     {
         $this->path = $path;
         $this->filter = $filter;
@@ -51,60 +43,70 @@ class CacheResolveEvent extends Event
     }
 
     /**
-     * Sets resource path.
+     * @param string $path
      *
-     * @param $path
+     * @return $this
      */
-    public function setPath($path)
+    public function setPath(string $path): self
     {
         $this->path = $path;
+
+        return $this;
     }
 
     /**
-     * Returns resource path.
-     *
      * @return string
      */
-    public function getPath()
+    public function getPath(): string
     {
         return $this->path;
     }
 
     /**
-     * Sets filter name.
+     * @param string $filter
      *
-     * @param $filter
+     * @return $this
      */
-    public function setFilter($filter)
+    public function setFilter(string $filter): self
     {
         $this->filter = $filter;
+
+        return $this;
     }
 
     /**
-     * Returns filter name.
-     *
      * @return string
      */
-    public function getFilter()
+    public function getFilter(): string
     {
         return $this->filter;
     }
 
     /**
-     * Sets resource url.
+     * @param string $url
      *
-     * @param $url
+     * @return $this
      */
-    public function setUrl($url)
+    public function setUrl(string $url): self
     {
         $this->url = $url;
+
+        return $this;
     }
 
     /**
-     * Returns resource url.
+     * @return string|null
      */
-    public function getUrl()
+    public function getUrl(): ?string
     {
         return $this->url;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasUrl(): bool
+    {
+        return null !== $this->url;
     }
 }

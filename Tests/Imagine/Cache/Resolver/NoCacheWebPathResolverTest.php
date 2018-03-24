@@ -11,7 +11,7 @@
 
 namespace Liip\ImagineBundle\Tests\Imagine\Cache\Resolver;
 
-use Liip\ImagineBundle\File\FileContent;
+use Liip\ImagineBundle\File\FileBlob;
 use Liip\ImagineBundle\Imagine\Cache\Resolver\NoCacheWebPathResolver;
 use Liip\ImagineBundle\Tests\AbstractTest;
 use Symfony\Component\Routing\RequestContext;
@@ -38,7 +38,7 @@ class NoCacheWebPathResolverTest extends AbstractTest
     public function testDoNothingOnStore()
     {
         $resolver = new NoCacheWebPathResolver(new RequestContext());
-        $resolver->store(FileContent::create('aContent', 'image/jpeg', 'jpeg'), 'a/path', 'aFilter');
+        $resolver->store(FileBlob::create('aContent', 'image/jpeg', 'jpeg'), 'a/path', 'aFilter');
     }
 
     public function testDoNothingForPathAndFilterOnRemove()

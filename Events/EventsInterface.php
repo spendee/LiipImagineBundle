@@ -9,20 +9,17 @@
  * file that was distributed with this source code.
  */
 
-namespace Liip\ImagineBundle\File\Metadata;
+namespace Liip\ImagineBundle\Events;
 
-/**
- * @author Rob Frawley 2nd <rmf@src.run>
- */
-interface MetadataInterface
+interface EventsInterface
 {
     /**
-     * @return string
+     * @Event("Liip\ImagineBundle\Events\CacheResolveEvent")
      */
-    public function __toString(): string;
+    const PRE_RESOLVE = 'liip_imagine.pre_resolve';
 
     /**
-     * @return bool
+     * @Event("Liip\ImagineBundle\Events\CacheResolveEvent")
      */
-    public function isValid(): bool;
+    const POST_RESOLVE = 'liip_imagine.post_resolve';
 }

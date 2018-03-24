@@ -42,7 +42,7 @@
 
         <service id="liip_imagine.data.manager" class="Liip\ImagineBundle\Imagine\Data\DataManager" public="true">
             <argument type="service" id="liip_imagine.filter.configuration" />
-            <argument type="service" id="liip_imagine.guesser_manager" />
+            <argument type="service" id="liip_imagine.file_metadata.resolver" />
             <argument>%liip_imagine.binary.loader.default%</argument>
             <argument>%liip_imagine.default_image%</argument>
         </service>
@@ -173,7 +173,6 @@
 
         <service id="liip_imagine.binary.loader.prototype.filesystem" class="Liip\ImagineBundle\Binary\Loader\FileSystemLoader">
             <argument><!-- will be injected by FileSystemLoaderFactory --></argument>
-            <argument type="service" id="liip_imagine.guesser_manager" />
         </service>
 
         <service id="liip_imagine.binary.loader.prototype.stream" class="Liip\ImagineBundle\Binary\Loader\StreamLoader">
@@ -183,7 +182,6 @@
 
         <service id="liip_imagine.binary.loader.prototype.flysystem" class="Liip\ImagineBundle\Binary\Loader\FlysystemLoader" abstract="true">
             <argument><!-- will be injected by FlysystemLoaderFactory --></argument>
-            <argument type="service" id="liip_imagine.guesser_manager" />
         </service>
 
         <!-- Data loader locators -->
@@ -246,18 +244,22 @@
 
         <!-- Guessers -->
 
+        <service id="liip_imagine.file_metadata.resolver" class="Liip\ImagineBundle\File\Metadata\Resolver\ImageMetadataResolver">
+            <argument type="service" id="liip_imagine.guesser_manager" />
+        </service>
+
         <service id="liip_imagine.guesser_manager" class="Liip\ImagineBundle\File\Guesser\GuesserManager" public="false">
             <argument type="service" id="liip_imagine.guesser.content_type" />
             <argument type="service" id="liip_imagine.guesser.extension" />
         </service>
 
-        <service id="liip_imagine.guesser.extension" class="Liip\ImagineBundle\File\Guesser\ExtensionGuesser" public="false">
+        <service id="liip_imagine.guesser.extension" class="Liip\ImagineBundle\File\Guesser\Handler\ExtensionGuesser" public="false">
             <call method="register">
                 <argument type="service" id="liip_imagine.symfony_guesser.extension" />
             </call>
         </service>
 
-        <service id="liip_imagine.guesser.content_type" class="Liip\ImagineBundle\File\Guesser\ContentTypeGuesser" public="false">
+        <service id="liip_imagine.guesser.content_type" class="Liip\ImagineBundle\File\Guesser\Handler\ContentTypeGuesser" public="false">
             <call method="register">
                 <argument type="service" id="liip_imagine.symfony_guesser.content_type" />
             </call>

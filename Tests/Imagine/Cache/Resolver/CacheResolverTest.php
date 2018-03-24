@@ -13,7 +13,7 @@ namespace Liip\ImagineBundle\Tests\Imagine\Cache\Resolver;
 
 use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\Common\Cache\Cache;
-use Liip\ImagineBundle\File\FileContent;
+use Liip\ImagineBundle\File\FileBlob;
 use Liip\ImagineBundle\Imagine\Cache\Resolver\CacheResolver;
 use Liip\ImagineBundle\Tests\AbstractTest;
 
@@ -90,7 +90,7 @@ class CacheResolverTest extends AbstractTest
 
     public function testStoreIsForwardedToResolver()
     {
-        $binary = FileContent::create('aContent', 'image/jpeg', 'jpeg');
+        $binary = FileBlob::create('aContent', 'image/jpeg', 'jpeg');
 
         $resolver = $this->createCacheResolverInterfaceMock();
         $resolver

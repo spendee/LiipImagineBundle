@@ -11,10 +11,11 @@
 
 namespace Liip\ImagineBundle\Tests\File\Metadata;
 
-use Liip\ImagineBundle\File\Metadata\ContentTypeMetadata;
+use Liip\ImagineBundle\File\Metadata\MimeTypeMetadata;
 use Liip\ImagineBundle\File\Metadata\ExtensionMetadata;
 use Liip\ImagineBundle\File\Metadata\LocationMetadata;
 use Liip\ImagineBundle\File\Metadata\Metadata;
+use Liip\ImagineBundle\Tests\Fixtures\Data\DataLoader;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -33,24 +34,21 @@ class MetadataTest extends TestCase
     /**
      * @dataProvider provideMetadataData
      *
-     * @param LocationMetadata    $l
-     * @param ContentTypeMetadata $c
-     * @param ExtensionMetadata   $e
+     * @param string $c
+     * @param string $e
      */
-    public function testMetadata(LocationMetadata $l, ContentTypeMetadata $c, ExtensionMetadata $e)
+    public function testMetadata(string $c, string $e)
     {
-        $meta = Metadata::create($l, $c, $e);
+        $meta = Metadata::create($c, $e);
 
         $this->assertTrue($meta->isValid());
 
-        $this->assertTrue($meta->hasLocation());
-        $this->assertSame($l, $meta->location());
         $this->assertTrue($meta->hasContentType());
-        $this->assertSame($c, $meta->contentType());
+        $this->assertSame($c, $meta->getContentType()->__toString());
         $this->assertTrue($meta->hasExtension());
-        $this->assertSame($e, $meta->extension());
+        $this->assertSame($e, $meta->getExtension()->__toString());
 
-        $this->assertStringMatchesFormat('(%s) [%s]: %s', $meta->__toString());
+        $this->assertStringMatchesFormat('%s => "%s/%s"', $meta->__toString());
     }
 
     /**
@@ -58,19 +56,8 @@ class MetadataTest extends TestCase
      */
     public static function fixtureMetadata(): \Iterator
     {
-        $iterator = new \MultipleIterator(
-            \MultipleIterator::MIT_KEYS_ASSOC | \MultipleIterator::MIT_NEED_ALL
-        );
-        $iterator->attachIterator(LocationMetadataTest::fetchFixtureData(), 'l');
-        $iterator->attachIterator(ContentTypeMetadataTest::fetchFixtureData(), 'c');
-        $iterator->attachIterator(ExtensionMetadataTest::fetchFixtureData(), 'e');
-
-        foreach ($iterator as $item) {
-            yield [
-                LocationMetadata::create($item['l'][0]),
-                ContentTypeMetadata::create($item['c'][0]),
-                ExtensionMetadata::create($item['e'][0]),
-            ];
+        foreach ((new DataLoader())(MimeTypeMetadataTest::class, 10) as $d) {
+            yield [$d[0], $d[count($d) - 1]];
         }
     }
 }

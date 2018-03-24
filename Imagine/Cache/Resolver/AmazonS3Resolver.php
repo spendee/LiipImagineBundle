@@ -15,7 +15,7 @@ use Liip\ImagineBundle\Exception\Imagine\Cache\Resolver\NotStorableException;
 use Liip\ImagineBundle\File\FileInterface;
 use Psr\Log\LoggerInterface;
 
-class AmazonS3Resolver implements ResolverInterface
+class AmazonS3Resolver extends AbstractResolver
 {
     /**
      * @var \AmazonS3
@@ -38,20 +38,16 @@ class AmazonS3Resolver implements ResolverInterface
     protected $objUrlOptions;
 
     /**
-     * @var LoggerInterface
+     * @param \AmazonS3       $storage       The Amazon S3 storage API. It's required to know authentication information
+     * @param string          $bucket        The bucket name to operate on
+     * @param string          $acl           The ACL to use when storing new objects. Default: owner read/write, public read
+     * @param array           $objUrlOptions A list of options to be passed when retrieving the object url from Amazon S3
+     * @param LoggerInterface $logger
      */
-    protected $logger;
-
-    /**
-     * Constructs a cache resolver storing images on Amazon S3.
-     *
-     * @param \AmazonS3 $storage       The Amazon S3 storage API. It's required to know authentication information
-     * @param string    $bucket        The bucket name to operate on
-     * @param string    $acl           The ACL to use when storing new objects. Default: owner read/write, public read
-     * @param array     $objUrlOptions A list of options to be passed when retrieving the object url from Amazon S3
-     */
-    public function __construct(\AmazonS3 $storage, $bucket, $acl = \AmazonS3::ACL_PUBLIC, array $objUrlOptions = [])
+    public function __construct(\AmazonS3 $storage, string $bucket, string $acl = \AmazonS3::ACL_PUBLIC, array $objUrlOptions = [], LoggerInterface $logger = null)
     {
+        parent::__construct($logger);
+
         $this->storage = $storage;
         $this->bucket = $bucket;
         $this->acl = $acl;
@@ -59,17 +55,9 @@ class AmazonS3Resolver implements ResolverInterface
     }
 
     /**
-     * @param LoggerInterface $logger
-     */
-    public function setLogger(LoggerInterface $logger)
-    {
-        $this->logger = $logger;
-    }
-
-    /**
      * {@inheritdoc}
      */
-    public function isStored($path, $filter)
+    public function isStored(string $path, string $filter): bool
     {
         return $this->objectExists($this->getObjectPath($path, $filter));
     }
@@ -77,7 +65,7 @@ class AmazonS3Resolver implements ResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function resolve($path, $filter)
+    public function resolve(string $path, string $filter): string
     {
         return $this->getObjectUrl($this->getObjectPath($path, $filter));
     }
@@ -85,22 +73,23 @@ class AmazonS3Resolver implements ResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function store(FileInterface $binary, $path, $filter)
+    public function store(FileInterface $file, string $path, string $filter): void
     {
-        $objectPath = $this->getObjectPath($path, $filter);
-
-        $storageResponse = $this->storage->create_object($this->bucket, $objectPath, [
-            'body' => $binary->contents(),
-            'contentType' => $binary->contentType(),
-            'length' => mb_strlen($binary->contents()),
+        $object = $this->getObjectPath($path, $filter);
+        $result = $this->storage->create_object($this->bucket, $object, [
+            'body' => $file->getContents(),
+            'contentType' => (string) $file->getContentType(),
+            'length' => $file->getContentsLength(),
             'acl' => $this->acl,
         ]);
 
-        if (!$storageResponse->isOK()) {
-            $this->logError('The object could not be created on Amazon S3.', [
-                'objectPath' => $objectPath,
+        if (!$result->isOK()) {
+            $this->logger->error('The object could not be created on Amazon S3.', [
+                'path' => $path,
                 'filter' => $filter,
-                's3_response' => $storageResponse,
+                'object' => $object,
+                'bucket' => $this->bucket,
+                'result' => $result,
             ]);
 
             throw new NotStorableException('The object could not be created on Amazon S3.');
@@ -110,7 +99,7 @@ class AmazonS3Resolver implements ResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function remove(array $paths, array $filters)
+    public function remove(array $paths, array $filters): void
     {
         if (empty($paths) && empty($filters)) {
             return;
@@ -118,7 +107,7 @@ class AmazonS3Resolver implements ResolverInterface
 
         if (empty($paths)) {
             if (!$this->storage->delete_all_objects($this->bucket, sprintf('/%s/i', implode('|', $filters)))) {
-                $this->logError('The objects could not be deleted from Amazon S3.', [
+                $this->logger->error('The objects could not be deleted from Amazon S3.', [
                     'filters' => implode(', ', $filters),
                     'bucket' => $this->bucket,
                 ]);
@@ -129,16 +118,18 @@ class AmazonS3Resolver implements ResolverInterface
 
         foreach ($filters as $filter) {
             foreach ($paths as $path) {
-                $objectPath = $this->getObjectPath($path, $filter);
-                if (!$this->objectExists($objectPath)) {
+                $object = $this->getObjectPath($path, $filter);
+
+                if (!$this->objectExists($object)) {
                     continue;
                 }
 
-                if (!$this->storage->delete_object($this->bucket, $objectPath)->isOK()) {
-                    $this->logError('The objects could not be deleted from Amazon S3.', [
-                        'filter' => $filter,
-                        'bucket' => $this->bucket,
+                if (!$this->storage->delete_object($this->bucket, $object)->isOK()) {
+                    $this->logger->error('The objects could not be deleted from Amazon S3.', [
                         'path' => $path,
+                        'filter' => $filter,
+                        'object' => $object,
+                        'bucket' => $this->bucket,
                     ]);
                 }
             }
@@ -155,9 +146,9 @@ class AmazonS3Resolver implements ResolverInterface
      * @param string $key   The name of the option
      * @param mixed  $value The value to be set
      *
-     * @return AmazonS3Resolver $this
+     * @return $this
      */
-    public function setObjectUrlOption($key, $value)
+    public function setObjectUrlOption(string $key, string $value): self
     {
         $this->objUrlOptions[$key] = $value;
 
@@ -172,7 +163,7 @@ class AmazonS3Resolver implements ResolverInterface
      *
      * @return string The path of the object on S3
      */
-    protected function getObjectPath($path, $filter)
+    protected function getObjectPath(string $path, string $filter): string
     {
         return str_replace('//', '/', $filter.'/'.$path);
     }
@@ -180,37 +171,30 @@ class AmazonS3Resolver implements ResolverInterface
     /**
      * Returns the URL for an object saved on Amazon S3.
      *
-     * @param string $path
+     * @param string $object
      *
-     * @return string
+     * @return string|null
      */
-    protected function getObjectUrl($path)
+    protected function getObjectUrl(string $object): ?string
     {
-        return $this->storage->get_object_url($this->bucket, $path, 0, $this->objUrlOptions);
+        return $this
+            ->storage
+            ->get_object_url($this->bucket, $object, 0, $this->objUrlOptions);
     }
 
     /**
      * Checks whether an object exists.
      *
-     * @param string $objectPath
+     * @param string $object
      *
      * @throws \S3_Exception
      *
      * @return bool
      */
-    protected function objectExists($objectPath)
+    protected function objectExists(string $object): bool
     {
-        return $this->storage->if_object_exists($this->bucket, $objectPath);
-    }
-
-    /**
-     * @param mixed $message
-     * @param array $context
-     */
-    protected function logError($message, array $context = [])
-    {
-        if ($this->logger) {
-            $this->logger->error($message, $context);
-        }
+        return $this
+            ->storage
+            ->if_object_exists($this->bucket, $object);
     }
 }

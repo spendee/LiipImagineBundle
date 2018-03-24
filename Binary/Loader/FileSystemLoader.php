@@ -12,8 +12,8 @@
 namespace Liip\ImagineBundle\Binary\Loader;
 
 use Liip\ImagineBundle\Binary\Locator\LocatorInterface;
-use Liip\ImagineBundle\File\FileReference;
-use Liip\ImagineBundle\File\Guesser\GuesserManager;
+use Liip\ImagineBundle\File\FileInterface;
+use Liip\ImagineBundle\File\FilePath;
 
 class FileSystemLoader implements LoaderInterface
 {
@@ -23,30 +23,18 @@ class FileSystemLoader implements LoaderInterface
     private $locator;
 
     /**
-     * @var GuesserManager
-     */
-    private $guesserManager;
-
-    /**
      * @param LocatorInterface $locator
-     * @param GuesserManager   $guesserManager
      */
-    public function __construct(
-        LocatorInterface $locator,
-        GuesserManager   $guesserManager
-    ) {
+    public function __construct(LocatorInterface $locator)
+    {
         $this->locator = $locator;
-        $this->guesserManager = $guesserManager;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function find($path)
+    public function find(string $identity): FileInterface
     {
-        $path = $this->locator->locate($path);
-        $meta = $this->guesserManager->guessUsingPath($path);
-
-        return new FileReference($path, $meta->contentType(), $meta->extension());
+        return new FilePath($this->locator->locate($identity));
     }
 }

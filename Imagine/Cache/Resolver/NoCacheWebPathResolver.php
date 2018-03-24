@@ -32,7 +32,7 @@ class NoCacheWebPathResolver implements ResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function isStored($path, $filter)
+    public function isStored(string $path, string $filter): bool
     {
         return true;
     }
@@ -40,7 +40,7 @@ class NoCacheWebPathResolver implements ResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function resolve($path, $filter)
+    public function resolve(string $path, string $filter): string
     {
         return sprintf('%s://%s/%s',
             $this->requestContext->getScheme(),
@@ -52,14 +52,14 @@ class NoCacheWebPathResolver implements ResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function store(FileInterface $binary, $path, $filter)
+    public function store(FileInterface $file, string $path, string $filter): void
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function remove(array $paths, array $filters)
+    public function remove(array $paths, array $filters): void
     {
     }
 }

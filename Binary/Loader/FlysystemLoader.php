@@ -13,9 +13,10 @@ namespace Liip\ImagineBundle\Binary\Loader;
 
 use League\Flysystem\FilesystemInterface;
 use Liip\ImagineBundle\Exception\Binary\Loader\NotLoadableException;
-use Liip\ImagineBundle\File\FileContent;
+use Liip\ImagineBundle\File\FileBlob;
+use Liip\ImagineBundle\File\FileInterface;
 use Liip\ImagineBundle\File\Guesser\GuesserManager;
-use Liip\ImagineBundle\File\Metadata\ContentTypeMetadata;
+use Liip\ImagineBundle\File\Metadata\MimeTypeMetadata;
 
 class FlysystemLoader implements LoaderInterface
 {
@@ -25,36 +26,29 @@ class FlysystemLoader implements LoaderInterface
     private $filesystem;
 
     /**
-     * @var GuesserManager
-     */
-    private $guesserManager;
-
-    /**
      * @param FilesystemInterface $filesystem
-     * @param GuesserManager      $guesserManager
      */
-    public function __construct(FilesystemInterface $filesystem, GuesserManager $guesserManager)
+    public function __construct(FilesystemInterface $filesystem)
     {
         $this->filesystem = $filesystem;
-        $this->guesserManager = $guesserManager;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function find($path)
+    public function find(string $identity): FileInterface
     {
-        if (false === $this->filesystem->has($path)) {
-            throw new NotLoadableException(sprintf('Source image "%s" not found.', $path));
+        if (false === $this->filesystem->has($identity)) {
+            throw new NotLoadableException(sprintf('Source image "%s" not found.', $identity));
         }
 
         try {
-            $file = $this->filesystem->read($path);
-            $type = ContentTypeMetadata::create($this->filesystem->getMimetype($path));
+            $file = $this->filesystem->read($identity);
+            $type = $this->filesystem->getMimetype($identity);
         } catch (\Exception $e) {
-            throw new NotLoadableException(sprintf('Failed to load "%s" from flysystem service!', $path), 0, $e);
+            throw new NotLoadableException(sprintf('Failed to load "%s" from flysystem service!', $identity), 0, $e);
         }
 
-        return new FileContent($file, ContentTypeMetadata::create($type), $this->guesserManager->guessExtension($type));
+        return FileBlob::create($file, $type);
     }
 }

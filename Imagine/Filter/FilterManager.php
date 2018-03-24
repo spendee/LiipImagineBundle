@@ -13,7 +13,7 @@ namespace Liip\ImagineBundle\Imagine\Filter;
 
 use Imagine\Image\ImageInterface;
 use Imagine\Image\ImagineInterface;
-use Liip\ImagineBundle\File\FileContent;
+use Liip\ImagineBundle\File\FileBlob;
 use Liip\ImagineBundle\File\FileInterface;
 use Liip\ImagineBundle\File\Guesser\GuesserManager;
 use Liip\ImagineBundle\Imagine\Filter\Loader\LoaderInterface;
@@ -117,7 +117,7 @@ class FilterManager
      */
     public function applyFilters(FileInterface $file, array $config): FileInterface
     {
-        $image = $this->imagine->load($file->contents());
+        $image = $this->imagine->load($file->getContents());
 
         foreach ($this->sanitizeFilters($config['filters'] ?? []) as $name => $options) {
             $prior = $image;
@@ -192,24 +192,24 @@ class FilterManager
             $options['png_compression_filter'] = $config['png_compression_filter'];
         }
 
-        if ($file->extension()->isExtension('gif') && $config['animated'] ?? false) {
+        if ($file->getExtension()->isMatch('gif') && $config['animated'] ?? false) {
             $options['animated'] = $config['animated'];
         }
 
-        $filterDataTyped = $file->contentType();
-        $filterExtension = $config['format'] ?? (string) $file->extension();
+        $filterDataTyped = $file->getContentType();
+        $filterExtension = $config['format'] ?? (string) $file->getExtension();
         $filterImageBlob = $image->get($filterExtension, $options);
 
-        if ($filterExtension !== (string) $file->extension()) {
+        if ($filterExtension !== (string) $file->getExtension()) {
             $filterDataTyped = $this
                 ->guesserManager
                 ->guessUsingContent($filterImageBlob)
-                ->contentType();
+                ->getContentType();
         }
 
         $this->destroyImage($image);
 
-        return FileContent::create($filterImageBlob, $filterDataTyped, $filterExtension);
+        return FileBlob::create($filterImageBlob, $filterDataTyped, $filterExtension);
     }
 
     /**

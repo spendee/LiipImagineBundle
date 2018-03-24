@@ -35,7 +35,7 @@ class StreamLoaderTest extends AbstractTest
 
         $this->assertSame(
             file_get_contents($this->fixturesPath.'/assets/cats.jpeg'),
-            $loader->find($this->fixturesPath.'/assets/cats.jpeg')
+            $loader->find($this->fixturesPath.'/assets/cats.jpeg')->getContents()
         );
     }
 
@@ -45,7 +45,7 @@ class StreamLoaderTest extends AbstractTest
 
         $this->assertSame(
             file_get_contents($this->fixturesPath.'/assets/cats.jpeg'),
-            $loader->find($this->fixturesPath.'/assets/cats.jpeg')
+            $loader->find($this->fixturesPath.'/assets/cats.jpeg')->getContents()
         );
     }
 

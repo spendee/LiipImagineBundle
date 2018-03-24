@@ -9,25 +9,22 @@
  * file that was distributed with this source code.
  */
 
-namespace Liip\ImagineBundle\File\Guesser;
+namespace Liip\ImagineBundle\File\Guesser\Handler;
 
 use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesserInterface;
-use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesserInterface;
 
 /**
+ * @internal
+ *
  * @author Rob Frawley 2nd <rmf@src.run>
  */
-interface GuesserInterface extends \Countable
+final class ExtensionGuesser extends AbstractGuesser implements ExtensionGuesserInterface
 {
     /**
-     * @param GuesserInterface|MimeTypeGuesserInterface|ExtensionGuesserInterface $guesser
+     * {@inheritdoc}
      */
-    public function register($guesser): void;
-
-    /**
-     * @param string $subject
-     *
-     * @return string|null
-     */
-    public function guess($subject): ?string;
+    protected static function isSupportedGuesser($guesser): bool
+    {
+        return $guesser instanceof ExtensionGuesserInterface;
+    }
 }

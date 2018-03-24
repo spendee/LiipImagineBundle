@@ -39,15 +39,14 @@ abstract class AbstractFilesystemResolver implements ResolverInterface, CacheMan
      * @var int
      */
     protected $folderPermissions = 0777;
+
     /**
      * @var Request
      */
     private $request;
 
     /**
-     * Constructs a filesystem based cache resolver.
-     *
-     * @param Filesystem $filesystem
+     * C@param Filesystem $filesystem
      */
     public function __construct(Filesystem $filesystem)
     {
@@ -71,11 +70,9 @@ abstract class AbstractFilesystemResolver implements ResolverInterface, CacheMan
     }
 
     /**
-     * Set the base path to.
-     *
-     * @param $basePath
+     * @param string $basePath
      */
-    public function setBasePath($basePath)
+    public function setBasePath(string$basePath)
     {
         $this->basePath = $basePath;
     }
@@ -83,7 +80,7 @@ abstract class AbstractFilesystemResolver implements ResolverInterface, CacheMan
     /**
      * @param int $folderPermissions
      */
-    public function setFolderPermissions($folderPermissions)
+    public function setFolderPermissions(int $folderPermissions)
     {
         $this->folderPermissions = $folderPermissions;
     }
@@ -91,7 +88,7 @@ abstract class AbstractFilesystemResolver implements ResolverInterface, CacheMan
     /**
      * {@inheritdoc}
      */
-    public function isStored($path, $filter)
+    public function isStored(string $path, string $filter): bool
     {
         return file_exists($this->getFilePath($path, $filter));
     }
@@ -99,21 +96,18 @@ abstract class AbstractFilesystemResolver implements ResolverInterface, CacheMan
     /**
      * {@inheritdoc}
      */
-    public function store(FileInterface $binary, $path, $filter)
+    public function store(FileInterface $file, string $path, string $filter): void
     {
         $filePath = $this->getFilePath($path, $filter);
+        $this->makeFolder(pathinfo($filePath, PATHINFO_DIRNAME));
 
-        $dir = pathinfo($filePath, PATHINFO_DIRNAME);
-
-        $this->makeFolder($dir);
-
-        file_put_contents($filePath, $binary->contents());
+        file_put_contents($filePath, $file->getContents());
     }
 
     /**
      * {@inheritdoc}
      */
-    public function remove(array $paths, array $filters)
+    public function remove(array $paths, array $filters): void
     {
         if (empty($paths) && empty($filters)) {
             return;

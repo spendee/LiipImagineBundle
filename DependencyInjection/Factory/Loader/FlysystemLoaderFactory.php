@@ -20,18 +20,18 @@ class FlysystemLoaderFactory extends AbstractLoaderFactory
     /**
      * {@inheritdoc}
      */
-    public function create(ContainerBuilder $container, $loaderName, array $config)
+    public function create(ContainerBuilder $container, string $name, array $config): string
     {
         $definition = $this->getChildLoaderDefinition();
         $definition->replaceArgument(0, new Reference($config['filesystem_service']));
 
-        return $this->setTaggedLoaderDefinition($loaderName, $definition, $container);
+        return $this->setTaggedLoaderDefinition($name, $definition, $container);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'flysystem';
     }
@@ -39,7 +39,7 @@ class FlysystemLoaderFactory extends AbstractLoaderFactory
     /**
      * {@inheritdoc}
      */
-    public function addConfiguration(ArrayNodeDefinition $builder)
+    public function addConfiguration(ArrayNodeDefinition $builder): void
     {
         $builder
             ->children()

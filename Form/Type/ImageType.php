@@ -27,7 +27,7 @@ class ImageType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars['image_path'] = $options['image_path'];
         $view->vars['image_filter'] = $options['image_filter'];
@@ -40,7 +40,7 @@ class ImageType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired([
             'image_path',
@@ -58,7 +58,7 @@ class ImageType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getParent()
+    public function getParent(): string
     {
         return FileType::class;
     }

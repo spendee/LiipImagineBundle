@@ -20,7 +20,7 @@ class FlysystemResolverFactory extends AbstractResolverFactory
     /**
      * {@inheritdoc}
      */
-    public function create(ContainerBuilder $container, $resolverName, array $config)
+    public function create(ContainerBuilder $container, string $name, array $config): string
     {
         $resolverDefinition = $this->getChildResolverDefinition();
         $resolverDefinition->replaceArgument(0, new Reference($config['filesystem_service']));
@@ -28,10 +28,10 @@ class FlysystemResolverFactory extends AbstractResolverFactory
         $resolverDefinition->replaceArgument(3, $config['cache_prefix']);
         $resolverDefinition->replaceArgument(4, $config['visibility']);
         $resolverDefinition->addTag('liip_imagine.cache.resolver', [
-            'resolver' => $resolverName,
+            'resolver' => $name,
         ]);
 
-        $resolverId = 'liip_imagine.cache.resolver.'.$resolverName;
+        $resolverId = 'liip_imagine.cache.resolver.'.$name;
         $container->setDefinition($resolverId, $resolverDefinition);
 
         return $resolverId;
@@ -40,7 +40,7 @@ class FlysystemResolverFactory extends AbstractResolverFactory
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return 'flysystem';
     }
@@ -48,7 +48,7 @@ class FlysystemResolverFactory extends AbstractResolverFactory
     /**
      * {@inheritdoc}
      */
-    public function addConfiguration(ArrayNodeDefinition $builder)
+    public function addConfiguration(ArrayNodeDefinition $builder): void
     {
         $builder
             ->children()

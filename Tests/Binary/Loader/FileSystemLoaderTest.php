@@ -17,7 +17,7 @@ use Liip\ImagineBundle\Binary\Locator\FileSystemLocator;
 use Liip\ImagineBundle\Binary\Locator\LocatorInterface;
 use Liip\ImagineBundle\Exception\Binary\Loader\NotLoadableException;
 use Liip\ImagineBundle\Exception\InvalidArgumentException;
-use Liip\ImagineBundle\File\FileReference;
+use Liip\ImagineBundle\File\FilePath;
 use Liip\ImagineBundle\Tests\AbstractTest;
 
 /**
@@ -195,18 +195,17 @@ class FileSystemLoaderTest extends AbstractTest
     private function getFileSystemLoader(array $roots = [], LocatorInterface $locator = null)
     {
         return new FileSystemLoader(
-            null !== $locator ? $locator : $this->getFileSystemLocator(count($roots) ? $roots : $this->getDefaultDataRoots()),
-            $this->createFileGuesserManager()
+            null !== $locator ? $locator : $this->getFileSystemLocator(count($roots) ? $roots : $this->getDefaultDataRoots())
         );
     }
 
     /**
-     * @param FileReference|mixed $return
-     * @param string|null         $message
+     * @param FilePath|mixed $return
+     * @param string|null    $message
      */
     private function assertValidLoaderFindReturn($return, $message = null)
     {
-        $this->assertInstanceOf(FileReference::class, $return, $message);
-        $this->assertStringStartsWith('text/', $return->contentType()->__toString(), $message);
+        $this->assertInstanceOf(FilePath::class, $return, $message);
+        $this->assertTrue($return->hasFile());
     }
 }

@@ -11,10 +11,10 @@
 
 namespace Liip\ImagineBundle\Tests\File\Metadata;
 
-use Liip\ImagineBundle\File\Guesser\ContentTypeGuesser;
-use Liip\ImagineBundle\File\Guesser\ExtensionGuesser;
+use Liip\ImagineBundle\File\Guesser\Handler\ContentTypeGuesser;
+use Liip\ImagineBundle\File\Guesser\Handler\ExtensionGuesser;
 use Liip\ImagineBundle\File\Guesser\GuesserManager;
-use Liip\ImagineBundle\File\Metadata\ContentTypeMetadata;
+use Liip\ImagineBundle\File\Metadata\MimeTypeMetadata;
 use Liip\ImagineBundle\File\Metadata\ExtensionMetadata;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\Finder;
@@ -22,8 +22,8 @@ use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser as SymfonyEx
 use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser as SymfonyContentTypeGuesser;
 
 /**
- * @covers \Liip\ImagineBundle\File\Guesser\ContentTypeGuesser
- * @covers \Liip\ImagineBundle\File\Guesser\ExtensionGuesser
+ * @covers \Liip\ImagineBundle\File\Guesser\Handler\ContentTypeGuesser
+ * @covers \Liip\ImagineBundle\File\Guesser\Handler\ExtensionGuesser
  * @covers \Liip\ImagineBundle\File\Guesser\GuesserManager
  */
 class GuesserManagerTest extends TestCase
@@ -85,10 +85,10 @@ class GuesserManagerTest extends TestCase
         $manager = self::createSymfonyBasedGuesserManager();
         $meta = $manager->guessUsingPath($file);
 
-        $this->assertInstanceOf(ContentTypeMetadata::class, $meta->contentType());
-        $this->assertInstanceOf(ExtensionMetadata::class, $meta->extension());
-        $this->assertSame($contentType, $meta->contentType()->__toString());
-        $this->assertSame($extension, $meta->extension()->extension());
+        $this->assertInstanceOf(MimeTypeMetadata::class, $meta->getContentType());
+        $this->assertInstanceOf(ExtensionMetadata::class, $meta->getExtension());
+        $this->assertSame($contentType, $meta->getContentType()->__toString());
+        $this->assertSame($extension, $meta->getExtension()->getExtension());
     }
 
     public static function provideContentGuessData(): \Iterator
@@ -111,10 +111,10 @@ class GuesserManagerTest extends TestCase
         $manager = self::createSymfonyBasedGuesserManager();
         $meta = $manager->guessUsingContent($content);
 
-        $this->assertInstanceOf(ContentTypeMetadata::class, $meta->contentType());
-        $this->assertInstanceOf(ExtensionMetadata::class, $meta->extension());
-        $this->assertSame($contentType, $meta->contentType()->__toString());
-        $this->assertSame($extension, $meta->extension()->extension());
+        $this->assertInstanceOf(MimeTypeMetadata::class, $meta->getContentType());
+        $this->assertInstanceOf(ExtensionMetadata::class, $meta->getExtension());
+        $this->assertSame($contentType, $meta->getContentType()->__toString());
+        $this->assertSame($extension, $meta->getExtension()->getExtension());
     }
 
     /**

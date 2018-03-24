@@ -86,7 +86,7 @@ class FlysystemResolver implements ResolverInterface
      *
      * @return bool
      */
-    public function isStored($path, $filter)
+    public function isStored(string $path, string $filter): bool
     {
         return $this->flysystem->has($this->getFilePath($path, $filter));
     }
@@ -101,7 +101,7 @@ class FlysystemResolver implements ResolverInterface
      *
      * @return string The absolute URL of the cached image
      */
-    public function resolve($path, $filter)
+    public function resolve(string $path, string $filter): string
     {
         return sprintf(
             '%s/%s',
@@ -113,15 +113,15 @@ class FlysystemResolver implements ResolverInterface
     /**
      * Stores the content of the given binary.
      *
-     * @param FileInterface $binary The image binary to store
+     * @param FileInterface $file   The image binary to store
      * @param string        $path   The path where the original file is expected to be
      * @param string        $filter The name of the imagine filter in effect
      */
-    public function store(FileInterface $binary, $path, $filter)
+    public function store(FileInterface $file, string $path, string $filter): void
     {
         $this->flysystem->put(
             $this->getFilePath($path, $filter),
-            $binary->contents(),
+            $file->getContents(),
             ['visibility' => $this->visibility]
         );
     }
@@ -130,7 +130,7 @@ class FlysystemResolver implements ResolverInterface
      * @param string[] $paths   The paths where the original files are expected to be
      * @param string[] $filters The imagine filters in effect
      */
-    public function remove(array $paths, array $filters)
+    public function remove(array $paths, array $filters): void
     {
         if (empty($paths) && empty($filters)) {
             return;

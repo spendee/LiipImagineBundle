@@ -57,7 +57,7 @@ class FlysystemLoaderTest extends AbstractTest
 
         $this->assertSame(
             file_get_contents($this->fixturesPath.'/assets/cats.jpeg'),
-            $loader->find('assets/cats.jpeg')->contents()
+            $loader->find('assets/cats.jpeg')->getContents()
         );
     }
 

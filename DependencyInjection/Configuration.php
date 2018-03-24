@@ -42,7 +42,7 @@ class Configuration implements ConfigurationInterface
     /**
      * {@inheritdoc}
      */
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('liip_imagine', 'array');
@@ -166,7 +166,7 @@ class Configuration implements ConfigurationInterface
     /**
      * @param ArrayNodeDefinition $resolversPrototypeNode
      */
-    private function addResolversSections(ArrayNodeDefinition $resolversPrototypeNode)
+    private function addResolversSections(ArrayNodeDefinition $resolversPrototypeNode): void
     {
         $this->addConfigurationSections($this->resolversFactories, $resolversPrototypeNode);
     }
@@ -174,7 +174,7 @@ class Configuration implements ConfigurationInterface
     /**
      * @param ArrayNodeDefinition $resolversPrototypeNode
      */
-    private function addLoadersSections(ArrayNodeDefinition $resolversPrototypeNode)
+    private function addLoadersSections(ArrayNodeDefinition $resolversPrototypeNode): void
     {
         $this->addConfigurationSections($this->loadersFactories, $resolversPrototypeNode);
     }
@@ -183,7 +183,7 @@ class Configuration implements ConfigurationInterface
      * @param array               $factories
      * @param ArrayNodeDefinition $definition
      */
-    private function addConfigurationSections(array $factories, ArrayNodeDefinition $definition)
+    private function addConfigurationSections(array $factories, ArrayNodeDefinition $definition): void
     {
         foreach ($factories as $f) {
             $f->addConfiguration($definition->children()->arrayNode($f->getName()));

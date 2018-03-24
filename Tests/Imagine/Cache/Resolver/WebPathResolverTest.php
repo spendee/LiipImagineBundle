@@ -11,7 +11,7 @@
 
 namespace Liip\ImagineBundle\Tests\Imagine\Cache\Resolver;
 
-use Liip\ImagineBundle\File\FileContent;
+use Liip\ImagineBundle\File\FileBlob;
 use Liip\ImagineBundle\Imagine\Cache\Resolver\ResolverInterface;
 use Liip\ImagineBundle\Imagine\Cache\Resolver\WebPathResolver;
 use PHPUnit\Framework\TestCase;
@@ -289,7 +289,7 @@ class WebPathResolverTest extends TestCase
 
     public function testDumpBinaryContentOnStore()
     {
-        $binary = FileContent::create('theContent', 'a/content-type', 'format');
+        $binary = FileBlob::create('theContent', 'a/content-type', 'format');
 
         $filesystemMock = $this->createFilesystemMock();
         $filesystemMock

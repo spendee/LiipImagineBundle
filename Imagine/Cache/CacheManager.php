@@ -15,7 +15,7 @@ use Liip\ImagineBundle\Events\CacheResolveEvent;
 use Liip\ImagineBundle\File\FileInterface;
 use Liip\ImagineBundle\Imagine\Cache\Resolver\ResolverInterface;
 use Liip\ImagineBundle\Imagine\Filter\FilterConfiguration;
-use Liip\ImagineBundle\ImagineEvents;
+use Liip\ImagineBundle\Events\EventsInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -194,15 +194,15 @@ class CacheManager
             throw new NotFoundHttpException(sprintf("Source image was searched with '%s' outside of the defined root path", $path));
         }
 
-        $preEvent = new CacheResolveEvent($path, $filter);
-        $this->dispatcher->dispatch(ImagineEvents::PRE_RESOLVE, $preEvent);
+        $priorEvent = new CacheResolveEvent($path, $filter);
+        $this->dispatcher->dispatch(EventsInterface::PRE_RESOLVE, $priorEvent);
 
-        $url = $this->getResolver($preEvent->getFilter(), $resolver)->resolve($preEvent->getPath(), $preEvent->getFilter());
+        $url = $this->getResolver($priorEvent->getFilter(), $resolver)->resolve($priorEvent->getPath(), $priorEvent->getFilter());
 
-        $postEvent = new CacheResolveEvent($preEvent->getPath(), $preEvent->getFilter(), $url);
-        $this->dispatcher->dispatch(ImagineEvents::POST_RESOLVE, $postEvent);
+        $afterEvent = new CacheResolveEvent($priorEvent->getPath(), $priorEvent->getFilter(), $url);
+        $this->dispatcher->dispatch(EventsInterface::POST_RESOLVE, $afterEvent);
 
-        return $postEvent->getUrl();
+        return $afterEvent->getUrl();
     }
 
     /**

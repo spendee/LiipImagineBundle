@@ -38,11 +38,11 @@ class ExtensionMetadataTest extends TestCase
         $meta = ExtensionMetadata::create($provided);
 
         $this->assertTrue($meta->hasExtension());
-        $this->assertSame($provided, $meta->extension());
+        $this->assertSame($provided, $meta->getExtension());
         $this->assertSame($provided, $meta->__toString());
         $this->assertTrue($meta->isValid());
-        $this->assertTrue($meta->isExtension($provided));
-        $this->assertFalse($meta->isExtension('foo-bar-baz'));
+        $this->assertTrue($meta->isMatch($provided));
+        $this->assertFalse($meta->isMatch('foo-bar-baz'));
     }
 
     /**
@@ -50,6 +50,6 @@ class ExtensionMetadataTest extends TestCase
      */
     public static function fetchFixtureData(): \Iterator
     {
-        return (new DataLoader())(__CLASS__);
+        return (new DataLoader())(__CLASS__, 20);
     }
 }

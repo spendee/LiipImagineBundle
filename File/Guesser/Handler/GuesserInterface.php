@@ -9,13 +9,22 @@
  * file that was distributed with this source code.
  */
 
-namespace Liip\ImagineBundle\File\Guesser;
-
-use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesserInterface;
+namespace Liip\ImagineBundle\File\Guesser\Handler;
 
 /**
  * @author Rob Frawley 2nd <rmf@src.run>
  */
-final class ExtensionGuesser extends AbstractGuesser implements ExtensionGuesserInterface
+interface GuesserInterface
 {
+    /**
+     * @param GuesserInterface|mixed $guesser
+     */
+    public function register($guesser): void;
+
+    /**
+     * @param string $subject
+     *
+     * @return string|null
+     */
+    public function guess($subject): ?string;
 }
