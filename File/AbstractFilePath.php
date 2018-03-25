@@ -20,7 +20,7 @@ use Liip\ImagineBundle\Utility\Interpreter\Interpreter;
  *
  * @author Rob Frawley 2nd <rmf@src.run>
  */
-abstract class AbstractFilePath extends AbstractFile implements FilePathInterface
+abstract class AbstractFilePath extends AbstractFileBlob
 {
     /**
      * @var \SplFileInfo|null

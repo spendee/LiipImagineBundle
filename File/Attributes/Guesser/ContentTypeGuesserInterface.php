@@ -9,22 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Liip\ImagineBundle\File\Guesser\Handler;
+namespace Liip\ImagineBundle\File\Attributes\Guesser;
 
 use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesserInterface;
 
 /**
- * @internal
- *
  * @author Rob Frawley 2nd <rmf@src.run>
  */
-final class ContentTypeGuesser extends AbstractGuesser implements MimeTypeGuesserInterface
+interface ContentTypeGuesserInterface extends MimeTypeGuesserInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    protected static function isSupportedGuesser($guesser): bool
-    {
-        return $guesser instanceof MimeTypeGuesserInterface;
-    }
 }

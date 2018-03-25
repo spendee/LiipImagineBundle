@@ -73,11 +73,11 @@ class LiipImagineExtensionTest extends AbstractTest
     {
         return [
             [
-                'liip_imagine.symfony_guesser.content_type',
+                'liip_imagine.symfony.file_attributes.guesser.content_type',
                 [MimeTypeGuesser::class, 'getInstance'],
             ],
             [
-                'liip_imagine.symfony_guesser.extension',
+                'liip_imagine.symfony.file_attributes.guesser.extension',
                 [ExtensionGuesser::class, 'getInstance'],
             ],
         ];

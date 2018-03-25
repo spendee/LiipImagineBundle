@@ -22,7 +22,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\Finder;
 
 /**
- * @covers \Liip\ImagineBundle\File\AbstractFile
+ * @covers \Liip\ImagineBundle\File\AbstractFileBlob
  * @covers \Liip\ImagineBundle\File\AbstractFilePath
  * @covers \Liip\ImagineBundle\File\FilePath
  */

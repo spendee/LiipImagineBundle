@@ -9,17 +9,18 @@
  * file that was distributed with this source code.
  */
 
-namespace Liip\ImagineBundle\Tests\File\Metadata;
+namespace Liip\ImagineBundle\Tests\File\Attributes;
 
 use Liip\ImagineBundle\Exception\InvalidArgumentException;
-use Liip\ImagineBundle\File\Metadata\MimeTypeMetadata;
+use Liip\ImagineBundle\File\Attributes\ContentTypeAttribute;
 use Liip\ImagineBundle\Tests\Fixtures\Data\DataLoader;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \Liip\ImagineBundle\File\Metadata\MimeTypeMetadata
+ * @covers \Liip\ImagineBundle\File\Attributes\AttributeTrait
+ * @covers \Liip\ImagineBundle\File\Attributes\ContentTypeAttribute
  */
-class MimeTypeMetadataTest extends TestCase
+class ContentTypeAttributeTest extends TestCase
 {
     /**
      * @return \Iterator|string[]
@@ -43,53 +44,53 @@ class MimeTypeMetadataTest extends TestCase
      */
     public function testContentTypes(string $provided, string $type, string $subType, string $prefix = null, string $suffix = null, string $prefixDeliminator = null)
     {
-        $this->assertTrue(MimeTypeMetadata::isValidMimeType($provided));
+        $this->assertTrue(ContentTypeAttribute::isParsable($provided));
 
-        $meta = MimeTypeMetadata::create($provided);
+        $meta = ContentTypeAttribute::create($provided);
 
         $this->assertTrue($meta->isValid());
-        $this->assertSame($provided, $meta->__toString());
+        $this->assertSame($provided, $meta->stringify());
 
         $this->assertTrue($meta->hasType());
         $this->assertSame($type, $meta->getType());
-        $this->assertTrue($meta->isType($type));
-        $this->assertFalse($meta->isType('foobar'));
+        $this->assertTrue($meta->isTypeMatch($type));
+        $this->assertFalse($meta->isTypeMatch('foobar'));
 
         $this->assertTrue($meta->hasSubType());
         $this->assertSame($subType, $meta->getSubType());
-        $this->assertTrue($meta->isSubType($subType));
-        $this->assertFalse($meta->isSubType('foobar'));
+        $this->assertTrue($meta->isSubTypeMatch($subType));
+        $this->assertFalse($meta->isSubTypeMatch('foobar'));
 
         if (null !== $prefix) {
             $this->assertTrue($meta->hasPrefix());
             $this->assertSame($prefix, $meta->getPrefix());
-            $this->assertTrue($meta->isPrefix($prefix));
-            $this->assertFalse($meta->isPrefix('foobar'));
+            $this->assertTrue($meta->isPrefixMatch($prefix));
+            $this->assertFalse($meta->isPrefixMatch('foobar'));
             $this->assertTrue($meta->hasDeliminator());
             $this->assertSame($prefixDeliminator, $meta->getDeliminator());
-            $this->assertTrue($meta->isDeliminator($prefixDeliminator));
-            $this->assertFalse($meta->isDeliminator('foobar'));
+            $this->assertTrue($meta->isDeliminatorMatch($prefixDeliminator));
+            $this->assertFalse($meta->isDeliminatorMatch('foobar'));
         } else {
             $this->assertFalse($meta->hasPrefix());
             $this->assertNull($meta->getPrefix());
-            $this->assertTrue($meta->isPrefix(null));
-            $this->assertFalse($meta->isPrefix('foobar'));
+            $this->assertTrue($meta->isPrefixMatch(null));
+            $this->assertFalse($meta->isPrefixMatch('foobar'));
             $this->assertFalse($meta->hasDeliminator());
             $this->assertNull($meta->getDeliminator());
-            $this->assertTrue($meta->isDeliminator(null));
-            $this->assertFalse($meta->isDeliminator('foobar'));
+            $this->assertTrue($meta->isDeliminatorMatch(null));
+            $this->assertFalse($meta->isDeliminatorMatch('foobar'));
         }
 
         if (null !== $suffix) {
             $this->assertTrue($meta->hasSuffix());
             $this->assertSame($suffix, $meta->getSuffix());
-            $this->assertTrue($meta->isSuffix($suffix));
-            $this->assertFalse($meta->isSuffix('foobar'));
+            $this->assertTrue($meta->isSuffixMatch($suffix));
+            $this->assertFalse($meta->isSuffixMatch('foobar'));
         } else {
             $this->assertFalse($meta->hasSuffix());
             $this->assertNull($meta->getSuffix());
-            $this->assertTrue($meta->isSuffix(null));
-            $this->assertFalse($meta->isSuffix('foobar'));
+            $this->assertTrue($meta->isSuffixMatch(null));
+            $this->assertFalse($meta->isSuffixMatch('foobar'));
         }
     }
 
@@ -109,10 +110,10 @@ class MimeTypeMetadataTest extends TestCase
      */
     public function testInvalidContentTypes(string $provided = null)
     {
-        $this->assertNull(MimeTypeMetadata::getMimeTypeParts($provided));
-        $this->assertFalse(MimeTypeMetadata::isValidMimeType($provided));
+        $this->assertNull(ContentTypeAttribute::explodeParsable($provided));
+        $this->assertFalse(ContentTypeAttribute::isParsable($provided));
 
-        $meta = MimeTypeMetadata::create($provided);
+        $meta = ContentTypeAttribute::create($provided);
 
         $this->assertFalse($meta->hasType());
         $this->assertFalse($meta->hasSubType());
@@ -143,7 +144,7 @@ class MimeTypeMetadataTest extends TestCase
      */
     public function testVendorTypes(string $provided, string $vendor = null)
     {
-        $mime = MimeTypeMetadata::create($provided);
+        $mime = ContentTypeAttribute::create($provided);
 
         $this->assertSame($vendor, $mime->getPrefix());
 
@@ -193,7 +194,7 @@ class MimeTypeMetadataTest extends TestCase
      */
     public function testIsEquivalent(string $provided = null, string $type, string $subType, string $prefix = null, string $suffix = null)
     {
-        $meta = MimeTypeMetadata::create($provided);
+        $meta = ContentTypeAttribute::create($provided);
 
         $this->assertTrue($meta->isMatch($type, $subType, $prefix, $suffix));
 
@@ -207,7 +208,7 @@ class MimeTypeMetadataTest extends TestCase
 
     public function testToStringOnNullFileType()
     {
-        $this->assertEmpty(MimeTypeMetadata::create()->__toString());
+        $this->assertEmpty(ContentTypeAttribute::create()->stringify());
     }
 
     /**
@@ -234,9 +235,27 @@ class MimeTypeMetadataTest extends TestCase
     public function testThrowsOnInvalidMimeTypes(string $type, string $subType = null, string $prefix = null, string $suffix = null, string $deliminator = null)
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageRegExp('{Invalid mime type (prefix|deliminator|character\(s\)) "[^"]+" provided (in "[^"]+" )?\(accepted values are ".+"\)\.}');
+        $this->expectExceptionMessageRegExp('{Invalid (mime type )?(prefix|deliminator|character\(s\)) "[^"]+" provided (in "[^"]+" )?\(accepted values are ".+"\)\.}');
 
-        new MimeTypeMetadata($type, $subType, $prefix, $suffix, $deliminator);
+        new ContentTypeAttribute($type, $subType, $prefix, $suffix, $deliminator);
+    }
+
+    public function provideNonParsableData()
+    {
+        yield ['foo$/bar'];
+        yield ['foo/bar$'];
+        yield ['foo/bar+baz$'];
+        yield ['foo/x.bar+baz$'];
+    }
+
+    /**
+     * @dataProvider provideNonParsableData
+     *
+     * @param string $provided
+     */
+    public function testNonParable(string $provided)
+    {
+        $this->assertFalse(ContentTypeAttribute::isParsable($provided));
     }
 
     /**
@@ -244,6 +263,6 @@ class MimeTypeMetadataTest extends TestCase
      */
     public static function fetchFixtureData(): \Iterator
     {
-        return (new DataLoader())(__CLASS__, 20);
+        return (new DataLoader())(__CLASS__, 30);
     }
 }

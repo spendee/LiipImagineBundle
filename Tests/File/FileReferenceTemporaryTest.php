@@ -17,7 +17,7 @@ use Liip\ImagineBundle\File\FileTemp;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \Liip\ImagineBundle\File\AbstractFile
+ * @covers \Liip\ImagineBundle\File\AbstractFileBlob
  * @covers \Liip\ImagineBundle\File\AbstractFilePath
  * @covers \Liip\ImagineBundle\File\FileTemp
  */

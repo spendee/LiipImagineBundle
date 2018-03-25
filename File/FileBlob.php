@@ -11,13 +11,13 @@
 
 namespace Liip\ImagineBundle\File;
 
-use Liip\ImagineBundle\File\Metadata\MimeTypeMetadata;
-use Liip\ImagineBundle\File\Metadata\ExtensionMetadata;
+use Liip\ImagineBundle\File\Attributes\ContentTypeAttribute;
+use Liip\ImagineBundle\File\Attributes\ExtensionAttribute;
 
 /**
  * @author Rob Frawley 2nd <rmf@src.run>
  */
-class FileBlob extends AbstractFile
+class FileBlob extends AbstractFileBlob implements FileBlobInterface
 {
     /**
      * @var string|null
@@ -25,14 +25,15 @@ class FileBlob extends AbstractFile
     private $contents;
 
     /**
-     * @param string|null            $contents
-     * @param MimeTypeMetadata|null  $contentType
-     * @param ExtensionMetadata|null $extension
+     * @param string|null               $contents
+     * @param ContentTypeAttribute|null $contentType
+     * @param ExtensionAttribute|null   $extension
      */
-    public function __construct(string $contents = null, MimeTypeMetadata $contentType = null, ExtensionMetadata $extension = null)
+    public function __construct(string $contents = null, ContentTypeAttribute $contentType = null, ExtensionAttribute $extension = null)
     {
-        $this->contents = $contents;
         parent::__construct($contentType, $extension);
+
+        $this->contents = $contents;
     }
 
     /**
@@ -44,7 +45,7 @@ class FileBlob extends AbstractFile
      */
     public static function create(string $contents = null, string $contentType = null, string $extension = null)
     {
-        return new self($contents, MimeTypeMetadata::create($contentType), ExtensionMetadata::create($extension));
+        return new self($contents, ContentTypeAttribute::create($contentType), ExtensionAttribute::create($extension));
     }
 
     /**

@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Liip\ImagineBundle\Tests\Fixtures\Data\File\Metadata;
+namespace Liip\ImagineBundle\Tests\Fixtures\Data\File\Attributes;
 
 return function (): array {
     return [
@@ -26,7 +26,6 @@ return function (): array {
             ['application/mac-binhex40', 'application', 'mac-binhex40', null, null, null, 'hqx'],
             ['application/msword', 'application', 'msword', null, null, null, 'doc'],
             ['application/msword', 'application', 'msword', null, null, null, 'dot'],
-            ['application/octet-stream', 'application', 'octet-stream', null, null, null, '*'],
             ['application/octet-stream', 'application', 'octet-stream', null, null, null, 'bin'],
             ['application/octet-stream', 'application', 'octet-stream', null, null, null, 'class'],
             ['application/octet-stream', 'application', 'octet-stream', null, null, null, 'dms'],

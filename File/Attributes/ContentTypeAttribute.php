@@ -9,15 +9,17 @@
  * file that was distributed with this source code.
  */
 
-namespace Liip\ImagineBundle\File\Metadata;
+namespace Liip\ImagineBundle\File\Attributes;
 
 use Liip\ImagineBundle\Exception\InvalidArgumentException;
 
 /**
  * @author Rob Frawley 2nd <rmf@src.run>
  */
-class MimeTypeMetadata
+class ContentTypeAttribute
 {
+    use AttributeTrait;
+
     /**
      * @var string
      */
@@ -65,8 +67,13 @@ class MimeTypeMetadata
      * @param string|null $suffix
      * @param string|null $deliminator
      */
-    public function __construct(string $type = null, string $subType = null, string $prefix = null, string $suffix = null, string $deliminator = null)
-    {
+    public function __construct(
+        string $type = null,
+        string $subType = null,
+        string $prefix = null,
+        string $suffix = null,
+        string $deliminator = null
+    ) {
         $this->type = self::sanitize($type);
         $this->subType = self::sanitize($subType);
         $this->prefix = self::sanitizePrefix($prefix);
@@ -77,29 +84,7 @@ class MimeTypeMetadata
     /**
      * @return string
      */
-    public function __toString(): string
-    {
-        return $this->getMimeType() ?: '';
-    }
-
-    /**
-     * @param string|null $string
-     *
-     * @return self
-     */
-    public static function create(string $string = null): self
-    {
-        if (null !== $sections = self::getMimeTypeParts($string)) {
-            return new self(...$sections);
-        }
-
-        return new self();
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getMimeType(): ?string
+    public function stringify(): string
     {
         return $this->hasType() && $this->hasSubType() ? vsprintf('%s/%s%s%s%s', [
             $this->getType(),
@@ -107,7 +92,7 @@ class MimeTypeMetadata
             $this->hasPrefix() && $this->hasDeliminator() ? $this->getDeliminator() : '',
             $this->getSubType(),
             $this->hasSuffix() ? sprintf('+%s', $this->getSuffix()) : '',
-        ]) : null;
+        ]) : '';
     }
 
     /**
@@ -123,7 +108,7 @@ class MimeTypeMetadata
      */
     public function hasType(): bool
     {
-        return null !== $this->type;
+        return null !== $this->getType();
     }
 
     /**
@@ -131,9 +116,9 @@ class MimeTypeMetadata
      *
      * @return bool
      */
-    public function isType(string $type = null): bool
+    public function isTypeMatch(string $type = null): bool
     {
-        return $type === $this->type;
+        return $this->getType() === $type;
     }
 
     /**
@@ -149,7 +134,7 @@ class MimeTypeMetadata
      */
     public function hasSubType(): bool
     {
-        return null !== $this->subType;
+        return null !== $this->getSubType();
     }
 
     /**
@@ -157,9 +142,9 @@ class MimeTypeMetadata
      *
      * @return bool
      */
-    public function isSubType(string $subType = null): bool
+    public function isSubTypeMatch(string $subType = null): bool
     {
-        return $subType === $this->subType;
+        return $this->getSubType() === $subType;
     }
 
     /**
@@ -175,7 +160,7 @@ class MimeTypeMetadata
      */
     public function hasPrefix(): bool
     {
-        return null !== $this->prefix;
+        return null !== $this->getPrefix();
     }
 
     /**
@@ -183,9 +168,43 @@ class MimeTypeMetadata
      *
      * @return bool
      */
-    public function isPrefix(string $prefix = null): bool
+    public function isPrefixMatch(string $prefix = null): bool
     {
-        return $prefix === $this->prefix;
+        return $this->getPrefix() === $prefix;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isPrefixUnregistered(): bool
+    {
+        return $this->isPrefixMatch(self::PREFIX_UNREGISTERED);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isPrefixVendor(): bool
+    {
+        return $this->isPrefixMatch(self::PREFIX_VENDOR);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isPrefixPersonal(): bool
+    {
+        return $this->isPrefixMatch(self::PREFIX_PERSONAL);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isPrefixStandard(): bool
+    {
+        return false === $this->isPrefixUnregistered()
+            && false === $this->isPrefixVendor()
+            && false === $this->isPrefixPersonal();
     }
 
     /**
@@ -201,7 +220,7 @@ class MimeTypeMetadata
      */
     public function hasDeliminator(): bool
     {
-        return null !== $this->deliminator;
+        return null !== $this->getDeliminator();
     }
 
     /**
@@ -209,9 +228,9 @@ class MimeTypeMetadata
      *
      * @return bool
      */
-    public function isDeliminator(string $deliminator = null): bool
+    public function isDeliminatorMatch(string $deliminator = null): bool
     {
-        return $deliminator === $this->deliminator;
+        return $this->getDeliminator() === $deliminator;
     }
 
     /**
@@ -227,7 +246,7 @@ class MimeTypeMetadata
      */
     public function hasSuffix(): bool
     {
-        return null !== $this->suffix;
+        return null !== $this->getSuffix();
     }
 
     /**
@@ -235,51 +254,9 @@ class MimeTypeMetadata
      *
      * @return bool
      */
-    public function isSuffix(string $suffix = null): bool
+    public function isSuffixMatch(string $suffix = null): bool
     {
-        return $suffix === $this->suffix;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isPrefixStandard(): bool
-    {
-        return false === $this->isPrefixUnregistered()
-            && false === $this->isPrefixVendor()
-            && false === $this->isPrefixPersonal();
-    }
-
-    /**
-     * @return bool
-     */
-    public function isPrefixUnregistered(): bool
-    {
-        return $this->isPrefix(self::PREFIX_UNREGISTERED);
-    }
-
-    /**
-     * @return bool
-     */
-    public function isPrefixVendor(): bool
-    {
-        return $this->isPrefix(self::PREFIX_VENDOR);
-    }
-
-    /**
-     * @return bool
-     */
-    public function isPrefixPersonal(): bool
-    {
-        return $this->isPrefix(self::PREFIX_PERSONAL);
-    }
-
-    /**
-     * @return bool
-     */
-    public function isValid(): bool
-    {
-        return $this->hasType() && $this->hasSubType() && self::isValidMimeType($this);
+        return $this->getSuffix() === $suffix;
     }
 
     /**
@@ -292,10 +269,20 @@ class MimeTypeMetadata
      */
     public function isMatch(string $type = null, string $subType = null, string $prefix = null, string $suffix = null): bool
     {
-        return $this->isType($type ?: $this->type)
-            && $this->isSubType($subType ?: $this->subType)
-            && $this->isPrefix($prefix ?: $this->prefix)
-            && $this->isSuffix($suffix ?: $this->suffix);
+        return true === $this->isTypeMatch($type ?: $this->getType())
+            && true === $this->isSubTypeMatch($subType ?: $this->getSubType())
+            && true === $this->isPrefixMatch($prefix ?: $this->getPrefix())
+            && true === $this->isSuffixMatch($suffix ?: $this->getSuffix());
+    }
+
+    /**
+     * @return bool
+     */
+    public function isValid(): bool
+    {
+        return true === $this->hasType()
+            && true === $this->hasSubType()
+            && true === self::isParsable($this->stringify());
     }
 
     /**
@@ -303,34 +290,24 @@ class MimeTypeMetadata
      *
      * @return array|null
      */
-    public static function getMimeTypeParts(string $string = null): ?array
+    public static function explodeParsable(string $string = null): ?array
     {
         $matched = 1 === preg_match(
-            '{^(?<type>[^/]+)/((?<prefix>vnd|prs|x)(?<deliminator>\.|\-))?(?<sub_type>[^+]+?)(\+(?<suffix>.+))?$}',
-            $string, $sections
-        );
+                '{^(?<type>[^/]+)/((?<prefix>vnd|prs|x)(?<deliminator>\.|\-))?(?<sub_type>[^+]+?)(\+(?<suffix>.+))?$}',
+                $string, $matches
+            );
 
-        $n = function (string $index) use ($sections): ?string {
-            return empty($sections[$index]) ? null : $sections[$index];
+        $section = function (string $index) use ($matches): ?string {
+            return empty($matches[$index]) ? null : $matches[$index];
         };
 
         return $matched ? [
-            self::sanitize($sections['type']),
-            self::sanitize($sections['sub_type']),
-            self::sanitizePrefix($n('prefix')),
-            self::sanitize($n('suffix')),
-            self::sanitizeDeliminator($n('deliminator')),
+            'type' => self::sanitize($matches['type']),
+            'subType' => self::sanitize($matches['sub_type']),
+            'prefix' => self::sanitizePrefix($section('prefix')),
+            'suffix' => self::sanitize($section('suffix')),
+            'deliminator' => self::sanitizeDeliminator($section('deliminator')),
         ] : null;
-    }
-
-    /**
-     * @param string|null $string
-     *
-     * @return bool
-     */
-    public static function isValidMimeType(string $string = null): bool
-    {
-        return !empty($string) && null !== self::getMimeTypeParts($string);
     }
 
     /**
@@ -364,21 +341,5 @@ class MimeTypeMetadata
         throw new InvalidArgumentException(sprintf(
             'Invalid mime type deliminator "%s" provided (accepted values are "." and "-").', $deliminator
         ));
-    }
-
-    /**
-     * @param string|null $string
-     *
-     * @return null|string
-     */
-    private static function sanitize(string $string = null): ?string
-    {
-        if (null !== $string && 1 === preg_match('{(?<characters>[^a-z0-9\.-]+)}i', $string, $matches)) {
-            throw new InvalidArgumentException(sprintf(
-                'Invalid mime type character(s) "%s" provided in "%s" (accepted values are "[a-z0-9\.-]").', $matches['characters'], $string
-            ));
-        }
-
-        return $string;
     }
 }

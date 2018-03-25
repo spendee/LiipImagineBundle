@@ -9,16 +9,17 @@
  * file that was distributed with this source code.
  */
 
-namespace Liip\ImagineBundle\Tests\File\Metadata;
+namespace Liip\ImagineBundle\Tests\File\Attributes;
 
-use Liip\ImagineBundle\File\Metadata\ExtensionMetadata;
+use Liip\ImagineBundle\File\Attributes\ExtensionAttribute;
 use Liip\ImagineBundle\Tests\Fixtures\Data\DataLoader;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \Liip\ImagineBundle\File\Metadata\ExtensionMetadata
+ * @covers \Liip\ImagineBundle\File\Attributes\AttributeTrait
+ * @covers \Liip\ImagineBundle\File\Attributes\ExtensionAttribute
  */
-class ExtensionMetadataTest extends TestCase
+class ExtensionAttributeTest extends TestCase
 {
     /**
      * @return \Iterator
@@ -35,10 +36,11 @@ class ExtensionMetadataTest extends TestCase
      */
     public function testExtensions(string $provided)
     {
-        $meta = ExtensionMetadata::create($provided);
+        $meta = ExtensionAttribute::create($provided);
 
-        $this->assertTrue($meta->hasExtension());
-        $this->assertSame($provided, $meta->getExtension());
+        $this->assertTrue($meta->hasName());
+        $this->assertSame($provided, $meta->getName());
+        $this->assertSame($provided, $meta->stringify());
         $this->assertSame($provided, $meta->__toString());
         $this->assertTrue($meta->isValid());
         $this->assertTrue($meta->isMatch($provided));
@@ -50,6 +52,6 @@ class ExtensionMetadataTest extends TestCase
      */
     public static function fetchFixtureData(): \Iterator
     {
-        return (new DataLoader())(__CLASS__, 20);
+        return (new DataLoader())(__CLASS__, 30);
     }
 }

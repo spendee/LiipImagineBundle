@@ -11,34 +11,34 @@
 
 namespace Liip\ImagineBundle\File;
 
-use Liip\ImagineBundle\File\Metadata\MimeTypeMetadata;
-use Liip\ImagineBundle\File\Metadata\ExtensionMetadata;
+use Liip\ImagineBundle\File\Attributes\ContentTypeAttribute;
+use Liip\ImagineBundle\File\Attributes\ExtensionAttribute;
 
 /**
  * @internal
  *
  * @author Rob Frawley 2nd <rmf@src.run>
  */
-abstract class AbstractFile implements FileInterface
+abstract class AbstractFileBlob
 {
     /**
-     * @var MimeTypeMetadata
+     * @var ContentTypeAttribute
      */
     protected $contentType;
 
     /**
-     * @var ExtensionMetadata
+     * @var ExtensionAttribute
      */
     protected $extension;
 
     /**
-     * @param MimeTypeMetadata|null  $contentType
-     * @param ExtensionMetadata|null $extension
+     * @param ContentTypeAttribute|null $contentType
+     * @param ExtensionAttribute|null   $extension
      */
-    public function __construct(MimeTypeMetadata $contentType = null, ExtensionMetadata $extension = null)
+    public function __construct(ContentTypeAttribute $contentType = null, ExtensionAttribute $extension = null)
     {
-        $this->contentType = $contentType ?: new MimeTypeMetadata();
-        $this->extension = $extension ?: new ExtensionMetadata();
+        $this->contentType = $contentType ?: new ContentTypeAttribute();
+        $this->extension = $extension ?: new ExtensionAttribute();
     }
 
     /**
@@ -52,7 +52,7 @@ abstract class AbstractFile implements FileInterface
     /**
      * {@inheritdoc}
      */
-    public function getContentType(): MimeTypeMetadata
+    public function getContentType(): ContentTypeAttribute
     {
         return $this->contentType;
     }
@@ -68,7 +68,7 @@ abstract class AbstractFile implements FileInterface
     /**
      * {@inheritdoc}
      */
-    public function getExtension(): ExtensionMetadata
+    public function getExtension(): ExtensionAttribute
     {
         return $this->extension;
     }

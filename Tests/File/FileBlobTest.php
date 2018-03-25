@@ -13,12 +13,12 @@ namespace Liip\ImagineBundle\Tests\File;
 
 use Liip\ImagineBundle\File\FileBlob;
 use Liip\ImagineBundle\File\FileInterface;
-use Liip\ImagineBundle\File\Metadata\MimeTypeMetadata;
-use Liip\ImagineBundle\File\Metadata\ExtensionMetadata;
+use Liip\ImagineBundle\File\Attributes\ContentTypeAttribute;
+use Liip\ImagineBundle\File\Attributes\ExtensionAttribute;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \Liip\ImagineBundle\File\AbstractFile
+ * @covers \Liip\ImagineBundle\File\AbstractFileBlob
  * @covers \Liip\ImagineBundle\File\FileBlob
  */
 class FileBlobTest extends TestCase

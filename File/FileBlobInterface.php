@@ -9,22 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Liip\ImagineBundle\File\Guesser\Handler;
+namespace Liip\ImagineBundle\File;
 
 /**
  * @author Rob Frawley 2nd <rmf@src.run>
  */
-interface GuesserInterface
+interface FileBlobInterface extends FileInterface
 {
-    /**
-     * @param GuesserInterface|mixed $guesser
-     */
-    public function register($guesser): void;
-
-    /**
-     * @param string $subject
-     *
-     * @return string|null
-     */
-    public function guess($subject): ?string;
 }

@@ -12,19 +12,21 @@
 namespace Liip\ImagineBundle\Imagine\Data;
 
 use Liip\ImagineBundle\Binary\Loader\LoaderInterface;
+use Liip\ImagineBundle\Exception\File\Attributes\Resolver\InvalidFileAttributesException;
+use Liip\ImagineBundle\Exception\Imagine\Data\InvalidFileFoundException;
 use Liip\ImagineBundle\File\FileBlob;
 use Liip\ImagineBundle\File\FileInterface;
-use Liip\ImagineBundle\File\Guesser\GuesserManager;
-use Liip\ImagineBundle\File\Metadata\Metadata;
-use Liip\ImagineBundle\File\Metadata\Resolver\ImageMetadataResolver;
+use Liip\ImagineBundle\File\Attributes\Resolver\FileAttributesResolver;
+use Liip\ImagineBundle\File\Attributes\Attributes;
+use Liip\ImagineBundle\File\Attributes\Resolver\FileAttributesApplier;
 use Liip\ImagineBundle\Imagine\Filter\FilterConfiguration;
 
 class DataManager
 {
     /**
-     * @var ImageMetadataResolver
+     * @var FileAttributesApplier
      */
-    protected $metadataResolver;
+    protected $fileAttributes;
 
     /**
      * @var FilterConfiguration
@@ -48,18 +50,18 @@ class DataManager
 
     /**
      * @param FilterConfiguration   $filterConfig
-     * @param ImageMetadataResolver $metadataResolver
+     * @param FileAttributesApplier $fileAttributesApplier
      * @param string                $defaultLoader
      * @param string                $globalDefaultImage
      */
     public function __construct(
         FilterConfiguration $filterConfig,
-        ImageMetadataResolver $metadataResolver,
+        FileAttributesApplier $fileAttributesApplier,
         string $defaultLoader = null,
         string $globalDefaultImage = null
     ) {
         $this->filterConfig = $filterConfig;
-        $this->metadataResolver = $metadataResolver;
+        $this->fileAttributes = $fileAttributesApplier;
         $this->defaultLoader = $defaultLoader;
         $this->globalDefaultImage = $globalDefaultImage;
     }
@@ -111,22 +113,18 @@ class DataManager
      */
     public function find(string $filter, string $path): FileInterface
     {
-        $file = $this
-            ->metadataResolver
-            ->resolve(
-                $this->getLoader($filter)->find($path)
-            );
+        $file = $this->getLoader($filter)->find($path);
 
-        if (!$file->hasContentType()) {
-            throw new \LogicException(sprintf(
-                'Failed to resolve the content type of "%s".', $path
-            ));
+        try {
+            $file = $this->fileAttributes->apply($file);
+        } catch (InvalidFileAttributesException $e) {
+            throw new InvalidFileFoundException(sprintf('Invalid attributes resolved for "%s".', $path), 0, $e);
         }
 
         if (!$file->getContentType()->isMatch('image')) {
-            throw new \LogicException(sprintf(
-                'Invalid content type "%s" resolved for "%s" (expected primary type "image").',
-                (string) $file->getContentType(), $path
+            throw new InvalidFileFoundException(sprintf(
+                'Invalid content type attribute "%s" for "%s" (expected primary content type "image" but got "%s").',
+                $file->getContentType()->stringify(), $path, $file->getContentType()->getType() ?: 'null'
             ));
         }
 

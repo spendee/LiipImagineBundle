@@ -18,7 +18,7 @@ use Liip\ImagineBundle\Utility\Interpreter\Interpreter;
 /**
  * @author Rob Frawley 2nd <rmf@src.run>
  */
-final class FileTemp extends AbstractFilePath
+final class FileTemp extends AbstractFilePath implements FilePathInterface
 {
     /**
      * @var string
@@ -36,6 +36,8 @@ final class FileTemp extends AbstractFilePath
      */
     public function __construct(string $name = null, string $root = null)
     {
+        parent::__construct();
+
         $this->setName($name);
         $this->setRoot($root);
     }

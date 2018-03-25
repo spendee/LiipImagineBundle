@@ -11,26 +11,26 @@
 
 namespace Liip\ImagineBundle\File;
 
-use Liip\ImagineBundle\File\Metadata\MimeTypeMetadata;
-use Liip\ImagineBundle\File\Metadata\ExtensionMetadata;
+use Liip\ImagineBundle\File\Attributes\ContentTypeAttribute;
+use Liip\ImagineBundle\File\Attributes\ExtensionAttribute;
 
 /**
  * @author Rob Frawley 2nd <rmf@src.run>
  */
-class FilePath extends AbstractFilePath
+class FilePath extends AbstractFilePath implements FilePathInterface
 {
     /**
-     * @param string|\SplFileInfo|null $file
-     * @param MimeTypeMetadata|null    $contentType
-     * @param ExtensionMetadata|null   $extension
+     * @param string|\SplFileInfo|null  $file
+     * @param ContentTypeAttribute|null $contentType
+     * @param ExtensionAttribute|null   $extension
      */
-    public function __construct($file = null, MimeTypeMetadata $contentType = null, ExtensionMetadata $extension = null)
+    public function __construct($file = null, ContentTypeAttribute $contentType = null, ExtensionAttribute $extension = null)
     {
+        parent::__construct($contentType, $extension);
+
         if (null !== $file) {
             $this->file = $file instanceof \SplFileInfo ? $file : new \SplFileInfo($file);
         }
-
-        parent::__construct($contentType, $extension);
     }
 
     /**
@@ -42,6 +42,6 @@ class FilePath extends AbstractFilePath
      */
     public static function create(string $file = null, string $contentType = null, string $extension = null)
     {
-        return new self($file, MimeTypeMetadata::create($contentType), ExtensionMetadata::create($extension));
+        return new self($file, ContentTypeAttribute::create($contentType), ExtensionAttribute::create($extension));
     }
 }

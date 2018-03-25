@@ -9,16 +9,16 @@
  * file that was distributed with this source code.
  */
 
-namespace Liip\ImagineBundle\Tests\File\Metadata\Handler;
+namespace Liip\ImagineBundle\Tests\File\Attributes\Guesser;
 
 use Liip\ImagineBundle\Exception\InvalidArgumentException;
-use Liip\ImagineBundle\File\Guesser\Handler\ContentTypeGuesser;
+use Liip\ImagineBundle\File\Attributes\Guesser\ContentTypeGuesser;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser;
 
 /**
- * @covers \Liip\ImagineBundle\File\Guesser\Handler\AbstractGuesser
- * @covers \Liip\ImagineBundle\File\Guesser\Handler\ContentTypeGuesser
+ * @covers \Liip\ImagineBundle\File\Attributes\Guesser\AbstractGuesser
+ * @covers \Liip\ImagineBundle\File\Attributes\Guesser\ContentTypeGuesser
  */
 class ContentTypeGuesserTest extends TestCase
 {
@@ -30,8 +30,9 @@ class ContentTypeGuesserTest extends TestCase
             ->method('guess')
             ->with('foobar');
 
-        $inst = new ContentTypeGuesser($mock);
-        $inst->guess('foobar');
+        $g = new ContentTypeGuesser();
+        $g->register($mock);
+        $g->guess('foobar');
 
         $mock = $this->createMimeTypeGuesserMock();
         $mock
@@ -40,18 +41,22 @@ class ContentTypeGuesserTest extends TestCase
             ->with('foobar')
             ->willReturnOnConsecutiveCalls(null, null, null, null, 'baz');
 
-        $inst = new ContentTypeGuesser($mock, $mock, $mock);
+        $g = new ContentTypeGuesser();
+        $g->register($mock);
+        $g->register($mock);
+        $g->register($mock);
 
-        $this->assertNull($inst->guess('foobar'));
-        $this->assertSame('baz', $inst->guess('foobar'));
+        $this->assertNull($g->guess('foobar'));
+        $this->assertSame('baz', $g->guess('foobar'));
     }
 
     public function testThrowsOnUnsupportedRegister()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageRegExp('{Unsupported guesser registered of type "[^"]+"}');
+        $this->expectExceptionMessageRegExp('{Invalid guesser type "[^"]+" provided for "[^"]+"\.}');
 
-        new ContentTypeGuesser(new class {});
+        $g = new ContentTypeGuesser();
+        $g->register(new class {});
     }
 
     /**

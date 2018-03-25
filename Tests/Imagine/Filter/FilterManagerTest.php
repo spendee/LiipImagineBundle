@@ -47,7 +47,7 @@ class FilterManagerTest extends AbstractTest
         $filterManager = new FilterManager(
             $config,
             $this->createImagineInterfaceMock(),
-            $this->createFileGuesserManager()
+            $this->createFileAttributeResolverInstance()
         );
 
         $filterManager->applyFilter($binary, 'thumbnail');
@@ -100,7 +100,7 @@ class FilterManagerTest extends AbstractTest
         $filterManager = new FilterManager(
             $config,
             $imagine,
-            $this->createFileGuesserManager()
+            $this->createFileAttributeResolverInstance()
         );
         $filterManager->addLoader('thumbnail', $loader);
 
@@ -156,7 +156,7 @@ class FilterManagerTest extends AbstractTest
         $filterManager = new FilterManager(
             $config,
             $imagine,
-            $this->createFileGuesserManager()
+            $this->createFileAttributeResolverInstance()
         );
         $filterManager->addLoader('thumbnail', $loader);
 
@@ -214,7 +214,7 @@ class FilterManagerTest extends AbstractTest
         $filterManager = new FilterManager(
             $config,
             $imagine,
-            $this->createFileGuesserManager()
+            $this->createFileAttributeResolverInstance()
         );
         $filterManager->addLoader('thumbnail', $loader);
 
@@ -272,7 +272,7 @@ class FilterManagerTest extends AbstractTest
         $filterManager = new FilterManager(
             $config,
             $imagine,
-            $this->createFileGuesserManager([$mimeTypeGuesser])
+            $this->createFileAttributeResolverInstance([$mimeTypeGuesser])
         );
         $filterManager->addLoader('thumbnail', $loader);
 
@@ -337,7 +337,7 @@ class FilterManagerTest extends AbstractTest
         $filterManager = new FilterManager(
             $config,
             $imagine,
-            $this->createFileGuesserManager([$mimeTypeGuesser])
+            $this->createFileAttributeResolverInstance([$mimeTypeGuesser])
         );
         $filterManager->addLoader('thumbnail', $loader);
 
@@ -395,7 +395,7 @@ class FilterManagerTest extends AbstractTest
         $filterManager = new FilterManager(
             $config,
             $imagine,
-            $this->createFileGuesserManager()
+            $this->createFileAttributeResolverInstance()
         );
         $filterManager->addLoader('thumbnail', $loader);
 
@@ -449,7 +449,7 @@ class FilterManagerTest extends AbstractTest
         $filterManager = new FilterManager(
             $config,
             $imagine,
-            $this->createFileGuesserManager()
+            $this->createFileAttributeResolverInstance()
         );
         $filterManager->addLoader('thumbnail', $loader);
 
@@ -513,7 +513,7 @@ class FilterManagerTest extends AbstractTest
         $filterManager = new FilterManager(
             $config,
             $imagine,
-            $this->createFileGuesserManager()
+            $this->createFileAttributeResolverInstance()
         );
         $filterManager->addLoader('thumbnail', $loader);
 
@@ -533,7 +533,7 @@ class FilterManagerTest extends AbstractTest
         $filterManager = new FilterManager(
             $this->createFilterConfigurationMock(),
             $this->createImagineInterfaceMock(),
-            $this->createFileGuesserManager()
+            $this->createFileAttributeResolverInstance()
         );
 
         $filterManager->apply($binary, [
@@ -581,7 +581,7 @@ class FilterManagerTest extends AbstractTest
         $filterManager = new FilterManager(
             $this->createFilterConfigurationMock(),
             $imagineMock,
-            $this->createFileGuesserManager()
+            $this->createFileAttributeResolverInstance()
         );
         $filterManager->addLoader('thumbnail', $loader);
 
@@ -630,7 +630,7 @@ class FilterManagerTest extends AbstractTest
         $filterManager = new FilterManager(
             $this->createFilterConfigurationMock(),
             $imagineMock,
-            $this->createFileGuesserManager()
+            $this->createFileAttributeResolverInstance()
         );
         $filterManager->addLoader('thumbnail', $loader);
 
@@ -680,7 +680,7 @@ class FilterManagerTest extends AbstractTest
         $filterManager = new FilterManager(
             $this->createFilterConfigurationMock(),
             $imagineMock,
-            $this->createFileGuesserManager()
+            $this->createFileAttributeResolverInstance()
         );
         $filterManager->addLoader('thumbnail', $loader);
 
@@ -735,7 +735,7 @@ class FilterManagerTest extends AbstractTest
         $filterManager = new FilterManager(
             $this->createFilterConfigurationMock(),
             $imagineMock,
-            $this->createFileGuesserManager([$mimeTypeGuesser])
+            $this->createFileAttributeResolverInstance([$mimeTypeGuesser])
         );
         $filterManager->addLoader('thumbnail', $loader);
 
@@ -792,7 +792,7 @@ class FilterManagerTest extends AbstractTest
         $filterManager = new FilterManager(
             $this->createFilterConfigurationMock(),
             $imagineMock,
-            $this->createFileGuesserManager([$mimeTypeGuesser])
+            $this->createFileAttributeResolverInstance([$mimeTypeGuesser])
         );
         $filterManager->addLoader('thumbnail', $loader);
 
@@ -843,7 +843,7 @@ class FilterManagerTest extends AbstractTest
         $filterManager = new FilterManager(
             $this->createFilterConfigurationMock(),
             $imagineMock,
-            $this->createFileGuesserManager()
+            $this->createFileAttributeResolverInstance()
         );
         $filterManager->addLoader('thumbnail', $loader);
 
@@ -893,7 +893,7 @@ class FilterManagerTest extends AbstractTest
         $filterManager = new FilterManager(
             $this->createFilterConfigurationMock(),
             $imagineMock,
-            $this->createFileGuesserManager()
+            $this->createFileAttributeResolverInstance()
         );
         $filterManager->addLoader('thumbnail', $loader);
 
@@ -969,7 +969,7 @@ class FilterManagerTest extends AbstractTest
         $filterManager = new FilterManager(
             $config,
             $imagineMock,
-            $this->createFileGuesserManager()
+            $this->createFileAttributeResolverInstance()
         );
         $filterManager->addLoader('thumbnail', $loader);
         $filterManager->addPostProcessor('foo', $postProcessor);
@@ -1034,7 +1034,7 @@ class FilterManagerTest extends AbstractTest
         $filterManager = new FilterManager(
             $config,
             $imagineMock,
-            $this->createFileGuesserManager()
+            $this->createFileAttributeResolverInstance()
         );
 
         $filterManager->addLoader('thumbnail', $loader);
@@ -1047,7 +1047,7 @@ class FilterManagerTest extends AbstractTest
         $filterManager = new FilterManager(
             $this->createFilterConfigurationMock(),
             $this->createImagineInterfaceMock(),
-            $this->createFileGuesserManager()
+            $this->createFileAttributeResolverInstance()
         );
 
         $this->assertSame($binary, $filterManager->applyPostProcessors($binary, []));

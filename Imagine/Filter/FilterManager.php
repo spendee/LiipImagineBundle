@@ -15,7 +15,7 @@ use Imagine\Image\ImageInterface;
 use Imagine\Image\ImagineInterface;
 use Liip\ImagineBundle\File\FileBlob;
 use Liip\ImagineBundle\File\FileInterface;
-use Liip\ImagineBundle\File\Guesser\GuesserManager;
+use Liip\ImagineBundle\File\Attributes\Resolver\FileAttributesResolver;
 use Liip\ImagineBundle\Imagine\Filter\Loader\LoaderInterface;
 use Liip\ImagineBundle\Imagine\Filter\PostProcessor\PostProcessorInterface;
 
@@ -32,7 +32,7 @@ class FilterManager
     protected $imagine;
 
     /**
-     * @var GuesserManager
+     * @var FileAttributesResolver
      */
     protected $guesserManager;
 
@@ -47,14 +47,14 @@ class FilterManager
     protected $postProcessors = [];
 
     /**
-     * @param FilterConfiguration $filterConfig
-     * @param ImagineInterface    $imagine
-     * @param GuesserManager      $guesserManager
+     * @param FilterConfiguration    $filterConfig
+     * @param ImagineInterface       $imagine
+     * @param FileAttributesResolver $guesserManager
      */
     public function __construct(
         FilterConfiguration $filterConfig,
         ImagineInterface $imagine,
-        GuesserManager $guesserManager
+        FileAttributesResolver $guesserManager
     ) {
         $this->filterConfig = $filterConfig;
         $this->imagine = $imagine;
@@ -203,7 +203,7 @@ class FilterManager
         if ($filterExtension !== (string) $file->getExtension()) {
             $filterDataTyped = $this
                 ->guesserManager
-                ->guessUsingContent($filterImageBlob)
+                ->resolveFileBlob(FileBlob::create($filterImageBlob))
                 ->getContentType();
         }
 

@@ -15,8 +15,8 @@ use League\Flysystem\FilesystemInterface;
 use Liip\ImagineBundle\Exception\Binary\Loader\NotLoadableException;
 use Liip\ImagineBundle\File\FileBlob;
 use Liip\ImagineBundle\File\FileInterface;
-use Liip\ImagineBundle\File\Guesser\GuesserManager;
-use Liip\ImagineBundle\File\Metadata\MimeTypeMetadata;
+use Liip\ImagineBundle\File\Attributes\Resolver\FileAttributesResolver;
+use Liip\ImagineBundle\File\Attributes\ContentTypeAttribute;
 
 class FlysystemLoader implements LoaderInterface
 {

@@ -37,12 +37,12 @@
         <service id="liip_imagine.filter.manager" class="Liip\ImagineBundle\Imagine\Filter\FilterManager" public="true">
             <argument type="service" id="liip_imagine.filter.configuration" />
             <argument type="service" id="liip_imagine" />
-            <argument type="service" id="liip_imagine.guesser_manager" />
+            <argument type="service" id="liip_imagine.file_attributes.resolver" />
         </service>
 
         <service id="liip_imagine.data.manager" class="Liip\ImagineBundle\Imagine\Data\DataManager" public="true">
             <argument type="service" id="liip_imagine.filter.configuration" />
-            <argument type="service" id="liip_imagine.file_metadata.resolver" />
+            <argument type="service" id="liip_imagine.file_attributes.applier" />
             <argument>%liip_imagine.binary.loader.default%</argument>
             <argument>%liip_imagine.default_image%</argument>
         </service>
@@ -244,32 +244,32 @@
 
         <!-- Guessers -->
 
-        <service id="liip_imagine.file_metadata.resolver" class="Liip\ImagineBundle\File\Metadata\Resolver\ImageMetadataResolver">
-            <argument type="service" id="liip_imagine.guesser_manager" />
+        <service id="liip_imagine.file_attributes.applier" class="Liip\ImagineBundle\File\Attributes\Resolver\FileAttributesApplier" public="false">
+            <argument type="service" id="liip_imagine.file_attributes.resolver" />
         </service>
 
-        <service id="liip_imagine.guesser_manager" class="Liip\ImagineBundle\File\Guesser\GuesserManager" public="false">
-            <argument type="service" id="liip_imagine.guesser.content_type" />
-            <argument type="service" id="liip_imagine.guesser.extension" />
+        <service id="liip_imagine.file_attributes.resolver" class="Liip\ImagineBundle\File\Attributes\Resolver\FileAttributesResolver" public="false">
+            <argument type="service" id="liip_imagine.file_attributes.guesser.content_type" />
+            <argument type="service" id="liip_imagine.file_attributes.guesser.extension" />
         </service>
 
-        <service id="liip_imagine.guesser.extension" class="Liip\ImagineBundle\File\Guesser\Handler\ExtensionGuesser" public="false">
+        <service id="liip_imagine.file_attributes.guesser.extension" class="Liip\ImagineBundle\File\Attributes\Guesser\ExtensionGuesser" public="false">
             <call method="register">
-                <argument type="service" id="liip_imagine.symfony_guesser.extension" />
+                <argument type="service" id="liip_imagine.symfony.file_attributes.guesser.extension" />
             </call>
         </service>
 
-        <service id="liip_imagine.guesser.content_type" class="Liip\ImagineBundle\File\Guesser\Handler\ContentTypeGuesser" public="false">
+        <service id="liip_imagine.file_attributes.guesser.content_type" class="Liip\ImagineBundle\File\Attributes\Guesser\ContentTypeGuesser" public="false">
             <call method="register">
-                <argument type="service" id="liip_imagine.symfony_guesser.content_type" />
+                <argument type="service" id="liip_imagine.symfony.file_attributes.guesser.content_type" />
             </call>
         </service>
 
-        <service id="liip_imagine.symfony_guesser.content_type" class="Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesserInterface">
+        <service id="liip_imagine.symfony.file_attributes.guesser.content_type" class="Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesserInterface" public="false">
             <factory class="Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser" method="getInstance" />
         </service>
 
-        <service id="liip_imagine.symfony_guesser.extension" class="Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesserInterface">
+        <service id="liip_imagine.symfony.file_attributes.guesser.extension" class="Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesserInterface" public="false">
             <factory class="Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser" method="getInstance" />
         </service>
 

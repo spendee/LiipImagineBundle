@@ -11,9 +11,12 @@
 
 namespace Liip\ImagineBundle\File;
 
-use Liip\ImagineBundle\File\Metadata\MimeTypeMetadata;
-use Liip\ImagineBundle\File\Metadata\ExtensionMetadata;
+use Liip\ImagineBundle\File\Attributes\ContentTypeAttribute;
+use Liip\ImagineBundle\File\Attributes\ExtensionAttribute;
 
+/**
+ * @author Rob Frawley 2nd <rmf@src.run>
+ */
 interface FileInterface
 {
     /**
@@ -45,9 +48,9 @@ interface FileInterface
     public function getContentsLength(): int;
 
     /**
-     * @return MimeTypeMetadata
+     * @return ContentTypeAttribute
      */
-    public function getContentType(): MimeTypeMetadata;
+    public function getContentType(): ContentTypeAttribute;
 
     /**
      * @return bool
@@ -55,9 +58,9 @@ interface FileInterface
     public function hasContentType(): bool;
 
     /**
-     * @return ExtensionMetadata
+     * @return ExtensionAttribute
      */
-    public function getExtension(): ExtensionMetadata;
+    public function getExtension(): ExtensionAttribute;
 
     /**
      * @return bool

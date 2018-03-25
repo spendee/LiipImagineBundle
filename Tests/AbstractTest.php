@@ -15,10 +15,11 @@ use Imagine\Image\ImageInterface;
 use Imagine\Image\ImagineInterface;
 use Imagine\Image\Metadata\MetadataBag;
 use Liip\ImagineBundle\Binary\Loader\LoaderInterface;
-use Liip\ImagineBundle\File\Guesser\Handler\ContentTypeGuesser;
-use Liip\ImagineBundle\File\Guesser\Handler\ExtensionGuesser;
-use Liip\ImagineBundle\File\Guesser\GuesserManager;
-use Liip\ImagineBundle\File\Metadata\Resolver\ImageMetadataResolver;
+use Liip\ImagineBundle\File\Attributes\Guesser\ContentTypeGuesser;
+use Liip\ImagineBundle\File\Attributes\Guesser\ContentTypeGuesserInterface;
+use Liip\ImagineBundle\File\Attributes\Guesser\ExtensionGuesser;
+use Liip\ImagineBundle\File\Attributes\Resolver\FileAttributesResolver;
+use Liip\ImagineBundle\File\Attributes\Resolver\FileAttributesApplier;
 use Liip\ImagineBundle\Imagine\Cache\CacheManager;
 use Liip\ImagineBundle\Imagine\Cache\Resolver\ResolverInterface;
 use Liip\ImagineBundle\Imagine\Cache\SignerInterface;
@@ -249,54 +250,121 @@ abstract class AbstractTest extends TestCase
     }
 
     /**
-     * @param array ...$guessers
+     * @param string|null $willReturn
+     * @param string|null $willExpect
      *
-     * @return \Liip\ImagineBundle\File\Guesser\Handler\ContentTypeGuesser
+     * @return ContentTypeGuesser
      */
-    protected function createFileContentTypeGuesser(...$guessers): ContentTypeGuesser
+    protected function createContentTypeGuesserMock(string $willReturn = null, string $willExpect = null): ContentTypeGuesser
     {
-        $g = new ContentTypeGuesser(...$guessers);
+        /** @var MimeTypeGuesserInterface|\PHPUnit_Framework_MockObject_MockObject $guesser */
+        $guesser = $this->getMockBuilder(MimeTypeGuesserInterface::class)
+            ->setMethods(['guess'])
+            ->getMock();
 
-        if (0 === count($guessers)) {
-            $g->register(MimeTypeGuesser::getInstance());
+        $builder = $guesser
+            ->expects($this->atLeastOnce())
+            ->method('guess');
+
+        if ($willExpect) {
+            $builder->with($willExpect);
+        } else {
+            $builder->withAnyParameters();
         }
 
-        return $g;
+        $builder->willReturn($willReturn);
+
+        return $this->createContentTypeGuesserInstance($guesser);
     }
 
     /**
-     * @param array ...$guessers
+     * @param string|null $willReturn
+     * @param string|null $willExpect
      *
-     * @return \Liip\ImagineBundle\File\Guesser\Handler\ExtensionGuesser
+     * @return ExtensionGuesser
      */
-    protected function createFileExtensionGuesser(...$guessers): ExtensionGuesser
+    protected function createExtensionGuesserMock(string $willReturn = null, string $willExpect = null): ExtensionGuesser
     {
-        $g = new ExtensionGuesser(...$guessers);
+        /** @var ExtensionGuesserInterface|\PHPUnit_Framework_MockObject_MockObject $guesser */
+        $guesser = $this->getMockBuilder(ExtensionGuesserInterface::class)
+            ->setMethods(['guess'])
+            ->getMock();
 
-        if (0 === count($guessers)) {
-            $g->register(SymfonyExtensionGuesser::getInstance());
+        $builder = $guesser
+            ->expects($this->atLeastOnce())
+            ->method('guess');
+
+        if ($willExpect) {
+            $builder->with($willExpect);
+        } else {
+            $builder->withAnyParameters();
         }
 
-        return $g;
+        $builder->willReturn($willReturn);
+
+        return $this->createExtensionGuesserInstance($guesser);
     }
 
     /**
-     * @return GuesserManager
+     * @param array ...$registrations
+     *
+     * @return ContentTypeGuesser
      */
-    protected function createFileGuesserManager($contentTypeGuessers = [], $extensionGuessers = []): GuesserManager
+    protected function createContentTypeGuesserInstance(...$registrations): ContentTypeGuesser
     {
-        return new GuesserManager(
-            $this->createFileContentTypeGuesser(...$contentTypeGuessers),
-            $this->createFileExtensionGuesser(...$extensionGuessers)
+        $guesser = new ContentTypeGuesser();
+
+        foreach ($registrations ?: [MimeTypeGuesser::getInstance()] as $g) {
+            $guesser->register($g);
+        }
+
+        return $guesser;
+    }
+
+    /**
+     * @param array ...$registrations
+     *
+     * @return ExtensionGuesser
+     */
+    protected function createExtensionGuesserInstance(...$registrations): ExtensionGuesser
+    {
+        $guesser = new ExtensionGuesser();
+
+        foreach ($registrations ?: [SymfonyExtensionGuesser::getInstance()] as $g) {
+            $guesser->register($g);
+        }
+
+        return $guesser;
+    }
+
+    /**
+     * @param ContentTypeGuesserInterface|ContentTypeGuesserInterface[] $cGuessers
+     * @param ExtensionGuesserInterface|ExtensionGuesserInterface[]     $eGuessers
+     *
+     * @return FileAttributesResolver
+     */
+    protected function createFileAttributeResolverInstance($cGuessers = [], $eGuessers = []): FileAttributesResolver
+    {
+        return new FileAttributesResolver(
+            $this->createContentTypeGuesserInstance(...array_values(is_array($cGuessers) ? $cGuessers : [$cGuessers])),
+            $this->createExtensionGuesserInstance(...array_values(is_array($eGuessers) ? $eGuessers : [$eGuessers]))
         );
     }
 
     /**
-     * @return ImageMetadataResolver
+     * @param ContentTypeGuesserInterface|ContentTypeGuesserInterface[] $cGuessers
+     * @param ExtensionGuesserInterface|ExtensionGuesserInterface[]     $eGuessers
+     *
+     * @return FileAttributesApplier
      */
-    protected function createFileMetadataResolver($contentTypeGuessers = [], $extensionGuessers = []): ImageMetadataResolver
+    protected function createFileAttributesApplierInstance($cGuessers = [], $eGuessers = []): FileAttributesApplier
     {
-        return new ImageMetadataResolver($this->createFileGuesserManager($contentTypeGuessers, $extensionGuessers));
+        return new FileAttributesApplier(
+            $this->createFileAttributeResolverInstance(
+                array_values(is_array($cGuessers) ? $cGuessers : [$cGuessers]),
+                array_values(is_array($eGuessers) ? $eGuessers : [$eGuessers])
+            )
+        );
     }
 
     /**
@@ -307,7 +375,7 @@ abstract class AbstractTest extends TestCase
      *
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
-    protected function createObjectMock($object, array $methods = [], $constructorInvoke = false, array $constructorParams = [])
+    protected function createObjectMock($object, array $methods = [], $constructorInvoke = false, array $constructorParams = []): \PHPUnit_Framework_MockObject_MockObject
     {
         $builder = $this->getMockBuilder($object);
 

@@ -9,15 +9,15 @@
  * file that was distributed with this source code.
  */
 
-namespace Liip\ImagineBundle\Tests\Fixtures\Data\File\Metadata;
+namespace Liip\ImagineBundle\Tests\Fixtures\Data\File\Attributes;
 
-use Liip\ImagineBundle\Tests\File\Metadata\MimeTypeMetadataTest;
+use Liip\ImagineBundle\Tests\File\Attributes\ContentTypeAttributeTest;
 use Liip\ImagineBundle\Tests\Fixtures\Data\DataLoader;
 
 return function (): array {
     return [
         'default' => array_map(function (array $data): array {
             return [array_pop($data)];
-        }, (iterator_to_array((new DataLoader())(MimeTypeMetadataTest::class)))),
+        }, (iterator_to_array((new DataLoader())(ContentTypeAttributeTest::class)))),
     ];
 };

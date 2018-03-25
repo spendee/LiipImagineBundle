@@ -39,14 +39,9 @@ class DataManagerTest extends AbstractTest
                 'data_loader' => null,
             ]));
 
-        $mimeTypeGuesser = $this->createMimeTypeGuesserInterfaceMock();
-        $mimeTypeGuesser
-            ->expects($this->atLeastOnce())
-            ->method('guess')
-            ->withAnyParameters()
-            ->will($this->returnValue('image/png'));
-
-        $dataManager = new DataManager($config, $this->createFileMetadataResolver([$mimeTypeGuesser]), 'default');
+        $dataManager = new DataManager($config, $this->createFileAttributesApplierInstance(
+            $this->createContentTypeGuesserMock('image/png')
+        ), 'default');
         $dataManager->addLoader('default', $loader);
 
         $dataManager->find('thumbnail', 'cats.jpeg');
@@ -71,13 +66,9 @@ class DataManagerTest extends AbstractTest
                 'data_loader' => 'the_loader',
             ]));
 
-        $mimeTypeGuesser = $this->createMimeTypeGuesserInterfaceMock();
-        $mimeTypeGuesser
-            ->expects($this->atLeastOnce())
-            ->method('guess')
-            ->will($this->returnValue('image/png'));
-
-        $dataManager = new DataManager($config, $this->createFileMetadataResolver([$mimeTypeGuesser]));
+        $dataManager = new DataManager($config, $this->createFileAttributesApplierInstance(
+            $this->createContentTypeGuesserMock('image/png')
+        ));
         $dataManager->addLoader('the_loader', $loader);
 
         $dataManager->find('thumbnail', 'cats.jpeg');
@@ -86,7 +77,7 @@ class DataManagerTest extends AbstractTest
     public function testThrowsIfMimeTypeWasNotGuessedOnFind()
     {
         $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Failed to resolve the content type of "cats.jpeg"');
+        $this->expectExceptionMessage('Invalid attributes resolved for "cats.jpeg"');
 
         $loader = $this->createBinaryLoaderInterfaceMock();
         $loader
@@ -105,13 +96,9 @@ class DataManagerTest extends AbstractTest
                 'data_loader' => 'the_loader',
             ]));
 
-        $mimeTypeGuesser = $this->createMimeTypeGuesserInterfaceMock();
-        $mimeTypeGuesser
-            ->expects($this->atLeastOnce())
-            ->method('guess')
-            ->will($this->returnValue(null));
-
-        $dataManager = new DataManager($config, $this->createFileMetadataResolver([$mimeTypeGuesser]));
+        $dataManager = new DataManager($config, $this->createFileAttributesApplierInstance(
+            $this->createContentTypeGuesserMock(null)
+        ));
         $dataManager->addLoader('the_loader', $loader);
         $dataManager->find('thumbnail', 'cats.jpeg');
     }
@@ -119,7 +106,7 @@ class DataManagerTest extends AbstractTest
     public function testThrowsIfMimeTypeNotImageOneOnFind()
     {
         $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Invalid content type "text/plain" resolved for "cats.jpeg" (expected primary type "image").');
+        $this->expectExceptionMessage('Invalid content type attribute "text/plain" for "cats.jpeg" (expected primary content type "image" but got "text").');
 
         $loader = $this->createBinaryLoaderInterfaceMock();
         $loader
@@ -145,7 +132,7 @@ class DataManagerTest extends AbstractTest
             ->method('guess')
             ->will($this->returnValue('text/plain'));
 
-        $dataManager = new DataManager($config, $this->createFileMetadataResolver([$mimeTypeGuesser]));
+        $dataManager = new DataManager($config, $this->createFileAttributesApplierInstance([$mimeTypeGuesser]));
         $dataManager->addLoader('the_loader', $loader);
         $dataManager->find('thumbnail', 'cats.jpeg');
     }
@@ -153,7 +140,7 @@ class DataManagerTest extends AbstractTest
     public function testThrowsIfLoaderReturnBinaryWithEmtptyMimeTypeOnFind()
     {
         $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Failed to resolve the content type of "cats.jpeg".');
+        $this->expectExceptionMessage('Invalid attributes resolved for "cats.jpeg".');
 
         $loader = $this->createBinaryLoaderInterfaceMock();
         $loader
@@ -178,7 +165,7 @@ class DataManagerTest extends AbstractTest
             ->expects($this->atLeastOnce())
             ->method('guess');
 
-        $dataManager = new DataManager($config, $this->createFileMetadataResolver([$mimeTypeGuesser]));
+        $dataManager = new DataManager($config, $this->createFileAttributesApplierInstance([$mimeTypeGuesser]));
         $dataManager->addLoader('the_loader', $loader);
         $dataManager->find('thumbnail', 'cats.jpeg');
     }
@@ -186,7 +173,7 @@ class DataManagerTest extends AbstractTest
     public function testThrowsIfLoaderReturnBinaryWithMimeTypeNotImageOneOnFind()
     {
         $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Invalid content type "text/plain" resolved for "cats.jpeg" (expected primary type "image").');
+        $this->expectExceptionMessage('Invalid content type attribute "text/plain" for "cats.jpeg" (expected primary content type "image" but got "text").');
 
         $binary = FileBlob::create('content', 'text/plain', 'txt');
 
@@ -213,7 +200,7 @@ class DataManagerTest extends AbstractTest
             ->expects($this->never())
             ->method('guess');
 
-        $dataManager = new DataManager($config, $this->createFileMetadataResolver([$mimeTypeGuesser]));
+        $dataManager = new DataManager($config, $this->createFileAttributesApplierInstance([$mimeTypeGuesser]));
         $dataManager->addLoader('the_loader', $loader);
         $dataManager->find('thumbnail', 'cats.jpeg');
     }
@@ -234,7 +221,7 @@ class DataManagerTest extends AbstractTest
                 'data_loader' => null,
             ]));
 
-        $dataManager = new DataManager($config, $this->createFileMetadataResolver());
+        $dataManager = new DataManager($config, $this->createFileAttributesApplierInstance());
         $dataManager->find('thumbnail', 'cats.jpeg');
     }
 
@@ -266,7 +253,7 @@ class DataManagerTest extends AbstractTest
                 'data_loader' => null,
             ]));
 
-        $dataManager = new DataManager($config, $this->createFileMetadataResolver([$mimeTypeGuesser]), 'default');
+        $dataManager = new DataManager($config, $this->createFileAttributesApplierInstance([$mimeTypeGuesser]), 'default');
         $dataManager->addLoader('default', $loader);
 
         $binary = $dataManager->find('thumbnail', 'cats.jpeg');
@@ -312,7 +299,7 @@ class DataManagerTest extends AbstractTest
                 'data_loader' => null,
             ]));
 
-        $dataManager = new DataManager($config, $this->createFileMetadataResolver([$mimeTypeGuesser], [$extensionGuesser]), 'default');
+        $dataManager = new DataManager($config, $this->createFileAttributesApplierInstance([$mimeTypeGuesser], [$extensionGuesser]), 'default');
         $dataManager->addLoader('default', $loader);
 
         $binary = $dataManager->find('thumbnail', 'cats.jpeg');
@@ -341,7 +328,7 @@ class DataManagerTest extends AbstractTest
             ->method('guess');
 
         $defaultGlobalImage = 'cats.jpeg';
-        $dataManager = new DataManager($config, $this->createFileMetadataResolver([$mimeTypeGuesser]), 'default', 'cats.jpeg');
+        $dataManager = new DataManager($config, $this->createFileAttributesApplierInstance([$mimeTypeGuesser]), 'default', 'cats.jpeg');
         $dataManager->addLoader('default', $loader);
 
         $defaultImage = $dataManager->getDefaultImageUrl('thumbnail');
@@ -368,7 +355,7 @@ class DataManagerTest extends AbstractTest
             ->expects($this->never())
             ->method('guess');
 
-        $dataManager = new DataManager($config, $this->createFileMetadataResolver([$mimeTypeGuesser]), 'default', null);
+        $dataManager = new DataManager($config, $this->createFileAttributesApplierInstance([$mimeTypeGuesser]), 'default', null);
         $dataManager->addLoader('default', $loader);
 
         $defaultImage = $dataManager->getDefaultImageUrl('thumbnail');

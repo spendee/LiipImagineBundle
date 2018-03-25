@@ -43,7 +43,7 @@ class FlysystemLoaderTest extends AbstractTest
      */
     public function getFlysystemLoader()
     {
-        return new FlysystemLoader($this->flyFilesystem, $this->createFileGuesserManager());
+        return new FlysystemLoader($this->flyFilesystem, $this->createFileAttributeResolverInstance());
     }
 
     public function testShouldImplementLoaderInterface()

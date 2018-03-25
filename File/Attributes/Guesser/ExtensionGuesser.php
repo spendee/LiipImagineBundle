@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Liip\ImagineBundle\File\Guesser\Handler;
+namespace Liip\ImagineBundle\File\Attributes\Guesser;
 
-use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesserInterface;
+use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesserInterface as BaseExtensionGuesserInterface;
 
 /**
  * @internal
@@ -25,6 +25,7 @@ final class ExtensionGuesser extends AbstractGuesser implements ExtensionGuesser
      */
     protected static function isSupportedGuesser($guesser): bool
     {
-        return $guesser instanceof ExtensionGuesserInterface;
+        return $guesser instanceof ExtensionGuesserInterface
+            || $guesser instanceof BaseExtensionGuesserInterface;
     }
 }

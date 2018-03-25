@@ -9,23 +9,26 @@
  * file that was distributed with this source code.
  */
 
-namespace Liip\ImagineBundle\Tests\File\Metadata;
+namespace Liip\ImagineBundle\Tests\File\Attributes\Resolver;
 
+use Liip\ImagineBundle\Exception\File\Attributes\Resolver\InvalidFileAttributesException;
 use Liip\ImagineBundle\File\FileBlob;
 use Liip\ImagineBundle\File\FilePath;
-use Liip\ImagineBundle\File\Guesser\Handler\ContentTypeGuesser;
-use Liip\ImagineBundle\File\Guesser\GuesserManager;
-use Liip\ImagineBundle\File\Guesser\Handler\ExtensionGuesser;
-use Liip\ImagineBundle\File\Metadata\Resolver\ImageMetadataResolver;
+use Liip\ImagineBundle\File\Attributes\Guesser\ContentTypeGuesser;
+use Liip\ImagineBundle\File\Attributes\Resolver\FileAttributesResolver;
+use Liip\ImagineBundle\File\Attributes\Guesser\ExtensionGuesser;
+use Liip\ImagineBundle\File\Attributes\Resolver\FileAttributesApplier;
+use Liip\ImagineBundle\Tests\AbstractTest;
+use Liip\ImagineBundle\Tests\File\Attributes\ContentTypeAttributeTest;
 use Liip\ImagineBundle\Tests\Fixtures\Data\DataLoader;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesserInterface;
 use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesserInterface;
 
 /**
- * @covers \Liip\ImagineBundle\File\Metadata\Resolver\ImageMetadataResolver
+ * @covers \Liip\ImagineBundle\File\Attributes\Resolver\FileAttributesApplier
  */
-class FileMetadataResolverTest extends TestCase
+class FileAttributesApplierTest extends AbstractTest
 {
     /**
      * @return \Iterator|string[]
@@ -45,35 +48,13 @@ class FileMetadataResolverTest extends TestCase
      */
     public function testResolve(string $contentType, string $extension)
     {
-        /** @var MimeTypeGuesserInterface|\PHPUnit_Framework_MockObject_MockObject $symfonyContentTypeGuesser */
-        $symfonyContentTypeGuesser = $this->getMockBuilder(MimeTypeGuesserInterface::class)
-            ->setMethods(['guess'])
-            ->getMock();
+        $resolver = $this->createFileAttributesApplierInstance(
+            $this->createContentTypeGuesserMock($contentType),
+            $this->createExtensionGuesserMock($extension, $contentType)
+        );
 
-        $symfonyContentTypeGuesser
-            ->expects($this->atLeastOnce())
-            ->method('guess')
-            ->withAnyParameters()
-            ->willReturn($contentType);
-
-        $contentTypeGuesser = new ContentTypeGuesser($symfonyContentTypeGuesser);
-
-        /** @var ExtensionGuesserInterface|\PHPUnit_Framework_MockObject_MockObject $symfonyExtensionGuesser */
-        $symfonyExtensionGuesser = $this->getMockBuilder(ExtensionGuesserInterface::class)
-            ->setMethods(['guess'])
-            ->getMock();
-
-        $symfonyExtensionGuesser
-            ->expects($this->atLeastOnce())
-            ->method('guess')
-            ->with($contentType)
-            ->willReturn($extension);
-
-        $extensionGuesser = new ExtensionGuesser($symfonyExtensionGuesser);
-
-        $resolver = new ImageMetadataResolver(new GuesserManager($contentTypeGuesser, $extensionGuesser));
-        $fileBlob = $resolver->resolve($fb = FileBlob::create('content'));
-        $filePath = $resolver->resolve($fp = FilePath::create('file.ext'));
+        $fileBlob = $resolver->apply($fb = FileBlob::create('content'));
+        $filePath = $resolver->apply($fp = FilePath::create('file.ext'));
 
         $this->assertNotSame($fb, $fileBlob);
         $this->assertSame($contentType, (string) $fileBlob->getContentType());
@@ -84,8 +65,8 @@ class FileMetadataResolverTest extends TestCase
         $this->assertSame($extension, (string) $filePath->getExtension());
         $this->assertSame('file.ext', $filePath->getFile()->getPathname());
 
-        $fileBlob = $resolver->resolve($fb = FileBlob::create('content', $contentType));
-        $filePath = $resolver->resolve($fp = FilePath::create('file.ext', $contentType));
+        $fileBlob = $resolver->apply($fb = FileBlob::create('content', $contentType));
+        $filePath = $resolver->apply($fp = FilePath::create('file.ext', $contentType));
 
         $this->assertNotSame($fb, $fileBlob);
         $this->assertSame($contentType, (string) $fileBlob->getContentType());
@@ -96,8 +77,8 @@ class FileMetadataResolverTest extends TestCase
         $this->assertSame($extension, (string) $filePath->getExtension());
         $this->assertSame('file.ext', $filePath->getFile()->getPathname());
 
-        $fileBlob = $resolver->resolve($fb = FileBlob::create('content', $contentType, $extension));
-        $filePath = $resolver->resolve($fp = FilePath::create('file.ext', $contentType, $extension));
+        $fileBlob = $resolver->apply($fb = FileBlob::create('content', $contentType, $extension));
+        $filePath = $resolver->apply($fp = FilePath::create('file.ext', $contentType, $extension));
 
         $this->assertSame($fb, $fileBlob);
         $this->assertSame($contentType, (string) $fileBlob->getContentType());
@@ -110,11 +91,49 @@ class FileMetadataResolverTest extends TestCase
     }
 
     /**
+     * @dataProvider provideResolveData
+     *
+     * @param string $contentType
+     * @param string $extension
+     */
+    public function testResolveThrowsOnInvalidContentTypeAttribute(string $contentType, string $extension)
+    {
+        $this->expectException(InvalidFileAttributesException::class);
+        $this->expectExceptionMessage('Unable to resolve content type attribute for file blob.');
+
+        $resolver = $this->createFileAttributesApplierInstance(
+            $this->createContentTypeGuesserMock('foobar'),
+            $this->createExtensionGuesserMock($extension, null)
+        );
+
+        $resolver->apply(FileBlob::create());
+    }
+
+    /**
+     * @dataProvider provideResolveData
+     *
+     * @param string $contentType
+     * @param string $extension
+     */
+    public function testResolveThrowsOnInvalidExtensionAttribute(string $contentType, string $extension)
+    {
+        $this->expectException(InvalidFileAttributesException::class);
+        $this->expectExceptionMessage('Unable to resolve extension attribute for file blob.');
+
+        $resolver = $this->createFileAttributesApplierInstance(
+            $this->createContentTypeGuesserMock($contentType),
+            $this->createExtensionGuesserMock(null, $contentType)
+        );
+
+        $resolver->apply(FileBlob::create());
+    }
+
+    /**
      * @return \Iterator
      */
     public static function fetchFixtureData(): \Iterator
     {
-        foreach ((new DataLoader())(MimeTypeMetadataTest::class, 10) as $d) {
+        foreach ((new DataLoader())(ContentTypeAttributeTest::class, 10) as $d) {
             yield [$d[0], $d[count($d) - 1]];
         }
     }

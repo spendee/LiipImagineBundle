@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Liip\ImagineBundle\File\Guesser\Handler;
+namespace Liip\ImagineBundle\File\Attributes\Guesser;
 
 use Liip\ImagineBundle\Exception\InvalidArgumentException;
-use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesserInterface;
+use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesserInterface as BaseExtensionGuesserInterface;
 use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesserInterface;
 
 /**
@@ -23,28 +23,18 @@ use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesserInterface;
 abstract class AbstractGuesser
 {
     /**
-     * @var MimeTypeGuesserInterface[]|ExtensionGuesserInterface[]
+     * @var ContentTypeGuesserInterface[]|MimeTypeGuesserInterface[]|ExtensionGuesserInterface[]|BaseExtensionGuesserInterface[]
      */
     private $guessers = [];
 
     /**
-     * @param MimeTypeGuesserInterface[]|ExtensionGuesserInterface[] ...$guessers
-     */
-    public function __construct(...$guessers)
-    {
-        foreach ($guessers as $g) {
-            $this->register($g);
-        }
-    }
-
-    /**
-     * @param MimeTypeGuesserInterface|ExtensionGuesserInterface $guesser
+     * @param ContentTypeGuesserInterface|MimeTypeGuesserInterface|ExtensionGuesserInterface|BaseExtensionGuesserInterface $guesser
      */
     public function register($guesser): void
     {
         if (!static::isSupportedGuesser($guesser)) {
             throw new InvalidArgumentException(sprintf(
-                'Unsupported guesser registered of type "%s".', get_class($guesser)
+                'Invalid guesser type "%s" provided for "%s".', get_class($guesser), get_called_class()
             ));
         }
 
@@ -58,9 +48,9 @@ abstract class AbstractGuesser
      */
     public function guess($subject): ?string
     {
-        foreach ($this->guessers as $g) {
-            if (null !== $guess = $g->guess((string) $subject)) {
-                return $guess;
+        foreach ($this->guessers as $guesser) {
+            if (null !== $result = $guesser->guess($subject)) {
+                return $result;
             }
         }
 
