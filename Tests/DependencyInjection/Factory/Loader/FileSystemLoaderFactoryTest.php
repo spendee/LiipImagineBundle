@@ -68,7 +68,7 @@ class FileSystemLoaderFactoryTest extends FactoryTestCase
         $loaderDefinition = $container->getDefinition('liip_imagine.binary.loader.the_loader_name');
 
         $this->assertInstanceOfChildDefinition($loaderDefinition);
-        $this->assertSame('liip_imagine.binary.loader.prototype.filesystem', $loaderDefinition->getParent());
+        $this->assertSame('liip_imagine.binary.loader.filesystem.prototype', $loaderDefinition->getParent());
 
         $this->assertSame(['theDataRoot'], $loaderDefinition->getArgument(0)->getArgument(0));
     }

@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Liip\ImagineBundle\Binary\Locator;
+namespace Liip\ImagineBundle\File\Loader\Locator;
 
 class FileSystemInsecureLocator extends FileSystemLocator
 {

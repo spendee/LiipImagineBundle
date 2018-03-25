@@ -11,12 +11,12 @@
 
 namespace Liip\ImagineBundle\Tests\Functional\Binary\Locator;
 
-use Liip\ImagineBundle\Binary\Locator\FileSystemLocator;
-use Liip\ImagineBundle\Binary\Locator\LocatorInterface;
+use Liip\ImagineBundle\File\Loader\Locator\FileSystemLocator;
+use Liip\ImagineBundle\File\Loader\Locator\LocatorInterface;
 use Liip\ImagineBundle\Tests\Functional\AbstractWebTestCase;
 
 /**
- * @covers \Liip\ImagineBundle\Binary\Locator\FileSystemLocator
+ * @covers \Liip\ImagineBundle\File\Loader\Locator\FileSystemLocator
  */
 class FileSystemLocatorTest extends AbstractWebTestCase
 {

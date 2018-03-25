@@ -11,6 +11,7 @@
 
 namespace Liip\ImagineBundle\Tests\Imagine\Cache\Resolver;
 
+use Aws\S3\Exception\S3Exception;
 use Aws\S3\S3Client;
 use Guzzle\Service\Resource\Model;
 use Liip\ImagineBundle\Exception\Imagine\Cache\Resolver\NotStorableException;
@@ -36,8 +37,11 @@ class AwsS3ResolverTest extends AbstractTest
         $s3 = $this->getS3ClientMock();
         $s3
             ->expects($this->once())
-            ->method('getObjectUrl')
-            ->with('images.example.com', 'thumb/some-folder/path.jpg')
+            ->method('getObject')
+            ->with([
+                'Bucket' => 'images.example.com',
+                'Key'    => 'thumb/some-folder/path.jpg'
+            ])
             ->willReturn('resolved/thumb.png');
 
         $resolver = new AwsS3Resolver($s3, 'images.example.com');
@@ -49,41 +53,65 @@ class AwsS3ResolverTest extends AbstractTest
         $s3 = $this->getS3ClientMock();
         $s3
             ->expects($this->once())
-            ->method('getObjectUrl')
-            ->with('images.example.com', 'thumb/some-folder/path.jpg', 0, ['torrent' => true])
+            ->method('getObject')
+            ->with([
+                'torrent' => true,
+                'Bucket' => 'images.example.com',
+                'Key'    => 'thumb/some-folder/path.jpg'
+            ])
             ->willReturn('resolved/thumb.png');
 
-        $resolver = new AwsS3Resolver($s3, 'images.example.com');
-        $resolver->setGetOption('torrent', true);
+        $resolver = new AwsS3Resolver($s3, 'images.example.com', null, ['torrent' => true]);
+        $resolver->resolve('/some-folder/path.jpg', 'thumb');
+    }
+
+    public function testGetObjectResolveWithCachePrefix()
+    {
+        $s3 = $this->getS3ClientMock();
+        $s3
+            ->expects($this->once())
+            ->method('getObject')
+            ->with([
+                'Bucket' => 'images.example.com',
+                'Key'    => 'a/cache/prefix/thumb/some-folder/path.jpg'
+            ])
+            ->willReturn('resolved/a/cache/prefix/thumb.png');
+
+        $resolver = new AwsS3Resolver($s3, 'images.example.com', null, [], [], [], 'a/cache/prefix');
         $resolver->resolve('/some-folder/path.jpg', 'thumb');
     }
 
     public function testLogNotCreatedObjects()
     {
         $this->expectException(NotStorableException::class);
-        $this->expectExceptionMessage('The object could not be created on Amazon S3');
+        $this->expectExceptionMessageRegExp('{The object "[^"]+" could not be created on AWS S3 bucket "[^"]+"}');
 
-        $binary = FileBlob::create('aContent', 'image/jpeg', 'jpeg');
+        $file = FileBlob::create('aContent', 'image/jpeg', 'jpeg');
 
         $s3 = $this->getS3ClientMock();
         $s3
             ->expects($this->once())
             ->method('putObject')
-            ->will($this->throwException(new \Exception('Put object on amazon failed')));
+            ->will($this->throwException(
+                $this
+                    ->getMockBuilder(S3Exception::class)
+                    ->disableOriginalConstructor()
+                    ->getMock()
+            ));
 
-        $logger = $this->createLoggerInterfaceMock();
+        $logger = $this->createLoggerMock();
         $logger
             ->expects($this->once())
             ->method('error');
 
         $resolver = new AwsS3Resolver($s3, 'images.example.com');
         $resolver->setLogger($logger);
-        $resolver->store($binary, 'foobar.jpg', 'thumb');
+        $resolver->store($file, 'foobar.jpg', 'thumb');
     }
 
     public function testCreateObjectOnAmazon()
     {
-        $binary = FileBlob::create('aContent', 'image/jpeg', 'jpeg');
+        $file = FileBlob::create('aContent', 'image/jpeg', 'jpeg');
 
         $s3 = $this->getS3ClientMock();
         $s3
@@ -92,12 +120,12 @@ class AwsS3ResolverTest extends AbstractTest
             ->will($this->returnValue($this->getS3ResponseMock()));
 
         $resolver = new AwsS3Resolver($s3, 'images.example.com');
-        $resolver->store($binary, 'thumb/foobar.jpg', 'thumb');
+        $resolver->store($file, 'thumb/foobar.jpg', 'thumb');
     }
 
     public function testObjectOptionsPassedToS3ClintOnCreate()
     {
-        $binary = FileBlob::create('aContent', 'image/jpeg', 'jpeg');
+        $file = FileBlob::create('aContent', 'image/jpeg', 'jpeg');
 
         $s3 = $this->getS3ClientMock();
         $s3
@@ -112,9 +140,8 @@ class AwsS3ResolverTest extends AbstractTest
                 'ContentType' => 'image/jpeg',
             ]);
 
-        $resolver = new AwsS3Resolver($s3, 'images.example.com');
-        $resolver->setPutOption('CacheControl', 'max-age=86400');
-        $resolver->store($binary, 'images/foobar.jpg', 'filter');
+        $resolver = new AwsS3Resolver($s3, 'images.example.com', null, [], ['CacheControl' => 'max-age=86400']);
+        $resolver->store($file, 'images/foobar.jpg', 'filter');
     }
 
     public function testIsStoredChecksObjectExistence()
@@ -135,8 +162,11 @@ class AwsS3ResolverTest extends AbstractTest
         $s3 = $this->getS3ClientMock();
         $s3
             ->expects($this->once())
-            ->method('getObjectUrl')
-            ->with('images.example.com', 'thumb/some-folder/path.jpg', 0, [])
+            ->method('getObject')
+            ->with([
+                'Bucket' => 'images.example.com',
+                'Key'    => 'thumb/some-folder/path.jpg'
+            ])
             ->will($this->returnValue('http://images.example.com/some-folder/path.jpg'));
 
         $resolver = new AwsS3Resolver($s3, 'images.example.com');
@@ -312,9 +342,14 @@ class AwsS3ResolverTest extends AbstractTest
         $s3
             ->expects($this->once())
             ->method('deleteObject')
-            ->will($this->throwException(new \Exception()));
+            ->will($this->throwException(
+                $this
+                    ->getMockBuilder(S3Exception::class)
+                    ->disableOriginalConstructor()
+                    ->getMock()
+            ));
 
-        $logger = $this->createLoggerInterfaceMock();
+        $logger = $this->createLoggerMock();
         $logger
             ->expects($this->once())
             ->method('error');
@@ -333,7 +368,7 @@ class AwsS3ResolverTest extends AbstractTest
         $s3
             ->expects($this->once())
             ->method('deleteMatchingObjects')
-            ->with($expectedBucket, null, "/$expectedFilter/i");
+            ->with($expectedBucket, null, "/($expectedFilter)/i");
 
         $resolver = new AwsS3Resolver($s3, $expectedBucket);
         $resolver->remove([], [$expectedFilter]);
@@ -349,7 +384,7 @@ class AwsS3ResolverTest extends AbstractTest
         $s3
             ->expects($this->once())
             ->method('deleteMatchingObjects')
-            ->with($expectedBucket, null, "/{$expectedFilterOne}|{$expectedFilterTwo}/i");
+            ->with($expectedBucket, null, "/({$expectedFilterOne}|{$expectedFilterTwo})/i");
 
         $resolver = new AwsS3Resolver($s3, $expectedBucket);
         $resolver->remove([], [$expectedFilterOne, $expectedFilterTwo]);
@@ -364,9 +399,14 @@ class AwsS3ResolverTest extends AbstractTest
         $s3
             ->expects($this->once())
             ->method('deleteMatchingObjects')
-            ->will($this->throwException(new \Exception()));
+            ->will($this->throwException(
+                $this
+                    ->getMockBuilder(S3Exception::class)
+                    ->disableOriginalConstructor()
+                    ->getMock()
+            ));
 
-        $logger = $this->createLoggerInterfaceMock();
+        $logger = $this->createLoggerMock();
         $logger
             ->expects($this->once())
             ->method('error');
@@ -385,13 +425,15 @@ class AwsS3ResolverTest extends AbstractTest
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|\Aws\S3\S3Client
+     * @param bool    $useConstructor
+     * @param mixed[] ...$arguments
+     *
+     * @return \PHPUnit_Framework_MockObject_MockObject|S3Client
      */
-    protected function getS3ClientMock()
+    protected function getS3ClientMock(bool $useConstructor = false, ...$arguments)
     {
-        return $this
+        $builder = $this
             ->getMockBuilder(S3Client::class)
-            ->disableOriginalConstructor()
             ->setMethods([
                 'deleteObject',
                 'deleteMatchingObjects',
@@ -399,6 +441,15 @@ class AwsS3ResolverTest extends AbstractTest
                 'putObject',
                 'doesObjectExist',
                 'getObjectUrl',
-            ])->getMock();
+                'getObject',
+            ]);
+
+        if ($useConstructor) {
+            $builder->setConstructorArgs($arguments);
+        } else {
+            $builder->disableOriginalConstructor();
+        }
+
+        return $builder->getMock();
     }
 }

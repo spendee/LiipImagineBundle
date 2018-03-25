@@ -9,10 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Liip\ImagineBundle\Exception\Binary\Loader;
+namespace Liip\ImagineBundle\File\Loader\Locator;
 
-use Liip\ImagineBundle\Exception\ExceptionInterface;
-
-class NotLoadableException extends \RuntimeException implements ExceptionInterface
+interface LocatorInterface
 {
+    /**
+     * @param string $path
+     *
+     * @return string
+     */
+    public function locate(string $path): string;
 }

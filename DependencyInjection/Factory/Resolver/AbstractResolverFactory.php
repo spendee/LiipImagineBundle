@@ -11,22 +11,23 @@
 
 namespace Liip\ImagineBundle\DependencyInjection\Factory\Resolver;
 
-use Symfony\Component\DependencyInjection\ChildDefinition;
+use Liip\ImagineBundle\DependencyInjection\Factory\AbstractFactory;
 
-abstract class AbstractResolverFactory implements ResolverFactoryInterface
+abstract class AbstractResolverFactory extends AbstractFactory implements ResolverFactoryInterface
 {
     /**
-     * @var string
+     * @return string
      */
-    protected static $namePrefix = 'liip_imagine.cache.resolver';
+    protected static function getDefinitionNamePrefix(): string
+    {
+        return 'liip_imagine.cache.resolver';
+    }
 
     /**
-     * @param string|null $name
-     *
-     * @return ChildDefinition
+     * @return string
      */
-    final protected function getChildResolverDefinition(string $name = null): ChildDefinition
+    protected static function getDefinitionTagContext(): string
     {
-        return new ChildDefinition(sprintf('%s.prototype.%s', static::$namePrefix, $name ?: $this->getName()));
+        return 'resolver';
     }
 }

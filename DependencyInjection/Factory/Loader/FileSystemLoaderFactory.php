@@ -24,21 +24,10 @@ class FileSystemLoaderFactory extends AbstractLoaderFactory
      */
     public function create(ContainerBuilder $container, string $name, array $config): string
     {
-        $locatorDefinition = new ChildDefinition(sprintf('liip_imagine.binary.locator.%s', $config['locator']));
-        $locatorDefinition->replaceArgument(0, $this->resolveDataRoots($config['data_root'], $config['bundle_resources'], $container));
+        $definition = $this->createChildDefinition();
+        $definition->replaceArgument(0, $this->createLocatorDefinition($container, $config));
 
-        $definition = $this->getChildLoaderDefinition();
-        $definition->replaceArgument(0, $locatorDefinition);
-
-        return $this->setTaggedLoaderDefinition($name, $definition, $container);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName(): string
-    {
-        return 'filesystem';
+        return $this->registerFactoryDefinition($name, $definition, $container);
     }
 
     /**
@@ -87,6 +76,32 @@ class FileSystemLoaderFactory extends AbstractLoaderFactory
                     ->end()
                 ->end()
             ->end();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName(): string
+    {
+        return 'filesystem';
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     * @param array            $config
+     *
+     * @return ChildDefinition
+     */
+    private function createLocatorDefinition(ContainerBuilder $container, array $config): ChildDefinition
+    {
+        $locator = new ChildDefinition(sprintf('liip_imagine.binary.locator.%s', $config['locator']));
+        $locator->replaceArgument(0, $this->resolveDataRoots(
+            $config['data_root'],
+            $config['bundle_resources'],
+            $container
+        ));
+
+        return $locator;
     }
 
     /*

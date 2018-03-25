@@ -171,41 +171,41 @@
 
         <!-- Data loaders -->
 
-        <service id="liip_imagine.binary.loader.prototype.filesystem" class="Liip\ImagineBundle\Binary\Loader\FileSystemLoader">
+        <service id="liip_imagine.binary.loader.filesystem.prototype" class="Liip\ImagineBundle\File\Loader\FileSystemLoader">
             <argument><!-- will be injected by FileSystemLoaderFactory --></argument>
         </service>
 
-        <service id="liip_imagine.binary.loader.prototype.stream" class="Liip\ImagineBundle\Binary\Loader\StreamLoader">
+        <service id="liip_imagine.binary.loader.stream.prototype" class="Liip\ImagineBundle\File\Loader\StreamLoader">
             <argument><!-- will be injected by StreamLoaderFactory --></argument>
             <argument><!-- will be injected by StreamLoaderFactory --></argument>
         </service>
 
-        <service id="liip_imagine.binary.loader.prototype.flysystem" class="Liip\ImagineBundle\Binary\Loader\FlysystemLoader" abstract="true">
+        <service id="liip_imagine.binary.loader.flysystem.prototype" class="Liip\ImagineBundle\File\Loader\FlysystemLoader" abstract="true">
             <argument><!-- will be injected by FlysystemLoaderFactory --></argument>
         </service>
 
         <!-- Data loader locators -->
 
-        <service id="liip_imagine.binary.locator.filesystem" class="Liip\ImagineBundle\Binary\Locator\FileSystemLocator" shared="false">
+        <service id="liip_imagine.binary.locator.filesystem" class="Liip\ImagineBundle\File\Loader\Locator\FileSystemLocator" shared="false">
             <argument><!-- will be injected by FilesystemLoaderFactory --></argument>
             <tag name="liip_imagine.binary.locator" shared="false" />
         </service>
 
-        <service id="liip_imagine.binary.locator.filesystem_insecure" class="Liip\ImagineBundle\Binary\Locator\FileSystemInsecureLocator" shared="false">
+        <service id="liip_imagine.binary.locator.filesystem_insecure" class="Liip\ImagineBundle\File\Loader\Locator\FileSystemInsecureLocator" shared="false">
             <argument><!-- will be injected by FilesystemLoaderFactory --></argument>
             <tag name="liip_imagine.binary.locator" shared="false" />
         </service>
 
         <!-- Cache resolver -->
 
-        <service id="liip_imagine.cache.resolver.prototype.web_path" class="Liip\ImagineBundle\Imagine\Cache\Resolver\WebPathResolver" public="true" abstract="true">
+        <service id="liip_imagine.cache.resolver.web_path.prototype" class="Liip\ImagineBundle\Imagine\Cache\Resolver\WebPathResolver" public="true" abstract="true">
             <argument type="service" id="filesystem" />
             <argument type="service" id="router.request_context" />
             <argument><!-- will be injected by WebPathResolverFactory --></argument>
             <argument><!-- will be injected by WebPathResolverFactory --></argument>
         </service>
 
-        <service id="liip_imagine.cache.resolver.prototype.aws_s3" class="Liip\ImagineBundle\Imagine\Cache\Resolver\AwsS3Resolver" public="true" abstract="true">
+        <service id="liip_imagine.cache.resolver.aws_s3.prototype" class="Liip\ImagineBundle\Imagine\Cache\Resolver\AwsS3Resolver" public="true" abstract="true">
             <argument><!-- will be injected by AwsS3ResolverFactory --></argument>
             <argument><!-- will be injected by AwsS3ResolverFactory --></argument>
             <argument><!-- will be injected by AwsS3ResolverFactory --></argument>
@@ -213,12 +213,12 @@
             <argument><!-- will be injected by AwsS3ResolverFactory --></argument>
         </service>
 
-        <service id="liip_imagine.cache.resolver.prototype.cache" class="Liip\ImagineBundle\Imagine\Cache\Resolver\CacheResolver" public="true" abstract="true">
+        <service id="liip_imagine.cache.resolver.cache.prototype" class="Liip\ImagineBundle\Imagine\Cache\Resolver\CacheResolver" public="true" abstract="true">
             <argument><!-- will be injected by a ResolverFactory --></argument>
             <argument><!-- will be injected by a ResolverFactory --></argument>
         </service>
 
-        <service id="liip_imagine.cache.resolver.prototype.flysystem" class="Liip\ImagineBundle\Imagine\Cache\Resolver\FlysystemResolver" public="true" abstract="true">
+        <service id="liip_imagine.cache.resolver.flysystem.prototype" class="Liip\ImagineBundle\Imagine\Cache\Resolver\FlysystemResolver" public="true" abstract="true">
             <argument><!-- will be injected by a ResolverFactory --></argument>
             <argument type="service" id="router.request_context" />
             <argument><!-- will be injected by a ResolverFactory --></argument>
@@ -226,7 +226,7 @@
             <argument><!-- will be injected by a ResolverFactory --></argument>
         </service>
 
-        <service id="liip_imagine.cache.resolver.prototype.proxy" class="Liip\ImagineBundle\Imagine\Cache\Resolver\ProxyResolver" public="true" abstract="true">
+        <service id="liip_imagine.cache.resolver.proxy.prototype" class="Liip\ImagineBundle\Imagine\Cache\Resolver\ProxyResolver" public="true" abstract="true">
             <argument><!-- will be injected by AwsS3ResolverFactory --></argument>
             <argument><!-- will be injected by AwsS3ResolverFactory --></argument>
         </service>

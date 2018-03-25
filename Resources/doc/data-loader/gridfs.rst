@@ -30,7 +30,7 @@ Define a service for the loader:
 
         services:
             liip_imagine.binary.loader.grid_fs:
-                class: Liip\ImagineBundle\Binary\Loader\GridFSLoader
+                class: Liip\ImagineBundle\File\Loader\GridFSLoader
                 arguments:
                     - "@doctrine.odm.mongodb.document_manager"
                     - Application\ImageBundle\Document\Image
@@ -41,7 +41,7 @@ Define a service for the loader:
 
         <!-- app/config/services.xml -->
 
-        <service id="liip_imagine.binary.loader.grid_fs" class="Liip\ImagineBundle\Binary\Loader\GridFSLoader">
+        <service id="liip_imagine.binary.loader.grid_fs" class="Liip\ImagineBundle\File\Loader\GridFSLoader">
             <tag name="liip_imagine.binary.loader" loader="grid_fs" />
             <argument type="service" id="doctrine.odm.mongodb.document_manager" />
             <argument>Application\ImageBundle\Document\Image</argument>

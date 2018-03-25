@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Liip\ImagineBundle\Binary\Loader;
+namespace Liip\ImagineBundle\File\Loader;
 
 use Doctrine\Common\Persistence\ObjectManager;
-use Liip\ImagineBundle\Exception\Binary\Loader\NotLoadableException;
+use Liip\ImagineBundle\Exception\File\Loader\NotLoadableException;
 use Liip\ImagineBundle\File\FileBlob;
 use Liip\ImagineBundle\File\FileInterface;
 

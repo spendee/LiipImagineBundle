@@ -9,11 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Liip\ImagineBundle\Tests\Binary\Locator;
+namespace Liip\ImagineBundle\Tests\File\Loader\Locator;
 
-use Liip\ImagineBundle\Binary\Locator\FileSystemLocator;
-use Liip\ImagineBundle\Binary\Locator\LocatorInterface;
-use Liip\ImagineBundle\Exception\Binary\Loader\NotLoadableException;
+use Liip\ImagineBundle\File\Loader\Locator\FileSystemLocator;
+use Liip\ImagineBundle\File\Loader\Locator\LocatorInterface;
+use Liip\ImagineBundle\Exception\File\Loader\NotLoadableException;
 use Liip\ImagineBundle\Exception\InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
@@ -100,8 +100,8 @@ abstract class AbstractFileSystemLocatorTest extends TestCase
     public function provideOutsideRootPathsData()
     {
         return [
-            ['../Loader/../../Binary/Loader/../../../Resources/config/routing.yaml'],
-            ['../../Binary/'],
+            ['../Loader/../../File/Loader/../../../Resources/config/routing.yaml'],
+            ['../../File/'],
         ];
     }
 

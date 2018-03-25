@@ -11,11 +11,11 @@
 
 namespace Liip\ImagineBundle\Tests\Functional\Binary\Loader;
 
-use Liip\ImagineBundle\Binary\Loader\FileSystemLoader;
+use Liip\ImagineBundle\File\Loader\FileSystemLoader;
 use Liip\ImagineBundle\Tests\Functional\AbstractWebTestCase;
 
 /**
- * @covers \Liip\ImagineBundle\Binary\Loader\FileSystemLoader
+ * @covers \Liip\ImagineBundle\File\Loader\FileSystemLoader
  */
 class FileSystemLoaderTest extends AbstractWebTestCase
 {

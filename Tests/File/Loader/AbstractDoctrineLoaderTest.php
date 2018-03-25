@@ -9,17 +9,17 @@
  * file that was distributed with this source code.
  */
 
-namespace Liip\ImagineBundle\Tests\Binary\Loader;
+namespace Liip\ImagineBundle\Tests\File\Loader;
 
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
-use Liip\ImagineBundle\Binary\Loader\AbstractDoctrineLoader;
-use Liip\ImagineBundle\Exception\Binary\Loader\NotLoadableException;
+use Liip\ImagineBundle\File\Loader\AbstractDoctrineLoader;
+use Liip\ImagineBundle\Exception\File\Loader\NotLoadableException;
 use Liip\ImagineBundle\File\FileInterface;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \Liip\ImagineBundle\Binary\Loader\AbstractDoctrineLoader<extended>
+ * @covers \Liip\ImagineBundle\File\Loader\AbstractDoctrineLoader<extended>
  */
 class AbstractDoctrineLoaderTest extends TestCase
 {

@@ -11,7 +11,7 @@
 
 namespace Liip\ImagineBundle\Imagine\Data;
 
-use Liip\ImagineBundle\Binary\Loader\LoaderInterface;
+use Liip\ImagineBundle\File\Loader\LoaderInterface;
 use Liip\ImagineBundle\Exception\File\Attributes\Resolver\InvalidFileAttributesException;
 use Liip\ImagineBundle\Exception\Imagine\Data\InvalidFileFoundException;
 use Liip\ImagineBundle\File\FileBlob;

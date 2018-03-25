@@ -22,25 +22,11 @@ class WebPathResolverFactory extends AbstractResolverFactory
      */
     public function create(ContainerBuilder $container, string $name, array $config): string
     {
-        $resolverDefinition = $this->getChildResolverDefinition();
-        $resolverDefinition->replaceArgument(2, $config['web_root']);
-        $resolverDefinition->replaceArgument(3, $config['cache_prefix']);
-        $resolverDefinition->addTag('liip_imagine.cache.resolver', [
-            'resolver' => $name,
-        ]);
+        $definition = $this->createChildDefinition();
+        $definition->replaceArgument(2, $config['web_root']);
+        $definition->replaceArgument(3, $config['cache_prefix']);
 
-        $resolverId = 'liip_imagine.cache.resolver.';
-        $container->setDefinition($resolverId.$name, $resolverDefinition);
-
-        return $resolverId;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName(): string
-    {
-        return 'web_path';
+        return $this->registerFactoryDefinition($name, $definition, $container);
     }
 
     /**
@@ -59,5 +45,13 @@ class WebPathResolverFactory extends AbstractResolverFactory
                     ->cannotBeEmpty()
                 ->end()
             ->end();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName(): string
+    {
+        return 'web_path';
     }
 }

@@ -60,7 +60,7 @@ class StreamLoaderFactoryTest extends TestCase
 
         $loaderDefinition = $container->getDefinition('liip_imagine.binary.loader.the_loader_name');
         $this->assertInstanceOf(ChildDefinition::class, $loaderDefinition);
-        $this->assertSame('liip_imagine.binary.loader.prototype.stream', $loaderDefinition->getParent());
+        $this->assertSame('liip_imagine.binary.loader.stream.prototype', $loaderDefinition->getParent());
 
         $this->assertSame('theWrapper', $loaderDefinition->getArgument(0));
         $this->assertSame('theContext', $loaderDefinition->getArgument(1));

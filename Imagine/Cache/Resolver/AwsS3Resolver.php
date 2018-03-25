@@ -11,13 +11,17 @@
 
 namespace Liip\ImagineBundle\Imagine\Cache\Resolver;
 
+use Aws\S3\Exception\S3Exception;
 use Aws\S3\S3Client;
 use Liip\ImagineBundle\Exception\Imagine\Cache\Resolver\NotStorableException;
 use Liip\ImagineBundle\File\FileInterface;
+use Liip\ImagineBundle\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 
 class AwsS3Resolver implements ResolverInterface
 {
+    use LoggerAwareTrait;
+
     /**
      * @var S3Client
      */
@@ -39,11 +43,14 @@ class AwsS3Resolver implements ResolverInterface
     protected $getOptions;
 
     /**
-     * Object options added to PUT requests.
-     *
      * @var array
      */
     protected $putOptions;
+
+    /**
+     * @var array
+     */
+    protected $delOptions;
 
     /**
      * @var LoggerInterface
@@ -56,36 +63,29 @@ class AwsS3Resolver implements ResolverInterface
     protected $cachePrefix;
 
     /**
-     * Constructs a cache resolver storing images on Amazon S3.
-     *
-     * @param S3Client $storage    The Amazon S3 storage API. It's required to know authentication information
-     * @param string   $bucket     The bucket name to operate on
-     * @param string   $acl        The ACL to use when storing new objects. Default: owner read/write, public read
-     * @param array    $getOptions A list of options to be passed when retrieving the object url from Amazon S3
-     * @param array    $putOptions A list of options to be passed when saving the object to Amazon S3
+     * @param S3Client    $storage    The Amazon S3 storage API. It's required to know authentication information
+     * @param string      $bucket     The bucket name to operate on
+     * @param string|null $acl        The ACL to use when storing new objects. Default: owner read/write, public read
+     * @param array       $getOptions A list of options to be passed when retrieving an object url from Amazon S3
+     * @param array       $putOptions A list of options to be passed when saving an object to Amazon S3
+     * @param array       $delOptions A list of options to be passed when removing an object from Amazon S3
+     * @param string|null $cachePrefix A cache prefix string
      */
-    public function __construct(S3Client $storage, $bucket, $acl = 'public-read', array $getOptions = [], $putOptions = [])
-    {
+    public function __construct(
+        S3Client $storage,
+        string $bucket,
+        string $acl = null,
+        array $getOptions = [],
+        array $putOptions = [],
+        array $delOptions = [],
+        string $cachePrefix = null
+    ) {
         $this->storage = $storage;
         $this->bucket = $bucket;
-        $this->acl = $acl;
+        $this->acl = $acl ?: 'public-read';
         $this->getOptions = $getOptions;
         $this->putOptions = $putOptions;
-    }
-
-    /**
-     * @param LoggerInterface $logger
-     */
-    public function setLogger(LoggerInterface $logger)
-    {
-        $this->logger = $logger;
-    }
-
-    /**
-     * @param string $cachePrefix
-     */
-    public function setCachePrefix($cachePrefix)
-    {
+        $this->delOptions = $delOptions;
         $this->cachePrefix = $cachePrefix;
     }
 
@@ -110,31 +110,7 @@ class AwsS3Resolver implements ResolverInterface
      */
     public function store(FileInterface $file, string $path, string $filter): void
     {
-        $objectPath = $this->getObjectPath($path, $filter);
-
-        try {
-            $this->storage->putObject(
-                array_merge(
-                    $this->putOptions,
-                    [
-                        'ACL' => $this->acl,
-                        'Bucket' => $this->bucket,
-                        'Key' => $objectPath,
-                        'Body' => $file->getContents(),
-                        'ContentType' => (string) $file->getContentType(),
-                    ]
-                )
-            );
-        } catch (\Exception $e) {
-            $this->logError('The object could not be created on Amazon S3.', [
-                'objectPath' => $objectPath,
-                'filter' => $filter,
-                'bucket' => $this->bucket,
-                'exception' => $e,
-            ]);
-
-            throw new NotStorableException('The object could not be created on Amazon S3.', null, $e);
-        }
+        $this->putObjectPath($this->getObjectPath($path, $filter), $file);
     }
 
     /**
@@ -142,87 +118,15 @@ class AwsS3Resolver implements ResolverInterface
      */
     public function remove(array $paths, array $filters): void
     {
-        if (empty($paths) && empty($filters)) {
-            return;
-        }
-
-        if (empty($paths)) {
-            try {
-                $this->storage->deleteMatchingObjects($this->bucket, null, sprintf(
-                    '/%s/i',
-                    implode('|', $filters)
-                ));
-            } catch (\Exception $e) {
-                $this->logError('The objects could not be deleted from Amazon S3.', [
-                    'filter' => implode(', ', $filters),
-                    'bucket' => $this->bucket,
-                    'exception' => $e,
-                ]);
-            }
-
-            return;
-        }
-
-        foreach ($filters as $filter) {
-            foreach ($paths as $path) {
-                $objectPath = $this->getObjectPath($path, $filter);
-                if (!$this->objectExists($objectPath)) {
-                    continue;
-                }
-
-                try {
-                    $this->storage->deleteObject([
-                        'Bucket' => $this->bucket,
-                        'Key' => $objectPath,
-                    ]);
-                } catch (\Exception $e) {
-                    $this->logError('The object could not be deleted from Amazon S3.', [
-                        'objectPath' => $objectPath,
-                        'filter' => $filter,
-                        'bucket' => $this->bucket,
-                        'exception' => $e,
-                    ]);
+        if (empty($paths) && !empty($filters)) {
+            $this->delMatchingObjectPaths($filters);
+        } else {
+            foreach ($filters as $f) {
+                foreach ($paths as $p) {
+                    $this->delObjectPath($this->getObjectPath($p, $f));
                 }
             }
         }
-    }
-
-    /**
-     * Sets a single option to be passed when retrieving an objects URL.
-     *
-     * If the option is already set, it will be overwritten.
-     *
-     * @see \Aws\S3\S3Client::getObjectUrl() for available options
-     *
-     * @param string $key   The name of the option
-     * @param mixed  $value The value to be set
-     *
-     * @return $this
-     */
-    public function setGetOption($key, $value)
-    {
-        $this->getOptions[$key] = $value;
-
-        return $this;
-    }
-
-    /**
-     * Sets a single option to be passed when saving an object.
-     *
-     * If the option is already set, it will be overwritten.
-     *
-     * @see \Aws\S3\S3Client::putObject() for available options
-     *
-     * @param string $key   The name of the option
-     * @param mixed  $value The value to be set
-     *
-     * @return $this
-     */
-    public function setPutOption($key, $value)
-    {
-        $this->putOptions[$key] = $value;
-
-        return $this;
     }
 
     /**
@@ -251,7 +155,95 @@ class AwsS3Resolver implements ResolverInterface
      */
     protected function getObjectUrl($path)
     {
-        return $this->storage->getObjectUrl($this->bucket, $path, 0, $this->getOptions);
+        $object = $this->storage->getObject(array_merge($this->getOptions, [
+            'Bucket' => $this->bucket,
+            'Key'    => $path
+        ]));
+
+        return (string) $object;
+    }
+
+    /**
+     * @param array $filters
+     *
+     * @return string
+     */
+    protected function getObjectSearchFilters(array $filters)
+    {
+        return vsprintf('/%s(%s)/i', [
+            $this->cachePrefix ? preg_quote(sprintf('%s/', $this->cachePrefix), '/') : '',
+            implode('|', array_map(function (string $f): string {
+                return preg_quote($f, '/');
+            }, $filters))
+        ]);
+    }
+
+    /**
+     * @param string        $path
+     * @param FileInterface $file
+     *
+     * @throws S3Exception
+     */
+    private function putObjectPath(string $path, FileInterface $file): void
+    {
+        try {
+            $this->storage->putObject(array_merge($this->putOptions, [
+                'ACL' => $this->acl,
+                'Bucket' => $this->bucket,
+                'Key' => $path,
+                'Body' => $file->getContents(),
+                'ContentType' => (string) $file->getContentType(),
+            ]));
+        } catch (S3Exception $exception) {
+            $this->logger->error('The object "%path%" could not be created on AWS S3 bucket "%bucket%".', [
+                'path' => $path,
+                'bucket' => $this->bucket,
+                'exception' => $exception,
+            ]);
+
+            throw new NotStorableException(sprintf(
+                'The object "%s" could not be created on AWS S3 bucket "%s".', $path, $this->bucket
+            ), null, $exception);
+        }
+    }
+
+    /**
+     * @param string $object
+     */
+    private function delObjectPath(string $object): void
+    {
+        if (!$this->objectExists($object)) {
+            return;
+        }
+
+        try {
+            $this->storage->deleteObject(array_merge($this->delOptions, [
+                'Bucket' => $this->bucket,
+                'Key' => $object,
+            ]));
+        } catch (S3Exception $exception) {
+            $this->logger->error('The object "%path%" could not be deleted from AWS S3 bucket "%bucket%".', [
+                'path' => $object,
+                'bucket' => $this->bucket,
+                'exception' => $exception,
+            ]);
+        }
+    }
+
+    /**
+     * @param array $filters
+     */
+    private function delMatchingObjectPaths(array $filters): void
+    {
+        try {
+            $this->storage->deleteMatchingObjects($this->bucket, null, $this->getObjectSearchFilters($filters));
+        } catch (S3Exception $exception) {
+            $this->logger->error('The objects matching "%regex%" could not be deleted from AWS S3 bucket "%bucket%".', [
+                'regex' => $this->getObjectSearchFilters($filters),
+                'bucket' => $this->bucket,
+                'exception' => $exception,
+            ]);
+        }
     }
 
     /**
@@ -264,16 +256,5 @@ class AwsS3Resolver implements ResolverInterface
     protected function objectExists($objectPath)
     {
         return $this->storage->doesObjectExist($this->bucket, $objectPath);
-    }
-
-    /**
-     * @param mixed $message
-     * @param array $context
-     */
-    protected function logError($message, array $context = [])
-    {
-        if ($this->logger) {
-            $this->logger->error($message, $context);
-        }
     }
 }

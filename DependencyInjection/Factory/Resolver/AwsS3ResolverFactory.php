@@ -11,6 +11,7 @@
 
 namespace Liip\ImagineBundle\DependencyInjection\Factory\Resolver;
 
+use Aws\S3\S3Client;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -23,63 +24,53 @@ class AwsS3ResolverFactory extends AbstractResolverFactory
      */
     public function create(ContainerBuilder $container, string $name, array $config): string
     {
-        $awsS3ClientId = 'liip_imagine.cache.resolver.'.$name.'.client';
-        $awsS3ClientDefinition = new Definition('Aws\S3\S3Client');
-        $awsS3ClientDefinition->setFactory(['Aws\S3\S3Client', 'factory']);
-        $awsS3ClientDefinition->addArgument($config['client_config']);
-        $container->setDefinition($awsS3ClientId, $awsS3ClientDefinition);
+        $clientRef = $this->createReference($name, 'client');
+        $clientDef = (new Definition(S3Client::class))
+            ->setFactory([S3Client::class, 'factory'])
+            ->addArgument($config['client_config']);
 
-        $resolverDefinition = $this->getChildResolverDefinition();
-        $resolverDefinition->replaceArgument(0, new Reference($awsS3ClientId));
-        $resolverDefinition->replaceArgument(1, $config['bucket']);
-        $resolverDefinition->replaceArgument(2, $config['acl']);
-        $resolverDefinition->replaceArgument(3, $config['get_options']);
-        $resolverDefinition->replaceArgument(4, $config['put_options']);
+        $container->setDefinition($clientRef, $clientDef);
 
-        $resolverId = 'liip_imagine.cache.resolver.'.$name;
-        $container->setDefinition($resolverId, $resolverDefinition);
+        $resolverKey = $this->getFactoryServiceName($name, null);
+        $resolverDef = $this->createChildDefinition();
+        $resolverDef->replaceArgument(0, $clientRef);
+        $resolverDef->replaceArgument(1, $config['bucket']);
+        $resolverDef->replaceArgument(2, $config['acl']);
+        $resolverDef->replaceArgument(3, $config['get_options']);
+        $resolverDef->replaceArgument(4, $config['put_options']);
+        $resolverDef->replaceArgument(5, $config['del_options']);
 
         if (isset($config['cache_prefix'])) {
-            $resolverDefinition->addMethodCall('setCachePrefix', [$config['cache_prefix']]);
+            $resolverDef->replaceArgument(6, $config['cache_prefix']);
         }
 
+        $container->setDefinition($resolverKey, $resolverDef);
+
         if ($config['proxies']) {
-            $proxiedResolverId = 'liip_imagine.cache.resolver.'.$name.'.proxied';
+            $proxyRef = $this->createReference($name, 'proxy');
+            $container->setDefinition($proxyRef, $resolverDef);
 
-            $container->setDefinition($proxiedResolverId, $resolverDefinition);
-
-            $proxyResolverDefinition = $this->getChildResolverDefinition('proxy');
-            $proxyResolverDefinition->replaceArgument(0, new Reference($proxiedResolverId));
-            $proxyResolverDefinition->replaceArgument(1, $config['proxies']);
-
-            $container->setDefinition($resolverId, $proxyResolverDefinition);
+            $proxyDef = $this->createChildDefinition('proxy');
+            $proxyDef->replaceArgument(0, $proxyRef);
+            $proxyDef->replaceArgument(1, $config['proxies']);
+            $container->setDefinition($resolverKey, $proxyDef);
         }
 
         if ($config['cache']) {
-            $cachedResolverId = 'liip_imagine.cache.resolver.'.$name.'.cached';
+            $cacheRef = $this->createReference($name, 'cache');
+            $container->setDefinition($cacheRef, $container->getDefinition($resolverKey));
 
-            $container->setDefinition($cachedResolverId, $container->getDefinition($resolverId));
-
-            $cacheResolverDefinition = $this->getChildResolverDefinition('cache');
-            $cacheResolverDefinition->replaceArgument(0, new Reference($config['cache']));
-            $cacheResolverDefinition->replaceArgument(1, new Reference($cachedResolverId));
-
-            $container->setDefinition($resolverId, $cacheResolverDefinition);
+            $cacheDef = $this->createChildDefinition('cache');
+            $cacheDef->replaceArgument(0, new Reference($config['cache']));
+            $cacheDef->replaceArgument(1, new Reference($cacheRef));
+            $container->setDefinition($resolverKey, $cacheDef);
         }
 
-        $container->getDefinition($resolverId)->addTag('liip_imagine.cache.resolver', [
+        $container->getDefinition($resolverKey)->addTag('liip_imagine.cache.resolver', [
             'resolver' => $name,
         ]);
 
-        return $resolverId;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName(): string
-    {
-        return 'aws_s3';
+        return $resolverKey;
     }
 
     /**
@@ -93,6 +84,12 @@ class AwsS3ResolverFactory extends AbstractResolverFactory
                     ->isRequired()
                     ->cannotBeEmpty()
                 ->end()
+                ->arrayNode('client_config')
+                    ->isRequired()
+                    ->prototype('variable')
+                        ->treatNullLike([])
+                    ->end()
+                ->end()
                 ->scalarNode('cache')
                     ->defaultValue(false)
                 ->end()
@@ -103,28 +100,31 @@ class AwsS3ResolverFactory extends AbstractResolverFactory
                 ->scalarNode('cache_prefix')
                     ->defaultValue(null)
                 ->end()
-                ->arrayNode('client_config')
-                    ->isRequired()
-                    ->prototype('variable')
-                        ->treatNullLike([])
-                    ->end()
-                ->end()
                 ->arrayNode('get_options')
                     ->useAttributeAsKey('key')
-                        ->prototype('scalar')
-                    ->end()
+                    ->prototype('scalar')->end()
                 ->end()
                 ->arrayNode('put_options')
                     ->useAttributeAsKey('key')
-                        ->prototype('scalar')
-                    ->end()
+                    ->prototype('scalar')->end()
+                ->end()
+                ->arrayNode('del_options')
+                    ->useAttributeAsKey('key')
+                    ->prototype('scalar')->end()
                 ->end()
                 ->arrayNode('proxies')
                     ->defaultValue([])
                     ->useAttributeAsKey('name')
-                        ->prototype('scalar')
-                    ->end()
+                    ->prototype('scalar')->end()
                 ->end()
             ->end();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName(): string
+    {
+        return 'aws_s3';
     }
 }

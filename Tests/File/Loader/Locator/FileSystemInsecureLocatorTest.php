@@ -9,29 +9,35 @@
  * file that was distributed with this source code.
  */
 
-namespace Liip\ImagineBundle\Tests\Binary\Locator;
+namespace Liip\ImagineBundle\Tests\File\Loader\Locator;
 
-use Liip\ImagineBundle\Binary\Locator\FileSystemLocator;
-use Liip\ImagineBundle\Binary\Locator\LocatorInterface;
-use Liip\ImagineBundle\Exception\Binary\Loader\NotLoadableException;
+use Liip\ImagineBundle\File\Loader\Locator\FileSystemInsecureLocator;
+use Liip\ImagineBundle\File\Loader\Locator\LocatorInterface;
+use Liip\ImagineBundle\Exception\File\Loader\NotLoadableException;
 
 /**
- * @covers \Liip\ImagineBundle\Binary\Locator\FileSystemLocator
+ * @covers \Liip\ImagineBundle\File\Loader\Locator\FileSystemInsecureLocator
  */
-class FileSystemLocatorTest extends AbstractFileSystemLocatorTest
+class FileSystemInsecureLocatorTest extends AbstractFileSystemLocatorTest
 {
-    public function testThrowsIfPathHasSymbolicLinksPointOutsideRoot()
+    public function testLoadsOnSymbolicLinks()
+    {
+        $loader = $this->getFileSystemLocator($root = realpath(__DIR__.'/../../../Fixtures/FileSystemLocator/root-02'));
+        $this->assertStringStartsWith(realpath($root), $loader->locate('root-01/file.ext'));
+    }
+
+    public function testThrowsIfPathHasDoublePeriodBackStep()
     {
         $this->expectException(NotLoadableException::class);
-        $this->expectExceptionMessage('Source image invalid');
+        $this->expectExceptionMessage('Source image not resolvable');
 
-        $this->getFileSystemLocator(realpath(__DIR__.'/../../Fixtures/FileSystemLocator/root-02'))->locate('root-01/file.ext');
+        $this->getFileSystemLocator(realpath(__DIR__.'/../../../Fixtures/FileSystemLocator/root-02'))->locate('/../root-01/file.ext');
     }
 
     public function testRootPlaceholders()
     {
-        $root01 = realpath(__DIR__.'/../../Fixtures/FileSystemLocator/root-01');
-        $root02 = realpath(__DIR__.'/../../Fixtures/FileSystemLocator/root-02');
+        $root01 = realpath(__DIR__.'/../../../Fixtures/FileSystemLocator/root-01');
+        $root02 = realpath(__DIR__.'/../../../Fixtures/FileSystemLocator/root-02');
 
         $loader = $this->getFileSystemLocator([
             'root-01' => $root01,
@@ -39,7 +45,7 @@ class FileSystemLocatorTest extends AbstractFileSystemLocatorTest
         ]);
 
         $this->assertStringStartsWith($root01, $loader->locate('@root-01:file.ext'));
-        $this->assertStringStartsWith($root01, $loader->locate('@root-02:root-01/file.ext'));
+        $this->assertStringStartsWith($root02, $loader->locate('@root-02:root-01/file.ext'));
     }
 
     /**
@@ -53,9 +59,8 @@ class FileSystemLocatorTest extends AbstractFileSystemLocatorTest
             [__DIR__, $fileName],
             [__DIR__.'/', $fileName],
             [__DIR__, '/'.$fileName],
-            [__DIR__.'/../../Binary/Locator', '/'.$fileName],
+            [__DIR__.'/../../Loader/Locator', '/'.$fileName],
             [realpath(__DIR__.'/..'), 'Locator/'.$fileName],
-            [__DIR__.'/../', '/Locator/../../Binary/Locator/'.$fileName],
         ];
     }
 
@@ -82,6 +87,6 @@ class FileSystemLocatorTest extends AbstractFileSystemLocatorTest
      */
     protected function getFileSystemLocator($paths)
     {
-        return new FileSystemLocator((array) $paths);
+        return new FileSystemInsecureLocator((array) $paths);
     }
 }

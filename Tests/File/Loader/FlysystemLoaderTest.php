@@ -9,19 +9,19 @@
  * file that was distributed with this source code.
  */
 
-namespace Liip\ImagineBundle\Tests\Binary\Loader;
+namespace Liip\ImagineBundle\Tests\File\Loader;
 
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
-use Liip\ImagineBundle\Binary\Loader\FlysystemLoader;
-use Liip\ImagineBundle\Binary\Loader\LoaderInterface;
-use Liip\ImagineBundle\Exception\Binary\Loader\NotLoadableException;
+use Liip\ImagineBundle\File\Loader\FlysystemLoader;
+use Liip\ImagineBundle\File\Loader\LoaderInterface;
+use Liip\ImagineBundle\Exception\File\Loader\NotLoadableException;
 use Liip\ImagineBundle\Tests\AbstractTest;
 
 /**
  * @requires PHP 5.4
  *
- * @covers \Liip\ImagineBundle\Binary\Loader\FlysystemLoader
+ * @covers \Liip\ImagineBundle\File\Loader\FlysystemLoader
  */
 class FlysystemLoaderTest extends AbstractTest
 {

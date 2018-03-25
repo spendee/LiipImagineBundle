@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Liip\ImagineBundle\Binary\Loader;
+namespace Liip\ImagineBundle\File\Loader;
 
-use Liip\ImagineBundle\Binary\Locator\LocatorInterface;
+use Liip\ImagineBundle\File\Loader\Locator\LocatorInterface;
 use Liip\ImagineBundle\File\FileInterface;
 use Liip\ImagineBundle\File\FilePath;
 
@@ -35,6 +35,6 @@ class FileSystemLoader implements LoaderInterface
      */
     public function find(string $identity): FileInterface
     {
-        return new FilePath($this->locator->locate($identity));
+        return FilePath::create($this->locator->locate($identity));
     }
 }

@@ -61,7 +61,7 @@ class WebPathResolverFactoryTest extends TestCase
 
         $resolverDefinition = $container->getDefinition('liip_imagine.cache.resolver.the_resolver_name');
         $this->assertInstanceOf(ChildDefinition::class, $resolverDefinition);
-        $this->assertSame('liip_imagine.cache.resolver.prototype.web_path', $resolverDefinition->getParent());
+        $this->assertSame('liip_imagine.cache.resolver.web_path.prototype', $resolverDefinition->getParent());
 
         $this->assertSame('theWebRoot', $resolverDefinition->getArgument(2));
         $this->assertSame('theCachePrefix', $resolverDefinition->getArgument(3));

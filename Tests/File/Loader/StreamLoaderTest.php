@@ -9,14 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Liip\ImagineBundle\Tests\Binary\Loader;
+namespace Liip\ImagineBundle\Tests\File\Loader;
 
-use Liip\ImagineBundle\Binary\Loader\StreamLoader;
-use Liip\ImagineBundle\Exception\Binary\Loader\NotLoadableException;
+use Liip\ImagineBundle\File\Loader\StreamLoader;
+use Liip\ImagineBundle\Exception\File\Loader\NotLoadableException;
 use Liip\ImagineBundle\Tests\AbstractTest;
 
 /**
- * @covers \Liip\ImagineBundle\Binary\Loader\StreamLoader<extended>
+ * @covers \Liip\ImagineBundle\File\Loader\StreamLoader<extended>
  */
 class StreamLoaderTest extends AbstractTest
 {

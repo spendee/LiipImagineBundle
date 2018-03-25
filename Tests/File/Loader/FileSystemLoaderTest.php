@@ -9,19 +9,19 @@
  * file that was distributed with this source code.
  */
 
-namespace Liip\ImagineBundle\Tests\Binary\Loader;
+namespace Liip\ImagineBundle\Tests\File\Loader;
 
-use Liip\ImagineBundle\Binary\Loader\FileSystemLoader;
-use Liip\ImagineBundle\Binary\Loader\LoaderInterface;
-use Liip\ImagineBundle\Binary\Locator\FileSystemLocator;
-use Liip\ImagineBundle\Binary\Locator\LocatorInterface;
-use Liip\ImagineBundle\Exception\Binary\Loader\NotLoadableException;
+use Liip\ImagineBundle\File\Loader\FileSystemLoader;
+use Liip\ImagineBundle\File\Loader\LoaderInterface;
+use Liip\ImagineBundle\File\Loader\Locator\FileSystemLocator;
+use Liip\ImagineBundle\File\Loader\Locator\LocatorInterface;
+use Liip\ImagineBundle\Exception\File\Loader\NotLoadableException;
 use Liip\ImagineBundle\Exception\InvalidArgumentException;
 use Liip\ImagineBundle\File\FilePath;
 use Liip\ImagineBundle\Tests\AbstractTest;
 
 /**
- * @covers \Liip\ImagineBundle\Binary\Loader\FileSystemLoader
+ * @covers \Liip\ImagineBundle\File\Loader\FileSystemLoader
  */
 class FileSystemLoaderTest extends AbstractTest
 {
@@ -58,7 +58,7 @@ class FileSystemLoaderTest extends AbstractTest
                 $file,
             ],
             [
-                __DIR__.'/../../Binary/Loader',
+                __DIR__.'/../../File/Loader',
                 '/'.$file,
             ],
             [
@@ -67,7 +67,7 @@ class FileSystemLoaderTest extends AbstractTest
             ],
             [
                 __DIR__.'/../',
-                '/Loader/../../Binary/Loader/'.$file,
+                '/Loader/../../File/Loader/'.$file,
             ],
         ];
     }
@@ -133,8 +133,8 @@ class FileSystemLoaderTest extends AbstractTest
     public function provideOutsideRootPathsData()
     {
         return [
-            ['../Loader/../../Binary/Loader/../../../Resources/config/routing.yaml'],
-            ['../../Binary/'],
+            ['../Loader/../../File/Loader/../../../Resources/config/routing.yaml'],
+            ['../../File/'],
         ];
     }
 
@@ -155,7 +155,7 @@ class FileSystemLoaderTest extends AbstractTest
 
     public function testPathWithDoublePeriodBackStep()
     {
-        $this->assertValidLoaderFindReturn($this->getFileSystemLoader()->find('/../../Binary/Loader/'.pathinfo(__FILE__, PATHINFO_BASENAME)));
+        $this->assertValidLoaderFindReturn($this->getFileSystemLoader()->find('/../../File/Loader/'.pathinfo(__FILE__, PATHINFO_BASENAME)));
     }
 
     public function testThrowsIfFileDoesNotExist()

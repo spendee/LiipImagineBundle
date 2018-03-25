@@ -14,7 +14,7 @@ namespace Liip\ImagineBundle\Tests;
 use Imagine\Image\ImageInterface;
 use Imagine\Image\ImagineInterface;
 use Imagine\Image\Metadata\MetadataBag;
-use Liip\ImagineBundle\Binary\Loader\LoaderInterface;
+use Liip\ImagineBundle\File\Loader\LoaderInterface;
 use Liip\ImagineBundle\File\Attributes\Guesser\ContentTypeGuesser;
 use Liip\ImagineBundle\File\Attributes\Guesser\ContentTypeGuesserInterface;
 use Liip\ImagineBundle\File\Attributes\Guesser\ExtensionGuesser;
@@ -27,6 +27,7 @@ use Liip\ImagineBundle\Imagine\Data\DataManager;
 use Liip\ImagineBundle\Imagine\Filter\FilterConfiguration;
 use Liip\ImagineBundle\Imagine\Filter\FilterManager;
 use Liip\ImagineBundle\Imagine\Filter\PostProcessor\PostProcessorInterface;
+use Liip\ImagineBundle\Log\Logger;
 use Liip\ImagineBundle\Service\FilterService;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -186,11 +187,11 @@ abstract class AbstractTest extends TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|LoggerInterface
+     * @return \PHPUnit_Framework_MockObject_MockObject|Logger
      */
-    protected function createLoggerInterfaceMock()
+    protected function createLoggerMock()
     {
-        return $this->createObjectMock(LoggerInterface::class);
+        return $this->createObjectMock(Logger::class);
     }
 
     /**

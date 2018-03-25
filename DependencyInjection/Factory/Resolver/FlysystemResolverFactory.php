@@ -22,27 +22,13 @@ class FlysystemResolverFactory extends AbstractResolverFactory
      */
     public function create(ContainerBuilder $container, string $name, array $config): string
     {
-        $resolverDefinition = $this->getChildResolverDefinition();
-        $resolverDefinition->replaceArgument(0, new Reference($config['filesystem_service']));
-        $resolverDefinition->replaceArgument(2, $config['root_url']);
-        $resolverDefinition->replaceArgument(3, $config['cache_prefix']);
-        $resolverDefinition->replaceArgument(4, $config['visibility']);
-        $resolverDefinition->addTag('liip_imagine.cache.resolver', [
-            'resolver' => $name,
-        ]);
+        $definition = $this->createChildDefinition();
+        $definition->replaceArgument(0, new Reference($config['filesystem_service']));
+        $definition->replaceArgument(2, $config['root_url']);
+        $definition->replaceArgument(3, $config['cache_prefix']);
+        $definition->replaceArgument(4, $config['visibility']);
 
-        $resolverId = 'liip_imagine.cache.resolver.'.$name;
-        $container->setDefinition($resolverId, $resolverDefinition);
-
-        return $resolverId;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName(): string
-    {
-        return 'flysystem';
+        return $this->registerFactoryDefinition($name, $definition, $container);
     }
 
     /**
@@ -68,5 +54,13 @@ class FlysystemResolverFactory extends AbstractResolverFactory
                     ->defaultValue('public')
                 ->end()
             ->end();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName(): string
+    {
+        return 'flysystem';
     }
 }

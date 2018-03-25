@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Liip\ImagineBundle\Binary\Locator;
+namespace Liip\ImagineBundle\File\Loader\Locator;
 
-use Liip\ImagineBundle\Exception\Binary\Loader\NotLoadableException;
+use Liip\ImagineBundle\Exception\File\Loader\NotLoadableException;
 use Liip\ImagineBundle\Exception\InvalidArgumentException;
 
 class FileSystemLocator implements LocatorInterface

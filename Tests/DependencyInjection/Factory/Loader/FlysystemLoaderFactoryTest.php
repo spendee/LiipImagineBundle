@@ -71,7 +71,7 @@ class FlysystemLoaderFactoryTest extends TestCase
 
         $loaderDefinition = $container->getDefinition('liip_imagine.binary.loader.the_loader_name');
         $this->assertInstanceOf(ChildDefinition::class, $loaderDefinition);
-        $this->assertSame('liip_imagine.binary.loader.prototype.flysystem', $loaderDefinition->getParent());
+        $this->assertSame('liip_imagine.binary.loader.flysystem.prototype', $loaderDefinition->getParent());
 
         $reference = $loaderDefinition->getArgument(0);
         $this->assertSame('flyfilesystemservice', "$reference");
