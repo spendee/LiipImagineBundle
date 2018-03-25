@@ -22,16 +22,38 @@ use Symfony\Component\DependencyInjection\Reference;
 class PostProcessorsCompilerPass extends AbstractCompilerPass
 {
     /**
+     * @var string
+     */
+    private $tagName;
+
+    /**
+     * @var string
+     */
+    private $service;
+
+    /**
+     * @param string $filterTagName
+     * @param string $managerIdName
+     */
+    public function __construct(
+        string $filterTagName = 'liip_imagine.filter.post_processor',
+        string $managerIdName = 'liip_imagine.filter.manager'
+    ) {
+        $this->tagName = $filterTagName;
+        $this->service = $managerIdName;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function process(ContainerBuilder $container): void
     {
-        $tags = $container->findTaggedServiceIds('liip_imagine.filter.post_processor');
+        $filters = $container->findTaggedServiceIds($this->tagName);
 
-        if (count($tags) > 0 && $container->hasDefinition('liip_imagine.filter.manager')) {
-            $manager = $container->getDefinition('liip_imagine.filter.manager');
+        if (0 < count($filters) && $container->hasDefinition($this->service)) {
+            $manager = $container->getDefinition($this->service);
 
-            foreach ($tags as $id => $tag) {
+            foreach ($filters as $id => $tag) {
                 $manager->addMethodCall('addPostProcessor', [$tag[0]['post_processor'], new Reference($id)]);
                 $this->log($container, 'Registered filter post-processor: %s', $id);
             }

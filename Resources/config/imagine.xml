@@ -246,31 +246,28 @@
 
         <service id="liip_imagine.file_attributes.applier" class="Liip\ImagineBundle\File\Attributes\Resolver\FileAttributesApplier" public="false">
             <argument type="service" id="liip_imagine.file_attributes.resolver" />
+            <tag name="liip_imagine.logger" />
         </service>
 
         <service id="liip_imagine.file_attributes.resolver" class="Liip\ImagineBundle\File\Attributes\Resolver\FileAttributesResolver" public="false">
-            <argument type="service" id="liip_imagine.file_attributes.guesser.content_type" />
-            <argument type="service" id="liip_imagine.file_attributes.guesser.extension" />
+            <argument type="service" id="liip_imagine.file_attributes.guesser_proxy.content_type" />
+            <argument type="service" id="liip_imagine.file_attributes.guesser_proxy.extension" />
         </service>
 
-        <service id="liip_imagine.file_attributes.guesser.extension" class="Liip\ImagineBundle\File\Attributes\Guesser\ExtensionGuesser" public="false">
-            <call method="register">
-                <argument type="service" id="liip_imagine.symfony.file_attributes.guesser.extension" />
-            </call>
+        <service id="liip_imagine.file_attributes.guesser_proxy.extension" class="Liip\ImagineBundle\File\Attributes\Guesser\ExtensionGuesser" public="false">
         </service>
 
-        <service id="liip_imagine.file_attributes.guesser.content_type" class="Liip\ImagineBundle\File\Attributes\Guesser\ContentTypeGuesser" public="false">
-            <call method="register">
-                <argument type="service" id="liip_imagine.symfony.file_attributes.guesser.content_type" />
-            </call>
+        <service id="liip_imagine.file_attributes.guesser_proxy.content_type" class="Liip\ImagineBundle\File\Attributes\Guesser\ContentTypeGuesser" public="false">
         </service>
 
-        <service id="liip_imagine.symfony.file_attributes.guesser.content_type" class="Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesserInterface" public="false">
-            <factory class="Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser" method="getInstance" />
-        </service>
-
-        <service id="liip_imagine.symfony.file_attributes.guesser.extension" class="Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesserInterface" public="false">
+        <service id="liip_imagine.file_attributes.guesser.symfony_default_extension" class="Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesserInterface" public="false">
             <factory class="Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser" method="getInstance" />
+            <tag name="liip_imagine.file_attributes.guesser.extension" priority="9999" />
+        </service>
+
+        <service id="liip_imagine.file_attributes.guesser.symfony_default_content_type" class="Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesserInterface" public="false">
+            <factory class="Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser" method="getInstance" />
+            <tag name="liip_imagine.file_attributes.guesser.content_type" priority="9999" />
         </service>
 
         <!-- Signer -->

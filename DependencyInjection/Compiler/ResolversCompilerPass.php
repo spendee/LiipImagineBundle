@@ -17,16 +17,38 @@ use Symfony\Component\DependencyInjection\Reference;
 class ResolversCompilerPass extends AbstractCompilerPass
 {
     /**
+     * @var string
+     */
+    private $tagName;
+
+    /**
+     * @var string
+     */
+    private $service;
+
+    /**
+     * @param string $resolverTagName
+     * @param string $managerServiceId
+     */
+    public function __construct(
+        string $resolverTagName = 'liip_imagine.cache.resolver',
+        string $managerServiceId = 'liip_imagine.cache.manager'
+    ) {
+        $this->tagName = $resolverTagName;
+        $this->service = $managerServiceId;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function process(ContainerBuilder $container): void
     {
-        $tags = $container->findTaggedServiceIds('liip_imagine.cache.resolver');
+        $resolvers = $container->findTaggedServiceIds($this->tagName);
 
-        if (count($tags) > 0 && $container->hasDefinition('liip_imagine.cache.manager')) {
-            $manager = $container->getDefinition('liip_imagine.cache.manager');
+        if (0 < count($resolvers) && $container->hasDefinition($this->service)) {
+            $manager = $container->getDefinition($this->service);
 
-            foreach ($tags as $id => $tag) {
+            foreach ($resolvers as $id => $tag) {
                 $manager->addMethodCall('addResolver', [$tag[0]['resolver'], new Reference($id)]);
                 $this->log($container, 'Registered cache resolver: %s', $id);
             }
