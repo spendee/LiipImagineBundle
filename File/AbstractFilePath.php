@@ -84,7 +84,7 @@ abstract class AbstractFilePath extends AbstractFileBlob
         LockInvokable::blocking($this, function (): void {
             if ($this->fileExists() && (false === $this->isFileWritable() || false === @unlink($this->getFile()->getPathname()))) {
                 throw new FileOperationException(sprintf(
-                    'Failed to remove file "%s": %s', $this->file->getPathname(), Interpreter::lastErrorMessage()
+                    'Failed to remove file "%s": %s', $this->file->getPathname(), Interpreter::error()->message()
                 ));
             }
         });
@@ -133,7 +133,7 @@ abstract class AbstractFilePath extends AbstractFileBlob
     {
         if (false === is_dir($path) && false === @mkdir($path, 0777, true) && false === is_dir($path)) {
             throw new FileOperationException(sprintf(
-                'Failed to create file "%s": %s', $path, Interpreter::lastErrorMessage()
+                'Failed to create file "%s": %s', $path, Interpreter::error()->message()
             ));
         }
 
@@ -153,7 +153,7 @@ abstract class AbstractFilePath extends AbstractFileBlob
     {
         if (false === @file_put_contents($file, $contents, $append ? FILE_APPEND : 0)) {
             throw new FileOperationException(sprintf(
-                'Failed to write contents of "%s": %s.', $file, Interpreter::lastErrorMessage()
+                'Failed to write contents of "%s": %s.', $file, Interpreter::error()->message()
             ));
         }
     }

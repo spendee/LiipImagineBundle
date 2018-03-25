@@ -11,31 +11,36 @@
 
 namespace Liip\ImagineBundle\Utility\Interpreter;
 
+use Liip\ImagineBundle\Utility\Interpreter\State\AbstractErrorState;
+use Liip\ImagineBundle\Utility\Interpreter\State\ErrorStateDefault;
+use Liip\ImagineBundle\Utility\Interpreter\State\ErrorStateDefined;
+
 /**
- * @internal
+ * @author Rob Frawley 2nd <rmf@src.run>
  */
 final class Interpreter
 {
     /**
-     * @var string
+     * @param bool $clear
+     *
+     * @return AbstractErrorState|ErrorStateDefault|ErrorStateDefined
      */
-    private static $defaultResponse = 'An undefined error occured.';
-
-    /**
-     * @param string $defaultResponse
-     */
-    public static function setDefaultResponse(string $defaultResponse): void
+    public static function error(bool $clear = true)
     {
-        self::$defaultResponse = $defaultResponse;
+        try {
+            return AbstractErrorState::create(error_get_last());
+        } finally {
+            if (true === $clear) {
+                self::errorClear();
+            }
+        }
     }
 
     /**
-     * @param string $index
-     *
-     * @return string|null
+     * Clear the last error
      */
-    public static function lastErrorMessage(string $index = 'message')
+    public static function errorClear(): void
     {
-        return error_get_last()[$index] ?? self::$defaultResponse;
+        error_clear_last();
     }
 }

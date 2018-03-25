@@ -113,7 +113,7 @@ final class FileTemp extends AbstractFilePath implements FilePathInterface
             }
 
             throw new FileOperationException(sprintf(
-                'Failed to acquire temporary file in "%s": %s.', $this->getRoot(), Interpreter::lastErrorMessage()
+                'Failed to acquire temporary file in "%s": %s.', $this->getRoot(), Interpreter::error()->message()
             ));
         });
 
