@@ -21,6 +21,9 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesserInterface;
 use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesserInterface as SymfonyExtensionGuesserInterface;
 
+/**
+ * @author Rob Frawley 2nd <rmf@src.run>
+ */
 class AttributeGuessersCompilerPass extends AbstractCompilerPass
 {
     use PriorityTaggedServiceTrait;

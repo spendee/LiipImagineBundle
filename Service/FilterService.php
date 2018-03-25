@@ -16,11 +16,12 @@ use Liip\ImagineBundle\File\FileInterface;
 use Liip\ImagineBundle\Imagine\Cache\CacheManager;
 use Liip\ImagineBundle\Imagine\Data\DataManager;
 use Liip\ImagineBundle\Imagine\Filter\FilterManager;
-use Psr\Log\LoggerInterface;
-use Psr\Log\NullLogger;
+use Liip\ImagineBundle\Log\LoggerAwareTrait;
 
 class FilterService
 {
+    use LoggerAwareTrait;
+
     /**
      * @var DataManager
      */
@@ -37,26 +38,15 @@ class FilterService
     private $cacheManager;
 
     /**
-     * @var LoggerInterface
+     * @param DataManager   $dataManager
+     * @param FilterManager $filterManager
+     * @param CacheManager  $cacheManager
      */
-    private $logger;
-
-    /**
-     * @param DataManager     $dataManager
-     * @param FilterManager   $filterManager
-     * @param CacheManager    $cacheManager
-     * @param LoggerInterface $logger
-     */
-    public function __construct(
-        DataManager $dataManager,
-        FilterManager $filterManager,
-        CacheManager $cacheManager,
-        LoggerInterface $logger = null
-    ) {
+    public function __construct(DataManager $dataManager, FilterManager $filterManager, CacheManager $cacheManager)
+    {
         $this->dataManager = $dataManager;
         $this->filterManager = $filterManager;
         $this->cacheManager = $cacheManager;
-        $this->logger = $logger ?: new NullLogger();
     }
 
     /**

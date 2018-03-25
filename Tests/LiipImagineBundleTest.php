@@ -14,7 +14,7 @@ namespace Liip\ImagineBundle\Tests;
 use Liip\ImagineBundle\DependencyInjection\Compiler\AttributeGuessersCompilerPass;
 use Liip\ImagineBundle\DependencyInjection\Compiler\FiltersCompilerPass;
 use Liip\ImagineBundle\DependencyInjection\Compiler\LoadersCompilerPass;
-use Liip\ImagineBundle\DependencyInjection\Compiler\LoggerAwareCompilerPass;
+use Liip\ImagineBundle\DependencyInjection\Compiler\LoggerInjectCompilerPass;
 use Liip\ImagineBundle\DependencyInjection\Compiler\MetadataReaderCompilerPass;
 use Liip\ImagineBundle\DependencyInjection\Compiler\PostProcessorsCompilerPass;
 use Liip\ImagineBundle\DependencyInjection\Compiler\ResolversCompilerPass;
@@ -44,7 +44,7 @@ class LiipImagineBundleTest extends AbstractTest
      */
     public function provideAddCompilerPassOnBuildData(): \Iterator
     {
-        yield [0, LoggerAwareCompilerPass::class];
+        yield [0, LoggerInjectCompilerPass::class];
         yield [1, AttributeGuessersCompilerPass::class];
         yield [2, LoadersCompilerPass::class];
         yield [3, FiltersCompilerPass::class];

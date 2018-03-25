@@ -63,7 +63,7 @@
             <argument type="service" id="liip_imagine.data.manager" />
             <argument type="service" id="liip_imagine.filter.manager" />
             <argument type="service" id="liip_imagine.cache.manager" />
-            <argument type="service" id="logger" on-invalid="ignore" />
+            <tag name="liip_imagine.logger_inject" />
         </service>
 
         <!-- Controller -->
@@ -74,21 +74,21 @@
             <argument type="service" id="liip_imagine.cache.signer" />
         </service>
 
-        <service id="liip_imagine.meta_data.reader" class="Imagine\Image\Metadata\ExifMetadataReader" public="false" />
+        <service id="liip_imagine.meta_data.reader" class="Imagine\Image\Metadata\ExifMetadataReader" />
 
         <!-- ImagineInterface instances -->
 
         <service id="liip_imagine" alias="liip_imagine.gd" />
 
-        <service id="liip_imagine.gd" class="Imagine\Gd\Imagine" public="false" />
+        <service id="liip_imagine.gd" class="Imagine\Gd\Imagine" />
 
-        <service id="liip_imagine.imagick" class="Imagine\Imagick\Imagine" public="false" />
+        <service id="liip_imagine.imagick" class="Imagine\Imagick\Imagine" />
 
-        <service id="liip_imagine.gmagick" class="Imagine\Gmagick\Imagine" public="false" />
+        <service id="liip_imagine.gmagick" class="Imagine\Gmagick\Imagine" />
 
         <!--  Templating helpers and extensions -->
 
-        <service id="liip_imagine.templating.filter_extension" class="Liip\ImagineBundle\Templating\FilterExtension" public="false">
+        <service id="liip_imagine.templating.filter_extension" class="Liip\ImagineBundle\Templating\FilterExtension" >
             <tag name="twig.extension" />
             <argument type="service" id="liip_imagine.cache.manager" />
         </service>
@@ -186,12 +186,12 @@
 
         <!-- Data loader locators -->
 
-        <service id="liip_imagine.binary.locator.filesystem" class="Liip\ImagineBundle\Binary\Locator\FileSystemLocator" public="false" shared="false">
+        <service id="liip_imagine.binary.locator.filesystem" class="Liip\ImagineBundle\Binary\Locator\FileSystemLocator" shared="false">
             <argument><!-- will be injected by FilesystemLoaderFactory --></argument>
             <tag name="liip_imagine.binary.locator" shared="false" />
         </service>
 
-        <service id="liip_imagine.binary.locator.filesystem_insecure" class="Liip\ImagineBundle\Binary\Locator\FileSystemInsecureLocator" public="false" shared="false">
+        <service id="liip_imagine.binary.locator.filesystem_insecure" class="Liip\ImagineBundle\Binary\Locator\FileSystemInsecureLocator" shared="false">
             <argument><!-- will be injected by FilesystemLoaderFactory --></argument>
             <tag name="liip_imagine.binary.locator" shared="false" />
         </service>
@@ -244,30 +244,36 @@
 
         <!-- Guessers -->
 
-        <service id="liip_imagine.file_attributes.applier" class="Liip\ImagineBundle\File\Attributes\Resolver\FileAttributesApplier" public="false">
+        <service id="liip_imagine.file_attributes.applier" class="Liip\ImagineBundle\File\Attributes\Resolver\FileAttributesApplier" >
             <argument type="service" id="liip_imagine.file_attributes.resolver" />
-            <tag name="liip_imagine.logger" />
+            <tag name="liip_imagine.logger_inject" />
         </service>
 
-        <service id="liip_imagine.file_attributes.resolver" class="Liip\ImagineBundle\File\Attributes\Resolver\FileAttributesResolver" public="false">
+        <service id="liip_imagine.file_attributes.resolver" class="Liip\ImagineBundle\File\Attributes\Resolver\FileAttributesResolver" >
             <argument type="service" id="liip_imagine.file_attributes.guesser_proxy.content_type" />
             <argument type="service" id="liip_imagine.file_attributes.guesser_proxy.extension" />
         </service>
 
-        <service id="liip_imagine.file_attributes.guesser_proxy.extension" class="Liip\ImagineBundle\File\Attributes\Guesser\ExtensionGuesser" public="false">
+        <service id="liip_imagine.file_attributes.guesser_proxy.extension" class="Liip\ImagineBundle\File\Attributes\Guesser\ExtensionGuesser" >
         </service>
 
-        <service id="liip_imagine.file_attributes.guesser_proxy.content_type" class="Liip\ImagineBundle\File\Attributes\Guesser\ContentTypeGuesser" public="false">
+        <service id="liip_imagine.file_attributes.guesser_proxy.content_type" class="Liip\ImagineBundle\File\Attributes\Guesser\ContentTypeGuesser" >
         </service>
 
-        <service id="liip_imagine.file_attributes.guesser.symfony_default_extension" class="Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesserInterface" public="false">
+        <service id="liip_imagine.file_attributes.guesser.symfony_default_extension" class="Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesserInterface" >
             <factory class="Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser" method="getInstance" />
             <tag name="liip_imagine.file_attributes.guesser.extension" priority="9999" />
         </service>
 
-        <service id="liip_imagine.file_attributes.guesser.symfony_default_content_type" class="Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesserInterface" public="false">
+        <service id="liip_imagine.file_attributes.guesser.symfony_default_content_type" class="Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesserInterface" >
             <factory class="Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesser" method="getInstance" />
             <tag name="liip_imagine.file_attributes.guesser.content_type" priority="9999" />
+        </service>
+
+        <!-- Logger proxy -->
+
+        <service id="liip_imagine.logger" class="Liip\ImagineBundle\Log\Logger">
+            <argument type="service" id="logger" on-invalid="ignore" />
         </service>
 
         <!-- Signer -->
