@@ -19,12 +19,16 @@ use Liip\ImagineBundle\File\FilePath;
 use Liip\ImagineBundle\File\FilePathInterface;
 use Liip\ImagineBundle\File\Attributes\ContentTypeAttribute;
 use Liip\ImagineBundle\File\Attributes\ExtensionAttribute;
+use Psr\Log\LoggerAwareTrait;
+use Psr\Log\NullLogger;
 
 /**
  * @author Rob Frawley 2nd <rmf@src.run>
  */
 final class FileAttributesApplier
 {
+    use LoggerAwareTrait;
+
     /**
      * @var FileAttributesResolver
      */
@@ -36,6 +40,7 @@ final class FileAttributesApplier
     public function __construct(FileAttributesResolver $resolver)
     {
         $this->resolver = $resolver;
+        $this->logger = new NullLogger();
     }
 
     /**
@@ -78,15 +83,21 @@ final class FileAttributesApplier
     private function assignFileAttributes(FileInterface $file, ContentTypeAttribute $contentType, ExtensionAttribute $extension): FileInterface
     {
         if (false === $contentType->isValid()) {
-            throw new InvalidFileAttributesException(sprintf(
-                'Unable to resolve content type attribute for file %s.', $file->hasFile() ? $file->getFile()->getPathname() : 'blob'
+            $this->logger->error($m = sprintf(
+                'Unable to resolve content type attribute for file %s.',
+                $file->hasFile() ? $file->getFile()->getPathname() : 'blob'
             ));
+
+            throw new InvalidFileAttributesException($m);
         }
 
         if (false === $extension->isValid()) {
-            throw new InvalidFileAttributesException(sprintf(
-                'Unable to resolve extension attribute for file %s.', $file->hasFile() ? $file->getFile()->getPathname() : 'blob'
+            $this->logger->error($m = sprintf(
+                'Unable to resolve extension attribute for file %s.',
+                $file->hasFile() ? $file->getFile()->getPathname() : 'blob'
             ));
+
+            throw new InvalidFileAttributesException($m);
         }
 
         return $file instanceof FilePathInterface
