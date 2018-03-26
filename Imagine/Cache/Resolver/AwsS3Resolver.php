@@ -11,6 +11,7 @@
 
 namespace Liip\ImagineBundle\Imagine\Cache\Resolver;
 
+use Aws\CommandInterface;
 use Aws\S3\Exception\S3Exception;
 use Aws\S3\S3Client;
 use Liip\ImagineBundle\Exception\Imagine\Cache\Resolver\NotStorableException;
@@ -155,12 +156,14 @@ class AwsS3Resolver implements ResolverInterface
      */
     protected function getObjectUrl($path)
     {
-        $object = $this->storage->getObject(array_merge($this->getOptions, [
+        $command = $this->storage->getCommand('GetObject', array_merge($this->getOptions, [
             'Bucket' => $this->bucket,
             'Key'    => $path
         ]));
 
-        return (string) $object;
+        return (string) (
+            $command instanceof CommandInterface ? \Aws\serialize($command)->getUri() : $command
+        );
     }
 
     /**

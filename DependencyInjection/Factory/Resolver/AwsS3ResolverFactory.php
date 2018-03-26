@@ -27,7 +27,8 @@ class AwsS3ResolverFactory extends AbstractResolverFactory
         $clientRef = $this->createReference($name, 'client');
         $clientDef = (new Definition(S3Client::class))
             ->setFactory([S3Client::class, 'factory'])
-            ->addArgument($config['client_config']);
+            ->addArgument($this->createClientConfigArguments($config['client_config']))
+            ->setShared(false);
 
         $container->setDefinition($clientRef, $clientDef);
 
@@ -86,8 +87,19 @@ class AwsS3ResolverFactory extends AbstractResolverFactory
                 ->end()
                 ->arrayNode('client_config')
                     ->isRequired()
-                    ->prototype('variable')
-                        ->treatNullLike([])
+                    ->children()
+                        ->arrayNode('credentials')
+                            ->variablePrototype()
+                                ->isRequired()
+                            ->end()
+                        ->end()
+                        ->scalarNode('version')
+                            ->defaultValue('2016-03-01')
+                        ->end()
+                        ->scalarNode('region')->end()
+                        ->arrayNode('extras')
+                            ->arrayPrototype()->end()
+                        ->end()
                     ->end()
                 ->end()
                 ->scalarNode('cache')
@@ -126,5 +138,31 @@ class AwsS3ResolverFactory extends AbstractResolverFactory
     public function getName(): string
     {
         return 'aws_s3';
+    }
+
+    /**
+     * @param array $config
+     *
+     * @return array
+     */
+    private function createClientConfigArguments(array $config): array
+    {
+        $arguments = [
+            'credentials' => $config['credentials'],
+        ];
+
+        if (isset($config['version'])) {
+            $arguments['version'] = $config['version'];
+        }
+
+        if (isset($config['region'])) {
+            $arguments['region'] = $config['region'];
+        }
+
+        if (isset($config['extras']) && 0 < count($config['extras'])) {
+            $arguments = array_merge($arguments, $config['extras']);
+        }
+
+        return $arguments;
     }
 }

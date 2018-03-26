@@ -54,7 +54,10 @@ class AwsS3ResolverFactoryTest extends TestCase
         $resolver = new AwsS3ResolverFactory();
 
         $resolver->create($container, 'the_resolver_name', [
-            'client_config' => [],
+            'client_config' => [
+                'credentials' => [],
+                'region' => 'usa-abc'
+            ],
             'bucket' => 'theBucket',
             'acl' => 'theAcl',
             'get_options' => ['fooKey' => 'fooVal'],
@@ -77,7 +80,7 @@ class AwsS3ResolverFactoryTest extends TestCase
         $this->assertSame('theAcl', $resolverDefinition->getArgument(2));
         $this->assertSame(['fooKey' => 'fooVal'], $resolverDefinition->getArgument(3));
         $this->assertSame(['barKey' => 'barVal'], $resolverDefinition->getArgument(4));
-//        $this->assertSame(['bazKey' => 'bazVal'], $resolverDefinition->getArgument(5));
+        $this->assertSame(['bazKey' => 'bazVal'], $resolverDefinition->getArgument(5));
     }
 
     public function testCreateS3ClientDefinitionOnCreate()
@@ -87,7 +90,10 @@ class AwsS3ResolverFactoryTest extends TestCase
         $resolver = new AwsS3ResolverFactory();
 
         $resolver->create($container, 'the_resolver_name', [
-            'client_config' => ['theClientConfigKey' => 'theClientConfigVal'],
+            'client_config' => [
+                'credentials' => [],
+                'region' => 'usa-abc'
+            ],
             'bucket' => 'aBucket',
             'acl' => 'aAcl',
             'get_options' => [],
@@ -101,7 +107,10 @@ class AwsS3ResolverFactoryTest extends TestCase
 
         $clientDefinition = $container->getDefinition('liip_imagine.cache.resolver.aws_s3.the_resolver_name.client');
         $this->assertSame('Aws\S3\S3Client', $clientDefinition->getClass());
-        $this->assertSame(['theClientConfigKey' => 'theClientConfigVal'], $clientDefinition->getArgument(0));
+        $this->assertSame([
+            'credentials' => [],
+            'region' => 'usa-abc'
+        ], $clientDefinition->getArgument(0));
     }
 
     public function testCreateS3ClientDefinitionWithFactoryAsNonSharedOnCreate()
@@ -111,7 +120,10 @@ class AwsS3ResolverFactoryTest extends TestCase
         $resolver = new AwsS3ResolverFactory();
 
         $resolver->create($container, 'the_resolver_name', [
-            'client_config' => ['theClientConfigKey' => 'theClientConfigVal'],
+            'client_config' => [
+                'credentials' => [],
+                'region' => 'usa-abc'
+            ],
             'bucket' => 'aBucket',
             'acl' => 'aAcl',
             'get_options' => [],
@@ -123,7 +135,7 @@ class AwsS3ResolverFactoryTest extends TestCase
 
         $clientDefinition = $container->getDefinition('liip_imagine.cache.resolver.aws_s3.the_resolver_name.client');
         $this->assertSame(['Aws\S3\S3Client', 'factory'], $clientDefinition->getFactory());
-        //$this->assertFalse($clientDefinition->isShared());
+        $this->assertFalse($clientDefinition->isShared());
     }
 
     public function testWrapResolverWithProxyOnCreateWithoutCache()
@@ -133,7 +145,10 @@ class AwsS3ResolverFactoryTest extends TestCase
         $resolver = new AwsS3ResolverFactory();
 
         $resolver->create($container, 'the_resolver_name', [
-            'client_config' => [],
+            'client_config' => [
+                'credentials' => [],
+                'region' => 'usa-abc'
+            ],
             'bucket' => 'aBucket',
             'acl' => 'aAcl',
             'get_options' => [],
@@ -168,7 +183,10 @@ class AwsS3ResolverFactoryTest extends TestCase
         $resolver = new AwsS3ResolverFactory();
 
         $resolver->create($container, 'the_resolver_name', [
-            'client_config' => [],
+            'client_config' => [
+                'credentials' => [],
+                'region' => 'usa-abc'
+            ],
             'bucket' => 'aBucket',
             'acl' => 'aAcl',
             'get_options' => [],
@@ -204,7 +222,10 @@ class AwsS3ResolverFactoryTest extends TestCase
         $resolver = new AwsS3ResolverFactory();
 
         $resolver->create($container, 'the_resolver_name', [
-            'client_config' => [],
+            'client_config' => [
+                'credentials' => [],
+                'region' => 'usa-abc'
+            ],
             'bucket' => 'aBucket',
             'acl' => 'aAcl',
             'get_options' => [],
@@ -248,7 +269,10 @@ class AwsS3ResolverFactoryTest extends TestCase
         $resolver = new AwsS3ResolverFactory();
 
         $resolver->create($container, 'the_resolver_name', [
-            'client_config' => [],
+            'client_config' => [
+                'credentials' => [],
+                'region' => 'usa-abc'
+            ],
             'bucket' => 'aBucket',
             'acl' => 'aAcl',
             'get_options' => [],
@@ -281,7 +305,10 @@ class AwsS3ResolverFactoryTest extends TestCase
         $resolver = new AwsS3ResolverFactory();
 
         $resolver->create($container, 'the_resolver_name', [
-            'client_config' => [],
+            'client_config' => [
+                'credentials' => [],
+                'region' => 'usa-abc'
+            ],
             'bucket' => 'aBucket',
             'acl' => 'aAcl',
             'get_options' => [],
@@ -352,8 +379,10 @@ class AwsS3ResolverFactoryTest extends TestCase
     public function testProcessCorrectlyOptionsOnAddConfiguration()
     {
         $expectedClientConfig = [
-            'theKey' => 'theClientConfigVal',
-            'theOtherKey' => 'theOtherClientConfigValue',
+            'credentials' => [],
+            'version' => 'xxxx-xx-xx',
+            'region' => 'usa-abc',
+            'extras' => [],
         ];
         $expectedGetOptions = [
             'theKey' => 'theGetOptionsVal',
@@ -424,7 +453,10 @@ class AwsS3ResolverFactoryTest extends TestCase
         $config = $this->processConfigTree($treeBuilder, [
             'aws_s3' => [
                 'bucket' => 'aBucket',
-                'client_config' => [],
+                'client_config' => [
+                    'credentials' => [],
+                    'region' => 'usa-abc'
+                ],
             ],
         ]);
 
@@ -446,8 +478,9 @@ class AwsS3ResolverFactoryTest extends TestCase
                 'secret' => 'theSecret',
                 'token' => 'theToken',
             ],
-            'region' => 'theRegion',
-            'version' => 'theVersion',
+            'version' => 'xxxx-xx-xx',
+            'region' => 'usa-abc',
+            'extras' => [],
         ];
         $expectedGetOptions = [
             'theKey' => 'theGetOptionsVal',
