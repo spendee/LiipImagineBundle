@@ -83,6 +83,10 @@ class AwsS3ResolverTest extends AbstractTest
 
     public function testLogNotCreatedObjects()
     {
+        if (!class_exists(S3Exception::class)) {
+            $this->markTestSkipped(sprintf('Requires "S3Exception"'));
+        }
+
         $this->expectException(NotStorableException::class);
         $this->expectExceptionMessageRegExp('{The object "[^"]+" could not be created on AWS S3 bucket "[^"]+"}');
 
@@ -399,7 +403,7 @@ class AwsS3ResolverTest extends AbstractTest
         if (!class_exists(S3Exception::class)) {
             $this->markTestSkipped(sprintf('Requires "S3Exception"'));
         }
-        
+
         $expectedBucket = 'images.example.com';
         $expectedFilter = 'theFilter';
 

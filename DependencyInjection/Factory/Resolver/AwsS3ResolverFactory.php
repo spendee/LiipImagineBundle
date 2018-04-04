@@ -27,8 +27,7 @@ class AwsS3ResolverFactory extends AbstractResolverFactory
         $clientRef = $this->createReference($name, 'client');
         $clientDef = (new Definition(S3Client::class))
             ->setFactory([S3Client::class, 'factory'])
-            ->addArgument($this->createClientConfigArguments($config['client_config']))
-            ->setShared(false);
+            ->addArgument($this->createClientConfigArguments($config['client_config']));
 
         $container->setDefinition($clientRef, $clientDef);
 

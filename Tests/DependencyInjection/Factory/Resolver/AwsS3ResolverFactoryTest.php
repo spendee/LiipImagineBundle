@@ -11,6 +11,7 @@
 
 namespace Liip\ImagineBundle\Tests\DependencyInjection\Factory\Resolver;
 
+use Aws\S3\S3Client;
 use Liip\ImagineBundle\DependencyInjection\Factory\Resolver\AwsS3ResolverFactory;
 use Liip\ImagineBundle\DependencyInjection\Factory\Resolver\ResolverFactoryInterface;
 use PHPUnit\Framework\TestCase;
@@ -26,6 +27,15 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class AwsS3ResolverFactoryTest extends TestCase
 {
+    public function setUp()
+    {
+        if (!class_exists(S3Client::class)) {
+            $this->markTestSkipped('Requires S3Client');
+        }
+
+        parent::setUp();
+    }
+
     public function testImplementsResolverFactoryInterface()
     {
         $rc = new \ReflectionClass(AwsS3ResolverFactory::class);
@@ -135,7 +145,6 @@ class AwsS3ResolverFactoryTest extends TestCase
 
         $clientDefinition = $container->getDefinition('liip_imagine.cache.resolver.aws_s3.the_resolver_name.client');
         $this->assertSame(['Aws\S3\S3Client', 'factory'], $clientDefinition->getFactory());
-        $this->assertFalse($clientDefinition->isShared());
     }
 
     public function testWrapResolverWithProxyOnCreateWithoutCache()
