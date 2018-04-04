@@ -49,49 +49,31 @@ abstract class AbstractFileBlob
         return $this->getContents() ?: '';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getContentType(): ContentTypeAttribute
     {
         return $this->contentType;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasContentType(): bool
     {
         return $this->getContentType()->isValid();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getExtension(): ExtensionAttribute
     {
         return $this->extension;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasExtension(): bool
     {
         return $this->getExtension()->isValid();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getContents(): ?string
     {
         return $this->doGetContents();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasContents(): bool
     {
         return null !== $this->doGetContents();
@@ -118,9 +100,6 @@ abstract class AbstractFileBlob
         return mb_strlen($this->getContents());
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasFile(): bool
     {
         return false;

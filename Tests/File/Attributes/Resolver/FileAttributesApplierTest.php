@@ -14,16 +14,9 @@ namespace Liip\ImagineBundle\Tests\File\Attributes\Resolver;
 use Liip\ImagineBundle\Exception\File\Attributes\Resolver\InvalidFileAttributesException;
 use Liip\ImagineBundle\File\FileBlob;
 use Liip\ImagineBundle\File\FilePath;
-use Liip\ImagineBundle\File\Attributes\Guesser\ContentTypeGuesser;
-use Liip\ImagineBundle\File\Attributes\Resolver\FileAttributesResolver;
-use Liip\ImagineBundle\File\Attributes\Guesser\ExtensionGuesser;
-use Liip\ImagineBundle\File\Attributes\Resolver\FileAttributesApplier;
 use Liip\ImagineBundle\Tests\AbstractTest;
 use Liip\ImagineBundle\Tests\File\Attributes\ContentTypeAttributeTest;
 use Liip\ImagineBundle\Tests\Fixtures\Data\DataLoader;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesserInterface;
-use Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesserInterface;
 
 /**
  * @covers \Liip\ImagineBundle\File\Attributes\Resolver\FileAttributesApplier

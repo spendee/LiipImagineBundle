@@ -11,14 +11,12 @@
 
 namespace Liip\ImagineBundle\Imagine\Data;
 
-use Liip\ImagineBundle\Imagine\Data\Loader\LoaderInterface;
 use Liip\ImagineBundle\Exception\File\Attributes\Resolver\InvalidFileAttributesException;
 use Liip\ImagineBundle\Exception\Imagine\Data\InvalidFileFoundException;
-use Liip\ImagineBundle\File\FileBlob;
-use Liip\ImagineBundle\File\FileInterface;
-use Liip\ImagineBundle\File\Attributes\Resolver\FileAttributesResolver;
 use Liip\ImagineBundle\File\Attributes\Attributes;
 use Liip\ImagineBundle\File\Attributes\Resolver\FileAttributesApplier;
+use Liip\ImagineBundle\File\FileInterface;
+use Liip\ImagineBundle\Imagine\Data\Loader\LoaderInterface;
 use Liip\ImagineBundle\Imagine\Filter\FilterConfiguration;
 
 class DataManager

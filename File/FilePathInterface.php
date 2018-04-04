@@ -11,9 +11,6 @@
 
 namespace Liip\ImagineBundle\File;
 
-use Liip\ImagineBundle\File\Attributes\ContentTypeAttribute;
-use Liip\ImagineBundle\File\Attributes\ExtensionAttribute;
-
 /**
  * @author Rob Frawley 2nd <rmf@src.run>
  */

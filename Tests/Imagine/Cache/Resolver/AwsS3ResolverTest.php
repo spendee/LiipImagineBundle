@@ -11,9 +11,6 @@
 
 namespace Liip\ImagineBundle\Tests\Imagine\Cache\Resolver;
 
-use Aws\Command;
-use Aws\CommandInterface;
-use Aws\HandlerList;
 use Aws\S3\Exception\S3Exception;
 use Aws\S3\S3Client;
 use Guzzle\Service\Resource\Model;
@@ -43,7 +40,7 @@ class AwsS3ResolverTest extends AbstractTest
             ->method('getCommand')
             ->with('GetObject', [
                 'Bucket' => 'images.example.com',
-                'Key'    => 'thumb/some-folder/path.jpg'
+                'Key' => 'thumb/some-folder/path.jpg',
             ])
             ->willReturn('resolved/thumb/some-folder/path.jpg');
 
@@ -60,7 +57,7 @@ class AwsS3ResolverTest extends AbstractTest
             ->with('GetObject', [
                 'torrent' => true,
                 'Bucket' => 'images.example.com',
-                'Key'    => 'thumb/some-folder/path.jpg'
+                'Key' => 'thumb/some-folder/path.jpg',
             ])
             ->willReturn('resolved/thumb.png');
 
@@ -76,7 +73,7 @@ class AwsS3ResolverTest extends AbstractTest
             ->method('getCommand')
             ->with('GetObject', [
                 'Bucket' => 'images.example.com',
-                'Key'    => 'a/cache/prefix/thumb/some-folder/path.jpg'
+                'Key' => 'a/cache/prefix/thumb/some-folder/path.jpg',
             ])
             ->willReturn('resolved/a/cache/prefix/thumb.png');
 
@@ -168,7 +165,7 @@ class AwsS3ResolverTest extends AbstractTest
             ->method('getCommand')
             ->with('GetObject', [
                 'Bucket' => 'images.example.com',
-                'Key'    => 'thumb/some-folder/path.jpg'
+                'Key' => 'thumb/some-folder/path.jpg',
             ])
             ->will($this->returnValue('http://images.example.com/some-folder/path.jpg'));
 

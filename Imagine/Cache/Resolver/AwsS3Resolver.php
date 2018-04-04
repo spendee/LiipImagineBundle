@@ -64,12 +64,12 @@ class AwsS3Resolver implements ResolverInterface
     protected $cachePrefix;
 
     /**
-     * @param S3Client    $storage    The Amazon S3 storage API. It's required to know authentication information
-     * @param string      $bucket     The bucket name to operate on
-     * @param string|null $acl        The ACL to use when storing new objects. Default: owner read/write, public read
-     * @param array       $getOptions A list of options to be passed when retrieving an object url from Amazon S3
-     * @param array       $putOptions A list of options to be passed when saving an object to Amazon S3
-     * @param array       $delOptions A list of options to be passed when removing an object from Amazon S3
+     * @param S3Client    $storage     The Amazon S3 storage API. It's required to know authentication information
+     * @param string      $bucket      The bucket name to operate on
+     * @param string|null $acl         The ACL to use when storing new objects. Default: owner read/write, public read
+     * @param array       $getOptions  A list of options to be passed when retrieving an object url from Amazon S3
+     * @param array       $putOptions  A list of options to be passed when saving an object to Amazon S3
+     * @param array       $delOptions  A list of options to be passed when removing an object from Amazon S3
      * @param string|null $cachePrefix A cache prefix string
      */
     public function __construct(
@@ -158,7 +158,7 @@ class AwsS3Resolver implements ResolverInterface
     {
         $command = $this->storage->getCommand('GetObject', array_merge($this->getOptions, [
             'Bucket' => $this->bucket,
-            'Key'    => $path
+            'Key' => $path,
         ]));
 
         return (string) (
@@ -177,8 +177,20 @@ class AwsS3Resolver implements ResolverInterface
             $this->cachePrefix ? preg_quote(sprintf('%s/', $this->cachePrefix), '/') : '',
             implode('|', array_map(function (string $f): string {
                 return preg_quote($f, '/');
-            }, $filters))
+            }, $filters)),
         ]);
+    }
+
+    /**
+     * Checks whether an object exists.
+     *
+     * @param string $objectPath
+     *
+     * @return bool
+     */
+    protected function objectExists($objectPath)
+    {
+        return $this->storage->doesObjectExist($this->bucket, $objectPath);
     }
 
     /**
@@ -247,17 +259,5 @@ class AwsS3Resolver implements ResolverInterface
                 'exception' => $exception,
             ]);
         }
-    }
-
-    /**
-     * Checks whether an object exists.
-     *
-     * @param string $objectPath
-     *
-     * @return bool
-     */
-    protected function objectExists($objectPath)
-    {
-        return $this->storage->doesObjectExist($this->bucket, $objectPath);
     }
 }

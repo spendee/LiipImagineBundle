@@ -56,7 +56,7 @@ class AwsS3ResolverFactoryTest extends TestCase
         $resolver->create($container, 'the_resolver_name', [
             'client_config' => [
                 'credentials' => [],
-                'region' => 'usa-abc'
+                'region' => 'usa-abc',
             ],
             'bucket' => 'theBucket',
             'acl' => 'theAcl',
@@ -92,7 +92,7 @@ class AwsS3ResolverFactoryTest extends TestCase
         $resolver->create($container, 'the_resolver_name', [
             'client_config' => [
                 'credentials' => [],
-                'region' => 'usa-abc'
+                'region' => 'usa-abc',
             ],
             'bucket' => 'aBucket',
             'acl' => 'aAcl',
@@ -109,7 +109,7 @@ class AwsS3ResolverFactoryTest extends TestCase
         $this->assertSame('Aws\S3\S3Client', $clientDefinition->getClass());
         $this->assertSame([
             'credentials' => [],
-            'region' => 'usa-abc'
+            'region' => 'usa-abc',
         ], $clientDefinition->getArgument(0));
     }
 
@@ -122,7 +122,7 @@ class AwsS3ResolverFactoryTest extends TestCase
         $resolver->create($container, 'the_resolver_name', [
             'client_config' => [
                 'credentials' => [],
-                'region' => 'usa-abc'
+                'region' => 'usa-abc',
             ],
             'bucket' => 'aBucket',
             'acl' => 'aAcl',
@@ -147,7 +147,7 @@ class AwsS3ResolverFactoryTest extends TestCase
         $resolver->create($container, 'the_resolver_name', [
             'client_config' => [
                 'credentials' => [],
-                'region' => 'usa-abc'
+                'region' => 'usa-abc',
             ],
             'bucket' => 'aBucket',
             'acl' => 'aAcl',
@@ -185,7 +185,7 @@ class AwsS3ResolverFactoryTest extends TestCase
         $resolver->create($container, 'the_resolver_name', [
             'client_config' => [
                 'credentials' => [],
-                'region' => 'usa-abc'
+                'region' => 'usa-abc',
             ],
             'bucket' => 'aBucket',
             'acl' => 'aAcl',
@@ -224,7 +224,7 @@ class AwsS3ResolverFactoryTest extends TestCase
         $resolver->create($container, 'the_resolver_name', [
             'client_config' => [
                 'credentials' => [],
-                'region' => 'usa-abc'
+                'region' => 'usa-abc',
             ],
             'bucket' => 'aBucket',
             'acl' => 'aAcl',
@@ -271,7 +271,7 @@ class AwsS3ResolverFactoryTest extends TestCase
         $resolver->create($container, 'the_resolver_name', [
             'client_config' => [
                 'credentials' => [],
-                'region' => 'usa-abc'
+                'region' => 'usa-abc',
             ],
             'bucket' => 'aBucket',
             'acl' => 'aAcl',
@@ -307,7 +307,7 @@ class AwsS3ResolverFactoryTest extends TestCase
         $resolver->create($container, 'the_resolver_name', [
             'client_config' => [
                 'credentials' => [],
-                'region' => 'usa-abc'
+                'region' => 'usa-abc',
             ],
             'bucket' => 'aBucket',
             'acl' => 'aAcl',
@@ -455,7 +455,7 @@ class AwsS3ResolverFactoryTest extends TestCase
                 'bucket' => 'aBucket',
                 'client_config' => [
                     'credentials' => [],
-                    'region' => 'usa-abc'
+                    'region' => 'usa-abc',
                 ],
             ],
         ]);

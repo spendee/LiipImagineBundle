@@ -22,7 +22,7 @@ class LoggerAwareTraitTest extends TestCase
 {
     public function testLog(): void
     {
-        $logger = new class {
+        $logger = new class() {
             use LoggerAwareTrait;
         };
 

@@ -184,8 +184,8 @@ abstract class AbstractFormat implements FormatInterface
     {
         $block = $this->formatBlock($block);
 
-        if (0 === strpos($message, $block)) {
-            $message = substr($message, strlen($block) + 1);
+        if (0 === mb_strpos($message, $block)) {
+            $message = mb_substr($message, mb_strlen($block) + 1);
         }
 
         return $message;

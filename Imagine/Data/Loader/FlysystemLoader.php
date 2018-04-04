@@ -15,8 +15,6 @@ use League\Flysystem\FilesystemInterface;
 use Liip\ImagineBundle\Exception\File\Loader\NotLoadableException;
 use Liip\ImagineBundle\File\FileBlob;
 use Liip\ImagineBundle\File\FileInterface;
-use Liip\ImagineBundle\File\Attributes\Resolver\FileAttributesResolver;
-use Liip\ImagineBundle\File\Attributes\ContentTypeAttribute;
 
 class FlysystemLoader implements LoaderInterface
 {

@@ -11,15 +11,15 @@
 
 namespace Liip\ImagineBundle\File\Attributes\Resolver;
 
+use Liip\ImagineBundle\File\Attributes\Attributes;
+use Liip\ImagineBundle\File\Attributes\ContentTypeAttribute;
+use Liip\ImagineBundle\File\Attributes\ExtensionAttribute;
+use Liip\ImagineBundle\File\Attributes\Guesser\ContentTypeGuesserInterface;
+use Liip\ImagineBundle\File\Attributes\Guesser\ExtensionGuesserInterface;
 use Liip\ImagineBundle\File\FileBlobInterface;
 use Liip\ImagineBundle\File\FileInterface;
 use Liip\ImagineBundle\File\FilePathInterface;
 use Liip\ImagineBundle\File\FileTemp;
-use Liip\ImagineBundle\File\Attributes\Guesser\ContentTypeGuesserInterface;
-use Liip\ImagineBundle\File\Attributes\Attributes;
-use Liip\ImagineBundle\File\Attributes\ContentTypeAttribute;
-use Liip\ImagineBundle\File\Attributes\ExtensionAttribute;
-use Liip\ImagineBundle\File\Attributes\Guesser\ExtensionGuesserInterface;
 
 /**
  * @author Rob Frawley 2nd <rmf@src.run>

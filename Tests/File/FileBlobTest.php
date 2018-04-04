@@ -13,8 +13,6 @@ namespace Liip\ImagineBundle\Tests\File;
 
 use Liip\ImagineBundle\File\FileBlob;
 use Liip\ImagineBundle\File\FileInterface;
-use Liip\ImagineBundle\File\Attributes\ContentTypeAttribute;
-use Liip\ImagineBundle\File\Attributes\ExtensionAttribute;
 use PHPUnit\Framework\TestCase;
 
 /**

@@ -11,13 +11,13 @@
 
 namespace Liip\ImagineBundle\Tests\Imagine\Data\Loader;
 
+use Liip\ImagineBundle\Exception\File\Loader\NotLoadableException;
+use Liip\ImagineBundle\Exception\InvalidArgumentException;
+use Liip\ImagineBundle\File\FilePath;
 use Liip\ImagineBundle\Imagine\Data\Loader\FileSystemLoader;
 use Liip\ImagineBundle\Imagine\Data\Loader\LoaderInterface;
 use Liip\ImagineBundle\Imagine\Data\Loader\Locator\FileSystemLocator;
 use Liip\ImagineBundle\Imagine\Data\Loader\Locator\LocatorInterface;
-use Liip\ImagineBundle\Exception\File\Loader\NotLoadableException;
-use Liip\ImagineBundle\Exception\InvalidArgumentException;
-use Liip\ImagineBundle\File\FilePath;
 use Liip\ImagineBundle\Tests\AbstractTest;
 
 /**

@@ -11,9 +11,9 @@
 
 namespace Liip\ImagineBundle\Tests\Imagine\Data\Loader\Locator;
 
+use Liip\ImagineBundle\Exception\File\Loader\NotLoadableException;
 use Liip\ImagineBundle\Imagine\Data\Loader\Locator\FileSystemInsecureLocator;
 use Liip\ImagineBundle\Imagine\Data\Loader\Locator\LocatorInterface;
-use Liip\ImagineBundle\Exception\File\Loader\NotLoadableException;
 
 /**
  * @covers \Liip\ImagineBundle\Imagine\Data\Loader\Locator\FileSystemInsecureLocator

@@ -13,9 +13,9 @@ namespace Liip\ImagineBundle\Tests\Imagine\Data\Loader;
 
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
+use Liip\ImagineBundle\Exception\File\Loader\NotLoadableException;
 use Liip\ImagineBundle\Imagine\Data\Loader\FlysystemLoader;
 use Liip\ImagineBundle\Imagine\Data\Loader\LoaderInterface;
-use Liip\ImagineBundle\Exception\File\Loader\NotLoadableException;
 use Liip\ImagineBundle\Tests\AbstractTest;
 
 /**

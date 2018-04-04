@@ -56,7 +56,8 @@ class ContentTypeGuesserTest extends TestCase
         $this->expectExceptionMessageRegExp('{Invalid guesser type "[^"]+" provided for "[^"]+"\.}');
 
         $g = new ContentTypeGuesser();
-        $g->register(new class {});
+        $g->register(new class() {
+        });
     }
 
     /**

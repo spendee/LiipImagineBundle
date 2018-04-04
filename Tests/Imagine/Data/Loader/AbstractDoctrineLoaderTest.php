@@ -13,9 +13,9 @@ namespace Liip\ImagineBundle\Tests\Imagine\Data\Loader;
 
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
-use Liip\ImagineBundle\Imagine\Data\Loader\AbstractDoctrineLoader;
 use Liip\ImagineBundle\Exception\File\Loader\NotLoadableException;
 use Liip\ImagineBundle\File\FileInterface;
+use Liip\ImagineBundle\Imagine\Data\Loader\AbstractDoctrineLoader;
 use PHPUnit\Framework\TestCase;
 
 /**

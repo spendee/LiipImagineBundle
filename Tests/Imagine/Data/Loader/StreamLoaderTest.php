@@ -11,8 +11,8 @@
 
 namespace Liip\ImagineBundle\Tests\Imagine\Data\Loader;
 
-use Liip\ImagineBundle\Imagine\Data\Loader\StreamLoader;
 use Liip\ImagineBundle\Exception\File\Loader\NotLoadableException;
+use Liip\ImagineBundle\Imagine\Data\Loader\StreamLoader;
 use Liip\ImagineBundle\Tests\AbstractTest;
 
 /**

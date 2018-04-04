@@ -11,8 +11,6 @@
 
 namespace Liip\ImagineBundle\Tests\Log\Formatter;
 
-use Liip\ImagineBundle\Tests\AbstractTest;
-use Liip\ImagineBundle\Log\Formatter\FormatInterface;
 use Liip\ImagineBundle\Log\Formatter\SpfFormat;
 
 /**
@@ -31,8 +29,11 @@ class SpfFormatTest extends AbstractFormatTestCase
         }
 
         yield ['[imagine-bundle] [baz-qux] a message with 2 replacements', 'a message with %d %s', [2, 'replacements'], 'baz-qux'];
-        yield ['[imagine-bundle] a message with a complex replacement', 'a message with a %s replacement', [new class {
-            public function __toString() { return 'complex'; }
+        yield ['[imagine-bundle] a message with a complex replacement', 'a message with a %s replacement', [new class() {
+            public function __toString()
+            {
+                return 'complex';
+            }
         }]];
     }
 

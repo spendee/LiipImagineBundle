@@ -12,14 +12,13 @@
 namespace Liip\ImagineBundle\Tests\File\Attributes\Resolver;
 
 use Liip\ImagineBundle\File\Attributes\Attributes;
-use Liip\ImagineBundle\File\FileBlob;
-use Liip\ImagineBundle\File\FilePath;
+use Liip\ImagineBundle\File\Attributes\ContentTypeAttribute;
+use Liip\ImagineBundle\File\Attributes\ExtensionAttribute;
 use Liip\ImagineBundle\File\Attributes\Guesser\ContentTypeGuesser;
 use Liip\ImagineBundle\File\Attributes\Guesser\ExtensionGuesser;
 use Liip\ImagineBundle\File\Attributes\Resolver\FileAttributesResolver;
-use Liip\ImagineBundle\File\Attributes\ContentTypeAttribute;
-use Liip\ImagineBundle\File\Attributes\ExtensionAttribute;
-use Liip\ImagineBundle\File\FileTemp;
+use Liip\ImagineBundle\File\FileBlob;
+use Liip\ImagineBundle\File\FilePath;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser as SymfonyExtensionGuesser;

@@ -43,6 +43,14 @@ final class FileTemp extends AbstractFilePath implements FilePathInterface
     }
 
     /**
+     * Automatically release the temporary file.
+     */
+    public function __destruct()
+    {
+        $this->release();
+    }
+
+    /**
      * @param string|null $name
      * @param string|null $root
      * @param string|null $contents
@@ -58,14 +66,6 @@ final class FileTemp extends AbstractFilePath implements FilePathInterface
         }
 
         return $temporary;
-    }
-
-    /**
-     * Automatically release the temporary file.
-     */
-    public function __destruct()
-    {
-        $this->release();
     }
 
     /**

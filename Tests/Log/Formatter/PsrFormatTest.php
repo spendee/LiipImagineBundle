@@ -29,8 +29,11 @@ class PsrFormatTest extends AbstractFormatTestCase
         }
 
         yield ['[imagine-bundle] [baz-qux] a message with 2 replacements', 'a message with {count} {type}', ['count' => 2, 'type' => 'replacements'], 'baz-qux'];
-        yield ['[imagine-bundle] a message with a complex replacement', 'a message with a {adjective} replacement', ['adjective' => new class {
-            public function __toString() { return 'complex'; }
+        yield ['[imagine-bundle] a message with a complex replacement', 'a message with a {adjective} replacement', ['adjective' => new class() {
+            public function __toString()
+            {
+                return 'complex';
+            }
         }]];
     }
 

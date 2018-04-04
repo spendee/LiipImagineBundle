@@ -59,14 +59,19 @@ abstract class AbstractFormatTestCase extends AbstractTest
     /**
      * @dataProvider provideIndentData
      *
-     * @param string      $expected
-     * @param string      $message
-     * @param int         $indent
+     * @param string $expected
+     * @param string $message
+     * @param int    $indent
      */
     public function testIndent(string $expected, string $message, int $indent = 0): void
     {
         $this->assertSame($expected, static::invokeFormatMethod('indent', $message, $indent));
     }
+
+    /**
+     * @return string
+     */
+    abstract protected static function getFormatFqcn(): string;
 
     /**
      * @param string $method
@@ -77,11 +82,7 @@ abstract class AbstractFormatTestCase extends AbstractTest
     private static function invokeFormatMethod(string $method, ...$arguments): string
     {
         $class = static::getFormatFqcn();
+
         return (new $class())->{$method}(...$arguments);
     }
-
-    /**
-     * @return string
-     */
-    abstract protected static function getFormatFqcn(): string;
 }

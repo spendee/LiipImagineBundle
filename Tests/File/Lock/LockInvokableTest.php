@@ -11,8 +11,8 @@
 
 namespace Liip\ImagineBundle\Tests\File\Lock;
 
-use Liip\ImagineBundle\File\Lock\LockInvokable;
 use Liip\ImagineBundle\File\Lock\LockFactory;
+use Liip\ImagineBundle\File\Lock\LockInvokable;
 use PHPUnit\Framework\TestCase;
 
 /**

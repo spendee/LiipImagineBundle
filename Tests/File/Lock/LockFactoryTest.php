@@ -34,7 +34,7 @@ class LockFactoryTest extends TestCase
 
     public function testCreateLock()
     {
-        for ($i = 0; $i < 10; $i++) {
+        for ($i = 0; $i < 10; ++$i) {
             $lock = LockFactory::create('foo');
             $this->assertInstanceOf(Lock::class, $lock);
             $this->assertFalse($lock->isAcquired());
@@ -44,7 +44,7 @@ class LockFactoryTest extends TestCase
 
     public function testAcquireLock()
     {
-        for ($i = 0; $i < 10; $i++) {
+        for ($i = 0; $i < 10; ++$i) {
             $lock = LockFactory::acquire('foo');
             $this->assertInstanceOf(Lock::class, $lock);
             $this->assertTrue($lock->isAcquired());
@@ -103,7 +103,8 @@ class LockFactoryTest extends TestCase
 
     public function testObjectContexts()
     {
-        $object = new class() {};
+        $object = new class() {
+        };
 
         $lockOne = LockFactory::acquire($object);
         $lockTwo = LockFactory::acquire($object);
@@ -113,6 +114,7 @@ class LockFactoryTest extends TestCase
 
         $object = new class() {
             public static $i = 0;
+
             public function __toString(): string
             {
                 return sprintf('class-string-%d', self::$i++);

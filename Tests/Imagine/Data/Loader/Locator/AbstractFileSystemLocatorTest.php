@@ -11,10 +11,10 @@
 
 namespace Liip\ImagineBundle\Tests\Imagine\Data\Loader\Locator;
 
-use Liip\ImagineBundle\Imagine\Data\Loader\Locator\FileSystemLocator;
-use Liip\ImagineBundle\Imagine\Data\Loader\Locator\LocatorInterface;
 use Liip\ImagineBundle\Exception\File\Loader\NotLoadableException;
 use Liip\ImagineBundle\Exception\InvalidArgumentException;
+use Liip\ImagineBundle\Imagine\Data\Loader\Locator\FileSystemLocator;
+use Liip\ImagineBundle\Imagine\Data\Loader\Locator\LocatorInterface;
 use PHPUnit\Framework\TestCase;
 
 abstract class AbstractFileSystemLocatorTest extends TestCase

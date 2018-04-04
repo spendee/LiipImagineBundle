@@ -317,7 +317,7 @@ class ContentTypeAttribute
      */
     private static function sanitizePrefix(string $prefix = null): ?string
     {
-        if (null === $prefix || in_array($prefix, [self::PREFIX_UNREGISTERED, self::PREFIX_VENDOR, self::PREFIX_PERSONAL])) {
+        if (null === $prefix || in_array($prefix, [self::PREFIX_UNREGISTERED, self::PREFIX_VENDOR, self::PREFIX_PERSONAL], true)) {
             return self::sanitize($prefix);
         }
 
@@ -334,7 +334,7 @@ class ContentTypeAttribute
      */
     private static function sanitizeDeliminator(string $deliminator = null): ?string
     {
-        if (null === $deliminator || in_array($deliminator, ['.', '-'])) {
+        if (null === $deliminator || in_array($deliminator, ['.', '-'], true)) {
             return self::sanitize($deliminator);
         }
 

@@ -11,9 +11,9 @@
 
 namespace Liip\ImagineBundle\Imagine\Data\Loader;
 
-use Liip\ImagineBundle\Imagine\Data\Loader\Locator\LocatorInterface;
 use Liip\ImagineBundle\File\FileInterface;
 use Liip\ImagineBundle\File\FilePath;
+use Liip\ImagineBundle\Imagine\Data\Loader\Locator\LocatorInterface;
 
 class FileSystemLoader implements LoaderInterface
 {

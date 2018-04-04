@@ -43,6 +43,10 @@ class FileReferenceTest extends TestCase
      */
     public function setUp()
     {
+        if (!class_exists(vfsStream::class)) {
+            $this->markTestSkipped(sprintf('Requires "%s"', vfsStream::class));
+        }
+
         parent::setUp();
 
         try {

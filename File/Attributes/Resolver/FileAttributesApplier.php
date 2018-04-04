@@ -12,13 +12,13 @@
 namespace Liip\ImagineBundle\File\Attributes\Resolver;
 
 use Liip\ImagineBundle\Exception\File\Attributes\Resolver\InvalidFileAttributesException;
+use Liip\ImagineBundle\File\Attributes\ContentTypeAttribute;
+use Liip\ImagineBundle\File\Attributes\ExtensionAttribute;
 use Liip\ImagineBundle\File\FileBlob;
 use Liip\ImagineBundle\File\FileBlobInterface;
 use Liip\ImagineBundle\File\FileInterface;
 use Liip\ImagineBundle\File\FilePath;
 use Liip\ImagineBundle\File\FilePathInterface;
-use Liip\ImagineBundle\File\Attributes\ContentTypeAttribute;
-use Liip\ImagineBundle\File\Attributes\ExtensionAttribute;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
 
