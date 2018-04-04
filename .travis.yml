@@ -39,6 +39,7 @@ matrix:
       env: SYMFONY_VERSION=4.0.*
     - php: 7.2
       env:
+        - SYMFONY_VERSION=3.4.*
         - DEPENDENCIES="symfony/phpunit-bridge:^4"
         - COMPOSER_UPDATE_FLAGS="--no-dev"
     - php: 7.2
