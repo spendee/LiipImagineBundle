@@ -22,7 +22,7 @@ Configuration
 Custom
 ~~~~~~
 
-The ``Liip\ImagineBundle\File\Loader\StreamLoader`` allows to read images
+The ``Liip\ImagineBundle\Imagine\Data\Loader\StreamLoader`` allows to read images
 from any stream (http, ftp, and others…)  registered thus allowing you to serve your images from
 literally anywhere.
 
@@ -40,7 +40,7 @@ If you are using the `KnpGaufretteBundle`_ you can make use of the
 
     services:
         acme.liip_imagine.binary.loader.stream.profile_photos:
-            class: Liip\ImagineBundle\File\Loader\StreamLoader
+            class: Liip\ImagineBundle\Imagine\Data\Loader\StreamLoader
             arguments:
                 - 'gaufrette://profile_photos/'
             tags:

@@ -40,7 +40,7 @@ class FilterConfiguration
     public function get($filter)
     {
         if (false === array_key_exists($filter, $this->filters)) {
-            throw new NonExistingFilterException(sprintf('Could not find configuration for a filter: %s', $filter));
+            throw new NonExistingFilterException('Could not find configuration for a filter: %s', $filter);
         }
 
         return $this->filters[$filter];

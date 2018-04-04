@@ -9,6 +9,72 @@ given release.
 
 ## [Unreleased](https://github.com/liip/LiipImagineBundle/blob/2.0/CHANGELOG.md#unreleased)
 
+  - __[Dependency Injection]__ __[Logger]__ You can now use the `Psr\Log\LoggerAwareTrait` trait in your own filters,
+  resolvers, etc by tagging the service with `liip_imagine.logger_aware`, which will cause the `logger` service to
+  automatically be injected via your service's `setLogger()` method. _Note that `null` will be injected if the `logger`
+  service is unavailable._
+
+  - __[Dependency Injection]__ __[File Attributes]__ You can now implement and automatically register your own "content
+  type" and "extension" attribute guessers by defining a service and tagging it with either
+  `liip_imagine.file_attributes.guesser.extension` (for extension guessers) or
+  `liip_imagine.file_attributes.guesser.content_type` (for content type guessers). Note that extension guessers must
+  implement `Liip\ImagineBundle\File\Attributes\Guesser\ExtensionGuesserInterface` or
+  `Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesserInterface` and content type guessers must implement
+  `Liip\ImagineBundle\File\Attributes\Guesser\ContentTypeGuesserInterface` or
+  `Symfony\Component\HttpFoundation\File\MimeType\MimeTypeGuesserInterface`.
+  
+  - __[File Attributes]__
+
+  - __[File]__ __[BC BREAK]__ The `BinaryInterface` abstraction and related implementations have been removed and replaced
+  by `FileInterface`, a new file abstraction with three concrete implementations: `FileBlob` for passing around file
+  content, `FilePath` for passing around a file path, and `FileTemp` for working with temporary files that automatically
+  release themselves from disk.
+
+  - __[File]__ __[BC BREAK]__ The `SimpleMimeTypeGuesser` implementation has been removed and folded into the functionality
+  of the new `Liip\ImagineBundle\File\Attributes\Resolver\FileAttributesResolver` service as
+  `liip_imagine.file_attributes.resolver`.
+
+  - __[Data Loader]__ __[BC BREAK]__ The `LoaderInterface::find()` method must now return a `FileInterface` instead of a
+  string. Additionally, all data loaders that previously required a `ExtensionGuesserInterface` and/or
+  `ContentTypeGuesserInterface` to be passed to their `__construct()` method pass these class instances. Instead, there
+  is no longer any need to resolve file attributes (its content-type and extension) manually by yourself within a loader
+  implementation: moving forward you must return a `FileInterface` instance (one of `FileBlob` or `FilePath`) with as
+  much attribute data set as is available to you. All other attributes will be automatically resolved and applied by
+  the data loader manager.
+  
+  - __[Exceptions]__ The following new exceptions have been implemented and you can expect them to be thrown in certain
+  situations (all exceptions continue to implement `ExtensionInterface`):
+    - `Liip\ImagineBundle\Exception\File\Attributes\Resolver\InvalidFileAttributesException`
+    - `Liip\ImagineBundle\Exception\File\FileOperationException`
+    - `Liip\ImagineBundle\Imagine\Data\InvalidFileFoundException`
+
+  - __[Global]__ __\[BC BREAK\]__ Method _parameter types_ and _return types_ have been added to the following
+  classes and interfaces:
+    - `AbstractDoctrineLoader`
+    - `FileSystemLoader`
+    - `FlysystemLoader`
+    - `LoaderInterface`
+    - `StreamLoader`
+    - `ImagineController`
+    - `FiltersCompilersPass`
+    - `LoadersCompilersPass`
+    - `PostProcessorsCompilersPass`
+    - `ResolversCompilersPass`
+    - `Configuration`
+    - `FactoryInterface`
+    - `AbstractLoaderFactory`
+    - `FileSystemLoaderFactory`
+    - `FlysystemLoaderFactory`
+    - `StreamLoaderFactory`
+    - `AbstractResolverFactory`
+    - `AwsS3ResolverFactory`
+    - `FlystystemResolverFactory`
+    - `WebPathResolverFactory`
+    - `LiipImagineExtension`
+    - `CacheResolveEvent`
+    - `EventsInterface`
+    - ``
+
   - __[Post Processor]__  __\[BC BREAK\]__ The `PostProcessorConfigurablePostProcessorInterface` interface has been completely removed
   and the `PostProcessorInterface` interface has been updated to allow passing the configuration array to its
   `process` method as the second parameter. The `PostProcessorInterface::process()` now implements the following
@@ -41,7 +107,7 @@ given release.
 
   - __[Data Loader]__ The `FileSystemLoader::__construct()` method signature has changed in accordance with the prior
   deprecation notice; the third parameter must be of signature
-  `\Liip\ImagineBundle\Binary\Locator\LocatorInterface $locator` and the fourth parameter must be of signature
+  `\Liip\ImagineBundle\Imagine\Data\Loader\Locator\LocatorInterface $locator` and the fourth parameter must be of signature
   `array $dataRoots`.
 
   - __[Data Loader]__ The `GridFSLoader` data loader has been removed as the required
@@ -56,7 +122,7 @@ given release.
   [service decoration](http://symfony.com/doc/current/service_container/service_decoration.html).
 
   - __[Data Transformer]__ The data transformer interface
-  (`\Liip\ImagineBundle\Imagine\Data\Transforme\TransformerInterface`) was deprecated in version `1.x` and has been
+  (`\Liip\ImagineBundle\Imagine\Data\Transformer\TransformerInterface`) was deprecated in version `1.x` and has been
   removed.
 
   - __[Templating]__ The imagine extension `\Liip\ImagineBundle\Templating\ImagineExtension` has been renamed to
@@ -202,7 +268,7 @@ given release.
     impossible) to setup.
 
   - __[Deprecation]__ __[Data Loader]__ Instantiating `FileSystemLoader` without providing a forth constructor argument
-  of signature `\Liip\ImagineBundle\Binary\Locator\LocatorInterface $locator` is deprecated and the ability to do so
+  of signature `\Liip\ImagineBundle\Imagine\Data\Loader\Locator\LocatorInterface $locator` is deprecated and the ability to do so
   will be removed in the next major release, `2.0`.
 
   - __[Configuration]__ The `liip_imagine.loaders.default.filesystem.locator` bundle configuration option has been
@@ -406,10 +472,10 @@ given release.
     `liip_imagine.binary.loader.stream.class`
 
   - __[Data Loader]__ Service id `liip_imagine.data.loader.prototype.filesystem` changed to 
-    `liip_imagine.binary.loader.prototype.filesystem`
+    `liip_imagine.binary.loader.filesystem.prototype`
 
   - __[Data Loader]__ Service id `liip_imagine.data.loader.prototype.stream` changed to 
-    `liip_imagine.binary.loader.prototype.stream`
+    `liip_imagine.binary.loader.stream.prototype`
 
   - __[Filter]__ `FilterManager::applyFilter` now return instance of `BinaryInterface`.
 

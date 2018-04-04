@@ -11,8 +11,8 @@
 
 namespace Liip\ImagineBundle\Exception\File\Loader;
 
-use Liip\ImagineBundle\Exception\ExceptionInterface;
+use Liip\ImagineBundle\Exception\File\FileOperationException;
 
-class NotLoadableException extends \RuntimeException implements ExceptionInterface
+class NotLoadableException extends FileOperationException
 {
 }

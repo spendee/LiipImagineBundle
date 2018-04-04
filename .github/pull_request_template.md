@@ -1,14 +1,14 @@
 | Q | A
 | --- | ---
-| Branch? | 1.0 or 2.0 <!--choose version number-->
-| Bug fix? | yes/no
-| New feature? | yes/no
-| BC breaks? | yes/no
-| Deprecations? | yes/no
-| Tests pass? | yes/no
-| Fixed tickets | <!-- #-pre-fixed issue number(s), if any -->
+| Branch | x.y
+| Bug Fix | yes/no
+| New Feature | yes/no
+| BC Breaks | yes/no
+| Deprecations | yes/no
+| Tests Pass | yes/no
+| Fixed Tickets | <!-- list any issues fixed by this PR, if any -->
 | License | MIT
-| Doc PR | <!--highly recommended for new features-->
+| Docs | Included <!-- highly recommended for new features -->
 
 <!--
 - Please take a moment to complete the template above by answering

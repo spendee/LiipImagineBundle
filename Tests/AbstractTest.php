@@ -14,7 +14,7 @@ namespace Liip\ImagineBundle\Tests;
 use Imagine\Image\ImageInterface;
 use Imagine\Image\ImagineInterface;
 use Imagine\Image\Metadata\MetadataBag;
-use Liip\ImagineBundle\File\Loader\LoaderInterface;
+use Liip\ImagineBundle\Imagine\Data\Loader\LoaderInterface;
 use Liip\ImagineBundle\File\Attributes\Guesser\ContentTypeGuesser;
 use Liip\ImagineBundle\File\Attributes\Guesser\ContentTypeGuesserInterface;
 use Liip\ImagineBundle\File\Attributes\Guesser\ExtensionGuesser;
@@ -28,7 +28,7 @@ use Liip\ImagineBundle\Imagine\Filter\FilterConfiguration;
 use Liip\ImagineBundle\Imagine\Filter\FilterManager;
 use Liip\ImagineBundle\Imagine\Filter\PostProcessor\PostProcessorInterface;
 use Liip\ImagineBundle\Log\Logger;
-use Liip\ImagineBundle\Service\FilterService;
+use Liip\ImagineBundle\Imagine\ImagineService;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -235,11 +235,11 @@ abstract class AbstractTest extends TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|FilterService
+     * @return \PHPUnit_Framework_MockObject_MockObject|ImagineService
      */
     protected function createFilterServiceMock()
     {
-        return $this->createObjectMock(FilterService::class);
+        return $this->createObjectMock(ImagineService::class);
     }
 
     /**

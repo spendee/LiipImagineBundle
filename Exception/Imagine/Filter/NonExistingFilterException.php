@@ -11,8 +11,8 @@
 
 namespace Liip\ImagineBundle\Exception\Imagine\Filter;
 
-use Liip\ImagineBundle\Exception\ExceptionInterface;
+use Liip\ImagineBundle\Exception\RuntimeException;
 
-class NonExistingFilterException extends \RuntimeException implements ExceptionInterface
+class NonExistingFilterException extends RuntimeException
 {
 }

@@ -1,10 +1,10 @@
 | Q | A
 | --- | ---
-| Bug Report? | yes/no
-| Feature Request? | yes/no
-| BC Break Report? | yes/no
-| RFC? | yes/no
-| Imagine Bundle Version | x.y.z
+| Bug Report | yes/no
+| Feature Request | yes/no
+| BC Break Report | yes/no
+| RFC | yes/no
+| Imagine Version | x.y.z
 
 <!--
 - Please take a moment to complete the template above by answering

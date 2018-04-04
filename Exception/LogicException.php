@@ -11,6 +11,8 @@
 
 namespace Liip\ImagineBundle\Exception;
 
-class LogicException extends \LogicException implements ExceptionInterface
+use SR\Exception\Logic\LogicException as BaseLogicException;
+
+class LogicException extends BaseLogicException implements ExceptionInterface
 {
 }

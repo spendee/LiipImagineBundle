@@ -11,8 +11,8 @@
 
 namespace Liip\ImagineBundle\Exception\Imagine\Data;
 
-use Liip\ImagineBundle\Exception\ExceptionInterface;
+use Liip\ImagineBundle\Exception\InvalidArgumentException;
 
-class InvalidFileFoundException extends \LogicException implements ExceptionInterface
+class InvalidFileFoundException extends InvalidArgumentException
 {
 }

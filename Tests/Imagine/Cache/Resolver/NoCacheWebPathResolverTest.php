@@ -38,7 +38,7 @@ class NoCacheWebPathResolverTest extends AbstractTest
     public function testDoNothingOnStore()
     {
         $resolver = new NoCacheWebPathResolver(new RequestContext());
-        $resolver->store(FileBlob::create('aContent', 'image/jpeg', 'jpeg'), 'a/path', 'aFilter');
+        $this->assertNull($resolver->store(FileBlob::create('aContent', 'image/jpeg', 'jpeg'), 'a/path', 'aFilter'));
     }
 
     public function testDoNothingForPathAndFilterOnRemove()

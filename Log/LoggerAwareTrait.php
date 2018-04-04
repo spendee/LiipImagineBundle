@@ -11,23 +11,37 @@
 
 namespace Liip\ImagineBundle\Log;
 
-use Psr\Log\LoggerInterface;
-
 /**
  * @author Rob Frawley 2nd <rmf@src.run>
  */
 trait LoggerAwareTrait
 {
     /**
-     * @var LoggerInterface
+     * @var Logger|null
      */
     protected $logger;
 
     /**
-     * @param Logger $logger
+     * @return Logger|null
      */
-    public function setLogger(Logger $logger): void
+    public function getLogger(): ?Logger
+    {
+        return $this->logger;
+    }
+
+    /**
+     * @param Logger|null $logger
+     */
+    public function setLogger(Logger $logger = null): void
     {
         $this->logger = $logger;
+    }
+
+    /**
+     * @param Logger|null $logger
+     */
+    public function requireSetLogger(Logger $logger = null): void
+    {
+        $this->logger = $logger ?: new Logger();
     }
 }

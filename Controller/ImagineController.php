@@ -16,7 +16,7 @@ use Liip\ImagineBundle\Exception\File\Loader\NotLoadableException;
 use Liip\ImagineBundle\Exception\Imagine\Filter\NonExistingFilterException;
 use Liip\ImagineBundle\Imagine\Cache\SignerInterface;
 use Liip\ImagineBundle\Imagine\Data\DataManager;
-use Liip\ImagineBundle\Service\FilterService;
+use Liip\ImagineBundle\Imagine\ImagineService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -25,7 +25,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class ImagineController
 {
     /**
-     * @var FilterService
+     * @var \Liip\ImagineBundle\Imagine\ImagineService
      */
     private $filterService;
 
@@ -40,11 +40,11 @@ class ImagineController
     private $signer;
 
     /**
-     * @param FilterService   $filterService
+     * @param ImagineService  $filterService
      * @param DataManager     $dataManager
      * @param SignerInterface $signer
      */
-    public function __construct(FilterService $filterService, DataManager $dataManager, SignerInterface $signer)
+    public function __construct(ImagineService $filterService, DataManager $dataManager, SignerInterface $signer)
     {
         $this->filterService = $filterService;
         $this->dataManager = $dataManager;

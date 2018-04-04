@@ -11,8 +11,8 @@
 
 namespace Liip\ImagineBundle\Exception\File;
 
-use Liip\ImagineBundle\Exception\ExceptionInterface;
+use Liip\ImagineBundle\Exception\RuntimeException;
 
-class FileOperationException extends \RuntimeException implements ExceptionInterface
+class FileOperationException extends RuntimeException
 {
 }

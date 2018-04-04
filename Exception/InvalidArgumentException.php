@@ -11,6 +11,8 @@
 
 namespace Liip\ImagineBundle\Exception;
 
-class InvalidArgumentException extends \InvalidArgumentException implements ExceptionInterface
+use SR\Exception\Logic\InvalidArgumentException as BaseInvalidArgumentException;
+
+class InvalidArgumentException extends BaseInvalidArgumentException implements ExceptionInterface
 {
 }

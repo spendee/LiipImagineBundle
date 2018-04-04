@@ -204,9 +204,9 @@ class AwsS3Resolver implements ResolverInterface
                 'exception' => $exception,
             ]);
 
-            throw new NotStorableException(sprintf(
-                'The object "%s" could not be created on AWS S3 bucket "%s".', $path, $this->bucket
-            ), null, $exception);
+            throw new NotStorableException(
+                'The object "%s" could not be created on AWS S3 bucket "%s".', $path, $this->bucket, $exception
+            );
         }
     }
 

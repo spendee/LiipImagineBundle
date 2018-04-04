@@ -321,10 +321,10 @@ class ContentTypeAttribute
             return self::sanitize($prefix);
         }
 
-        throw new InvalidArgumentException(sprintf(
+        throw new InvalidArgumentException(
             'Invalid mime type prefix "%s" provided (accepted values are "%s", "%s", and "%s").', $prefix,
             self::PREFIX_UNREGISTERED, self::PREFIX_VENDOR, self::PREFIX_PERSONAL
-        ));
+        );
     }
 
     /**
@@ -338,8 +338,8 @@ class ContentTypeAttribute
             return self::sanitize($deliminator);
         }
 
-        throw new InvalidArgumentException(sprintf(
+        throw new InvalidArgumentException(
             'Invalid mime type deliminator "%s" provided (accepted values are "." and "-").', $deliminator
-        ));
+        );
     }
 }

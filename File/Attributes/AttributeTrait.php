@@ -80,9 +80,9 @@ trait AttributeTrait
             return $string;
         }
 
-        throw new InvalidArgumentException(sprintf(
+        throw new InvalidArgumentException(
             'Invalid character(s) "%s" provided in "%s" (accepted values are "[a-z0-9\.-]").',
             $matches['characters'], $string
-        ));
+        );
     }
 }

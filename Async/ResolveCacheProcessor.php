@@ -20,7 +20,7 @@ use Interop\Queue\PsrContext;
 use Interop\Queue\PsrMessage;
 use Interop\Queue\PsrProcessor;
 use Liip\ImagineBundle\Imagine\Filter\FilterManager;
-use Liip\ImagineBundle\Service\FilterService;
+use Liip\ImagineBundle\Imagine\ImagineService;
 
 final class ResolveCacheProcessor implements PsrProcessor, CommandSubscriberInterface, QueueSubscriberInterface
 {
@@ -30,7 +30,7 @@ final class ResolveCacheProcessor implements PsrProcessor, CommandSubscriberInte
     private $filterManager;
 
     /**
-     * @var FilterService
+     * @var \Liip\ImagineBundle\Imagine\ImagineService
      */
     private $filterService;
 
@@ -41,10 +41,10 @@ final class ResolveCacheProcessor implements PsrProcessor, CommandSubscriberInte
 
     /**
      * @param FilterManager     $filterManager
-     * @param FilterService     $filterService
+     * @param ImagineService    $filterService
      * @param ProducerInterface $producer
      */
-    public function __construct(FilterManager $filterManager, FilterService $filterService, ProducerInterface $producer)
+    public function __construct(FilterManager $filterManager, ImagineService $filterService, ProducerInterface $producer)
     {
         $this->filterManager = $filterManager;
         $this->filterService = $filterService;

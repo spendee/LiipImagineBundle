@@ -59,7 +59,7 @@
             <argument>%liip_imagine.filter_sets%</argument>
         </service>
 
-        <service id="liip_imagine.service.filter" class="Liip\ImagineBundle\Service\FilterService">
+        <service id="liip_imagine.service.filter" class="Liip\ImagineBundle\Imagine\ImagineService">
             <argument type="service" id="liip_imagine.data.manager" />
             <argument type="service" id="liip_imagine.filter.manager" />
             <argument type="service" id="liip_imagine.cache.manager" />
@@ -171,27 +171,27 @@
 
         <!-- Data loaders -->
 
-        <service id="liip_imagine.binary.loader.filesystem.prototype" class="Liip\ImagineBundle\File\Loader\FileSystemLoader">
+        <service id="liip_imagine.binary.loader.filesystem.prototype" class="Liip\ImagineBundle\Imagine\Data\Loader\FileSystemLoader">
             <argument><!-- will be injected by FileSystemLoaderFactory --></argument>
         </service>
 
-        <service id="liip_imagine.binary.loader.stream.prototype" class="Liip\ImagineBundle\File\Loader\StreamLoader">
+        <service id="liip_imagine.binary.loader.stream.prototype" class="Liip\ImagineBundle\Imagine\Data\Loader\StreamLoader">
             <argument><!-- will be injected by StreamLoaderFactory --></argument>
             <argument><!-- will be injected by StreamLoaderFactory --></argument>
         </service>
 
-        <service id="liip_imagine.binary.loader.flysystem.prototype" class="Liip\ImagineBundle\File\Loader\FlysystemLoader" abstract="true">
+        <service id="liip_imagine.binary.loader.flysystem.prototype" class="Liip\ImagineBundle\Imagine\Data\Loader\FlysystemLoader" abstract="true">
             <argument><!-- will be injected by FlysystemLoaderFactory --></argument>
         </service>
 
         <!-- Data loader locators -->
 
-        <service id="liip_imagine.binary.locator.filesystem" class="Liip\ImagineBundle\File\Loader\Locator\FileSystemLocator" shared="false">
+        <service id="liip_imagine.binary.locator.filesystem" class="Liip\ImagineBundle\Imagine\Data\Loader\Locator\FileSystemLocator" shared="false">
             <argument><!-- will be injected by FilesystemLoaderFactory --></argument>
             <tag name="liip_imagine.binary.locator" shared="false" />
         </service>
 
-        <service id="liip_imagine.binary.locator.filesystem_insecure" class="Liip\ImagineBundle\File\Loader\Locator\FileSystemInsecureLocator" shared="false">
+        <service id="liip_imagine.binary.locator.filesystem_insecure" class="Liip\ImagineBundle\Imagine\Data\Loader\Locator\FileSystemInsecureLocator" shared="false">
             <argument><!-- will be injected by FilesystemLoaderFactory --></argument>
             <tag name="liip_imagine.binary.locator" shared="false" />
         </service>

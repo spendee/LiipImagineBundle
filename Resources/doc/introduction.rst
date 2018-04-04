@@ -17,13 +17,13 @@ Retrieving the original image
 The first step is to retrieve the original image, the one you address.
 
 In order to retrieve such an image, there are so-called ``DataLoader`` those
-implement the ``Liip\ImagineBundle\File\Loader\LoaderInterface``. Those
+implement the ``Liip\ImagineBundle\Imagine\Data\Loader\LoaderInterface``. Those
 loaders are typically managed by the ``DataManager`` and automatically wired
 with it, using dependency injection.
 
 How a specific ``DataLoader`` retrieves the image, is up to the loader. The most
 simple way is to read a file from the local filesystem. This is implemented by
-the ``Liip\ImagineBundle\File\Loader\FileSystemLoader``, which is set by
+the ``Liip\ImagineBundle\Imagine\Data\Loader\FileSystemLoader``, which is set by
 default. You could also create a random image on the fly using drawing
 utilities, or read a binary stream from any stream registered.
 

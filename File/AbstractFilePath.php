@@ -13,7 +13,7 @@ namespace Liip\ImagineBundle\File;
 
 use Liip\ImagineBundle\Exception\File\FileOperationException;
 use Liip\ImagineBundle\File\Lock\LockInvokable;
-use Liip\ImagineBundle\Utility\Interpreter\Interpreter;
+use SR\Interpreter\Interpreter;
 
 /**
  * @internal
@@ -83,9 +83,9 @@ abstract class AbstractFilePath extends AbstractFileBlob
     {
         LockInvokable::blocking($this, function (): void {
             if ($this->fileExists() && (false === $this->isFileWritable() || false === @unlink($this->getFile()->getPathname()))) {
-                throw new FileOperationException(sprintf(
-                    'Failed to remove file "%s": %s', $this->file->getPathname(), Interpreter::error()->message()
-                ));
+                throw new FileOperationException(
+                    'Failed to remove file "%s": %s', $this->file->getPathname(), Interpreter::error()->text()
+                );
             }
         });
 
@@ -132,9 +132,9 @@ abstract class AbstractFilePath extends AbstractFileBlob
     protected static function makePathIfNotExists(string $path): string
     {
         if (false === is_dir($path) && false === @mkdir($path, 0777, true) && false === is_dir($path)) {
-            throw new FileOperationException(sprintf(
-                'Failed to create file "%s": %s', $path, Interpreter::error()->message()
-            ));
+            throw new FileOperationException(
+                'Failed to create file "%s": %s', $path, Interpreter::error()->text()
+            );
         }
 
         if (false !== $real = @realpath($path)) {
@@ -152,9 +152,9 @@ abstract class AbstractFilePath extends AbstractFileBlob
     private static function dumpContentsForFile(string $file, string $contents, bool $append): void
     {
         if (false === @file_put_contents($file, $contents, $append ? FILE_APPEND : 0)) {
-            throw new FileOperationException(sprintf(
-                'Failed to write contents of "%s": %s.', $file, Interpreter::error()->message()
-            ));
+            throw new FileOperationException(
+                'Failed to write contents of "%s": %s.', $file, Interpreter::error()->text()
+            );
         }
     }
 }

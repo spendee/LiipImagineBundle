@@ -11,8 +11,8 @@
 
 namespace Liip\ImagineBundle\Exception\Imagine\Cache\Resolver;
 
-use Liip\ImagineBundle\Exception\ExceptionInterface;
+use Liip\ImagineBundle\Exception\RuntimeException;
 
-class NotStorableException extends \RuntimeException implements ExceptionInterface
+class NotStorableException extends RuntimeException
 {
 }

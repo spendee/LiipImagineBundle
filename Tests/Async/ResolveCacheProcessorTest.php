@@ -22,7 +22,7 @@ use Liip\ImagineBundle\Async\ResolveCacheProcessor;
 use Liip\ImagineBundle\Async\Topics;
 use Liip\ImagineBundle\File\FileBlob;
 use Liip\ImagineBundle\Imagine\Filter\FilterConfiguration;
-use Liip\ImagineBundle\Service\FilterService;
+use Liip\ImagineBundle\Imagine\ImagineService;
 use Liip\ImagineBundle\Tests\AbstractTest;
 
 /**
@@ -435,7 +435,7 @@ class ResolveCacheProcessorTest extends AbstractTest
             ->method('find')
             ->willReturn($this->createDummyBinary());
 
-        $filterService = new FilterService(
+        $filterService = new ImagineService(
             $dataManagerMock,
             $filterManagerMock,
             $cacheManagerMock

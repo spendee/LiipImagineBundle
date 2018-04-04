@@ -105,10 +105,10 @@ class AttributeGuessersCompilerPass extends AbstractCompilerPass
         });
 
         if (empty($interfaces)) {
-            throw new InvalidArgumentException(sprintf(
+            throw new InvalidArgumentException(
                 'Class "%s" used for %s guesser service "%s" must implement one of "%s".',
                 $reflection->getName(), $context, (string) $guesser, implode(', ', $interfaces)
-            ));
+            );
         }
 
         $proxy->addMethodCall('register', [$guesser]);
@@ -144,8 +144,6 @@ class AttributeGuessersCompilerPass extends AbstractCompilerPass
             return $reflection;
         }
 
-        throw new InvalidArgumentException(sprintf(
-            'Class "%s" used for service "%s" cannot be found.', $class, $id
-        ));
+        throw new InvalidArgumentException('Class "%s" used for service "%s" cannot be found.', $class, $id);
     }
 }

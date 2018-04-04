@@ -12,7 +12,7 @@
 namespace Liip\ImagineBundle\Command;
 
 use Liip\ImagineBundle\Imagine\Filter\FilterManager;
-use Liip\ImagineBundle\Service\FilterService;
+use Liip\ImagineBundle\Imagine\ImagineService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -24,10 +24,10 @@ class ResolveCacheCommand extends Command
     /* @var FilterManager $filterManager */
     private $filterManager;
 
-    /* @var FilterService $filterService */
+    /* @var \Liip\ImagineBundle\Imagine\ImagineService $filterService */
     private $filterService;
 
-    public function __construct(FilterManager $filterManager, FilterService $filterService)
+    public function __construct(FilterManager $filterManager, ImagineService $filterService)
     {
         $this->filterManager = $filterManager;
         $this->filterService = $filterService;

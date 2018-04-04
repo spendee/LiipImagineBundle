@@ -43,6 +43,24 @@ final class FileTemp extends AbstractFilePath implements FilePathInterface
     }
 
     /**
+     * @param string|null $name
+     * @param string|null $root
+     * @param string|null $contents
+     *
+     * @return self
+     */
+    public static function create(string $name = null, string $root = null, string $contents = null): self
+    {
+        $temporary = new self($name, $root);
+
+        if (null !== $contents) {
+            $temporary->setContents($contents);
+        }
+
+        return $temporary;
+    }
+
+    /**
      * Automatically release the temporary file.
      */
     public function __destruct()
@@ -112,9 +130,9 @@ final class FileTemp extends AbstractFilePath implements FilePathInterface
                 return new \SplFileInfo($file);
             }
 
-            throw new FileOperationException(sprintf(
+            throw new FileOperationException(
                 'Failed to acquire temporary file in "%s": %s.', $this->getRoot(), Interpreter::error()->message()
-            ));
+            );
         });
 
         return $this;
@@ -159,7 +177,7 @@ final class FileTemp extends AbstractFilePath implements FilePathInterface
     private function requireReleasedState(string $message): void
     {
         if ($this->isAcquired()) {
-            throw new FileOperationException(sprintf('Temporary file must be released first: %s', $message));
+            throw new FileOperationException('Temporary file must be released first: %s', $message);
         }
     }
 }

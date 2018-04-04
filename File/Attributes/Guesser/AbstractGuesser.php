@@ -33,9 +33,9 @@ abstract class AbstractGuesser
     public function register($guesser): void
     {
         if (!static::isSupportedGuesser($guesser)) {
-            throw new InvalidArgumentException(sprintf(
+            throw new InvalidArgumentException(
                 'Invalid guesser type "%s" provided for "%s".', get_class($guesser), get_called_class()
-            ));
+            );
         }
 
         array_unshift($this->guessers, $guesser);

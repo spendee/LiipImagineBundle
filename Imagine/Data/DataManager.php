@@ -11,7 +11,7 @@
 
 namespace Liip\ImagineBundle\Imagine\Data;
 
-use Liip\ImagineBundle\File\Loader\LoaderInterface;
+use Liip\ImagineBundle\Imagine\Data\Loader\LoaderInterface;
 use Liip\ImagineBundle\Exception\File\Attributes\Resolver\InvalidFileAttributesException;
 use Liip\ImagineBundle\Exception\Imagine\Data\InvalidFileFoundException;
 use Liip\ImagineBundle\File\FileBlob;
@@ -118,14 +118,14 @@ class DataManager
         try {
             $file = $this->fileAttributes->apply($file);
         } catch (InvalidFileAttributesException $e) {
-            throw new InvalidFileFoundException(sprintf('Invalid attributes resolved for "%s".', $path), 0, $e);
+            throw new InvalidFileFoundException('Invalid attributes resolved for "%s".', $path, $e);
         }
 
         if (!$file->getContentType()->isMatch('image')) {
-            throw new InvalidFileFoundException(sprintf(
+            throw new InvalidFileFoundException(
                 'Invalid content type attribute "%s" for "%s" (expected primary content type "image" but got "%s").',
                 $file->getContentType()->stringify(), $path, $file->getContentType()->getType() ?: 'null'
-            ));
+            );
         }
 
         return $file;
