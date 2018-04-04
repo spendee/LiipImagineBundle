@@ -333,6 +333,10 @@ class AwsS3ResolverTest extends AbstractTest
 
     public function testCatchAndLogExceptionsForPathAndFilterOnRemove()
     {
+        if (!class_exists(S3Exception::class)) {
+            $this->markTestSkipped(sprintf('Requires "S3Exception"'));
+        }
+
         $s3 = $this->getS3ClientMock();
         $s3
             ->expects($this->once())
@@ -392,6 +396,10 @@ class AwsS3ResolverTest extends AbstractTest
 
     public function testCatchAndLogExceptionForFilterOnRemove()
     {
+        if (!class_exists(S3Exception::class)) {
+            $this->markTestSkipped(sprintf('Requires "S3Exception"'));
+        }
+        
         $expectedBucket = 'images.example.com';
         $expectedFilter = 'theFilter';
 
